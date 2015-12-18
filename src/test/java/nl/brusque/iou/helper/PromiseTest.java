@@ -8,6 +8,10 @@ import java.util.TimerTask;
 
 public class PromiseTest {
     private class TestPromise extends AbstractPromise<IPromise, TestFulfillable, TestRejectable> {
+        public TestPromise() {
+            super(TestFulfillable.class, TestRejectable.class);
+        }
+
         @Override
         public AbstractPromise<IPromise, TestFulfillable, TestRejectable> create() {
             return new TestPromise();

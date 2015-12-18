@@ -35,9 +35,13 @@ class EventDispatcher {
 
     public synchronized void queue(IEvent event) {
         _eventQueue.add(event);
+
+        synchronized (_looper) {
+            _looper.notify();
+        }
     }
 
-    private synchronized IEvent dequeue() {
+    private IEvent dequeue() {
         if (_eventQueue.isEmpty()) {
             return null;
         }
@@ -45,7 +49,7 @@ class EventDispatcher {
         return _eventQueue.remove();
     }
 
-    private synchronized void process(IEvent event) {
+    private void process(IEvent event) {
         Class<? extends IEvent> clazz = event.getClass();
         if (!_eventListeners.containsKey(clazz)) {
             return;
@@ -59,6 +63,14 @@ class EventDispatcher {
     private void processNextEvent() {
         IEvent event = dequeue();
         if (event == null) {
+            synchronized (_looper) {
+                try {
+                    _looper.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return;
         }
 
