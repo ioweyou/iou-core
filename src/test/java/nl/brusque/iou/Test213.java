@@ -1,12 +1,9 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.TestFulfillable;
-import nl.brusque.iou.helper.PromiseTest;
-import nl.brusque.iou.helper.TestRejectable;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Test213 extends PromiseTest {
+public class Test213 extends TestBase {
     @Test
     public void test2131WhenRejectedAPromiseMustNotTransitionToAnyOtherState() {
         describe("2.1.3.1: When rejected, a promise: must not transition to any other state.", new Runnable() {

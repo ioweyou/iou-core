@@ -1,6 +1,6 @@
-package nl.brusque.iou.helper;
+package nl.brusque.iou;
 
-public interface ISpy {
+interface ISpy {
     int getCallCount();
     Object getCalledWith();
     Object call(Object o) throws Exception;

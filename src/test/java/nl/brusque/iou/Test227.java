@@ -1,15 +1,11 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.TestFulfillable;
-import nl.brusque.iou.helper.PromiseTest;
-import nl.brusque.iou.helper.TestRejectable;
-import nl.brusque.iou.helper.Testable;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 
-public class Test227 extends PromiseTest {
+public class Test227 extends TestBase {
     @Test
     public void test227ThenMustReturnAPromise() {
         describe("2.2.7: `then` must return a promise: `promise2 = promise1.then(onFulfilled, onRejected)`", new Runnable() {
@@ -31,7 +27,7 @@ public class Test227 extends PromiseTest {
                 specify("is a promise", new Runnable() {
                     @Override
                     public void run() {
-                        IPromise promise1 = deferred().getPromise();
+                        AbstractPromise promise1 = deferred().getPromise();
                         Object promise2 = promise1.then();
 
                         Assert.assertFalse("AndroidPromise should not be null", promise2 == null);
@@ -47,7 +43,7 @@ public class Test227 extends PromiseTest {
                                 testFulfilled(dummy, new Testable() {
                                     @Override
                                     public void run() {
-                                        final IPromise promise1 = getPromise();
+                                        final AbstractPromise promise1 = getPromise();
 
                                         IThenable promise2 = promise1.then(new TestFulfillable() {
                                             @Override
@@ -72,7 +68,7 @@ public class Test227 extends PromiseTest {
                                 testRejected(dummy, new Testable() {
                                     @Override
                                     public void run() {
-                                        IPromise promise1 = getPromise();
+                                        AbstractPromise promise1 = getPromise();
 
                                         IThenable promise2 = promise1.then(null, new TestRejectable() {
                                             @Override

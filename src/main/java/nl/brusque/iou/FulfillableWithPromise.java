@@ -1,10 +1,6 @@
-package nl.brusque.iou.promise;
+package nl.brusque.iou;
 
-import nl.brusque.iou.IFulfillable;
-import nl.brusque.iou.IPromise;
-import nl.brusque.iou.IRejectable;
-
-class FulfillableWithPromise<TResult extends IPromise, TFulfillable extends IFulfillable, TRejectable extends IRejectable> {
+class FulfillableWithPromise<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> {
     private final AbstractPromise<TResult, TFulfillable, TRejectable> _promise;
     private final TFulfillable _fulfillable;
 

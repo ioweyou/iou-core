@@ -1,16 +1,8 @@
-package nl.brusque.iou.promise;
-
-import nl.brusque.iou.IFulfillable;
-import nl.brusque.iou.IPromise;
-import nl.brusque.iou.IRejectable;
-import nl.brusque.iou.promise.eventdispatcher.events.FireFulfillsEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.FireRejectsEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.FulfillEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.RejectEvent;
+package nl.brusque.iou;
 
 import java.util.ArrayDeque;
 
-class PromiseResolverEventHandler<TResult extends IPromise, TFulfillable extends IFulfillable, TRejectable extends IRejectable> {
+class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
 
@@ -47,7 +39,7 @@ class PromiseResolverEventHandler<TResult extends IPromise, TFulfillable extends
         eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
     }
 
-    public synchronized void resolvePromiseValue(IPromise promise) {
+    public synchronized void resolvePromiseValue(AbstractPromise<TResult, TFulfillable, TRejectable> promise) {
         promise.then(new PromiseFulfillable(), new PromiseRejectable());
     }
 

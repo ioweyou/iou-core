@@ -1,7 +1,4 @@
-package nl.brusque.iou.promise;
-
-import nl.brusque.iou.promise.eventdispatcher.IEvent;
-import nl.brusque.iou.promise.eventdispatcher.IEventListener;
+package nl.brusque.iou;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -10,7 +7,7 @@ import java.util.List;
 
 class EventDispatcher {
     private final ArrayDeque<IEvent> _eventQueue                                         = new ArrayDeque<>();
-    private final HashMap<Class<? extends IEvent>, List<IEventListener>> _eventListeners = new HashMap<>();
+    private final HashMap<Class<? extends IEvent>, List<IEventListener<? extends IEvent>>> _eventListeners = new HashMap<>();
 
     final Thread _looper = new Thread(new Runnable() {
         @Override
@@ -25,9 +22,9 @@ class EventDispatcher {
         _looper.start();
     }
 
-    public synchronized void addListener(Class<? extends IEvent> eventType, IEventListener listener) {
+    public synchronized void addListener(Class<? extends IEvent> eventType, IEventListener<? extends IEvent> listener) {
         if (!_eventListeners.containsKey(eventType)) {
-            _eventListeners.put(eventType, new ArrayList<IEventListener>());
+            _eventListeners.put(eventType, new ArrayList<IEventListener<? extends IEvent>>());
         }
 
        _eventListeners.get(eventType).add(listener);
@@ -56,7 +53,7 @@ class EventDispatcher {
         }
 
         for (IEventListener listener : _eventListeners.get(clazz)) {
-            listener.process(event);
+            listener.process(event); // FIXME unchecked call
         }
     }
 

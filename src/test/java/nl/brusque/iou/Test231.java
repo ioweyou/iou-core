@@ -2,16 +2,13 @@ package nl.brusque.iou;
 
 
 import nl.brusque.iou.errors.TypeError;
-import nl.brusque.iou.helper.TestFulfillable;
-import nl.brusque.iou.helper.PromiseTest;
-import nl.brusque.iou.helper.TestRejectable;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Test231 extends PromiseTest {
+public class Test231 extends TestBase {
     @Test
     public void test231IfPromiseAndXReferToTheSameObjectRejectPromiseWithATypeError() {
         describe("2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.", new Runnable() {

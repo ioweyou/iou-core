@@ -1,12 +1,10 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.PromiseTest;
-import nl.brusque.iou.helper.TestRejectable;
 import org.junit.Assert;
 import org.junit.Test;
 
 
-public class Test223 extends PromiseTest {
+public class Test223 extends TestBase {
     @Test
     public void test223IfOnRejectedIsAFunction() {
         describe("2.2.3: If `onRejected` is a function,", new Runnable() {

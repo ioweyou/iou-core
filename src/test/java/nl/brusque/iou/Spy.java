@@ -1,8 +1,6 @@
-package nl.brusque.iou.helper;
+package nl.brusque.iou;
 
-import nl.brusque.iou.Log;
-
-public class Spy implements ISpy {
+class Spy implements ISpy {
     private Object _result;
     private boolean _throwsError;
     private final int[] _callCount = {0};

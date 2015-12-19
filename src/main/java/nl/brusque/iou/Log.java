@@ -2,7 +2,7 @@ package nl.brusque.iou;
 
 import java.util.logging.Logger;
 
-public class Log {
+class Log {
     private static Logger _logger = Logger.getAnonymousLogger();
 
     public static void w(String message) {

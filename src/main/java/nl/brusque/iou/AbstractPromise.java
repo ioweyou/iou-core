@@ -1,15 +1,9 @@
-package nl.brusque.iou.promise;
+package nl.brusque.iou;
 
-import nl.brusque.iou.IFulfillable;
-import nl.brusque.iou.IPromise;
-import nl.brusque.iou.IRejectable;
 import nl.brusque.iou.errors.TypeError;
 import nl.brusque.iou.errors.TypeErrorException;
-import nl.brusque.iou.promise.eventdispatcher.events.FulfillEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.RejectEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.ThenEvent;
 
-public abstract class AbstractPromise<TResult extends IPromise, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IPromise<AbstractPromise<TResult, TFulfillable, TRejectable>> {
+public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IThenable<AbstractPromise<TResult, TFulfillable, TRejectable>> {
     private final PromiseStateHandler _promiseState = new PromiseStateHandler();
     private final EventDispatcher _eventDispatcher  = new EventDispatcher();
 
@@ -20,7 +14,9 @@ public abstract class AbstractPromise<TResult extends IPromise, TFulfillable ext
         _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(_promiseState, _eventDispatcher, promiseResolverEventHandler, fulfillableClass, rejectableClass));
     }
 
-    public AbstractPromise<TResult, TFulfillable, TRejectable> resolve(final Object o) {
+    public abstract TResult create();
+
+    AbstractPromise<TResult, TFulfillable, TRejectable> resolve(final Object o) {
         if (!_promiseState.isPending()) {
             return this;
         }
@@ -40,7 +36,7 @@ public abstract class AbstractPromise<TResult extends IPromise, TFulfillable ext
         return this;
     }
 
-    public AbstractPromise<TResult, TFulfillable, TRejectable> reject(final Object o) {
+    AbstractPromise<TResult, TFulfillable, TRejectable> reject(final Object o) {
         if (!_promiseState.isPending()) {
             return this;
         }

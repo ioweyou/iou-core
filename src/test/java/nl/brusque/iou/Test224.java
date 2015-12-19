@@ -1,12 +1,9 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.TestFulfillable;
-import nl.brusque.iou.helper.PromiseTest;
-import nl.brusque.iou.helper.TestRejectable;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Test224 extends PromiseTest {
+public class Test224 extends TestBase {
     @Test
     public void test224onFulfilledOronRejectedMustNotBeCalledUntilTheExecutionContextStackContainsOnlyPlatformCode() {
         describe("2.2.4: `onFulfilled` or `onRejected` must not be called until the execution context stack contains only platform code.", new Runnable() {
@@ -62,7 +59,7 @@ public class Test224 extends PromiseTest {
                         specify("when one `onFulfilled` is added inside another `onFulfilled`", new Runnable() {
                             @Override
                             public void run() {
-                                final IPromise promise = resolved();
+                                final AbstractPromise promise = resolved();
                                 final boolean[] firstOnFulfilledFinished = {false};
 
                                 promise.then(new TestFulfillable() {
@@ -90,7 +87,7 @@ public class Test224 extends PromiseTest {
                             @Override
                             public void run() {
                                 final IThenable promise = rejected();
-                                final IPromise promise2 = resolved();
+                                final AbstractPromise promise2 = resolved();
                                 final boolean[] firstOnFulfilledFinished = {false};
 
                                 promise.then(null, new TestRejectable() {
@@ -220,7 +217,7 @@ public class Test224 extends PromiseTest {
                         specify("when `onRejected` is added inside an `onFulfilled`", new Runnable() {
                             @Override
                             public void run() {
-                                final IPromise promise = resolved();
+                                final AbstractPromise promise = resolved();
                                 final IThenable promise2 = rejected();
                                 final boolean[] firstOnFulfilledFinished = {false};
 

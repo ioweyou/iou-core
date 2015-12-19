@@ -1,13 +1,12 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Test226 extends PromiseTest {
+public class Test226 extends TestBase {
     @Test
     public void test226ThenMayBeCalledMultipleTimesOnTheSamePromise() {
         describe("2.2.6: `then` may be called multiple times on the same promise.", new Runnable() {
@@ -33,7 +32,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler3 = fulfillableStub().returns(other);
                                         final ISpy spy      = rejectableStub();
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(handler1, spy);
                                         promise.then(handler2, spy);
                                         promise.then(handler3, spy);
@@ -67,7 +66,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler3 = fulfillableStub().returns(other);
                                         final ISpy spy      = rejectableStub();
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(handler1, spy);
                                         promise.then(handler2, spy);
                                         promise.then(handler3, spy);
@@ -96,7 +95,7 @@ public class Test226 extends PromiseTest {
                                 testFulfilled(dummy, new Testable() {
                                     @Override
                                     public void run() {
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
 
                                         promise
                                             .then(new TestFulfillable() {
@@ -161,7 +160,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler2 = new FulfillableSpy().returns("DUMMYB");
                                         final ISpy handler3 = new FulfillableSpy().returns("DUMMYC");
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(handler1);
                                         promise.then(handler2);
                                         promise.then(handler3);
@@ -191,7 +190,7 @@ public class Test226 extends PromiseTest {
                                             final ISpy handler2 = new FulfillableSpy().name("handler2").returns(dummy);
                                             final ISpy handler3 = new FulfillableSpy().name("handler3").returns(dummy);
 
-                                            final IPromise promise = getPromise();
+                                            final AbstractPromise promise = getPromise();
                                             promise.then(new TestFulfillable() {
                                                 @Override
                                                 public Object fulfill(Object o) throws Exception {
@@ -244,7 +243,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler3 = rejectableStub().returns(other);
                                         final ISpy spy      = fulfillableStub();
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(spy, handler1);
                                         promise.then(spy, handler2);
                                         promise.then(spy, handler3);
@@ -278,7 +277,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler3 = rejectableStub().returns(other);
                                         final ISpy spy = fulfillableStub();
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(spy, handler1);
                                         promise.then(spy, handler2);
                                         promise.then(spy, handler3);
@@ -307,7 +306,7 @@ public class Test226 extends PromiseTest {
                                 testRejected(dummy, new Testable() {
                                     @Override
                                     public void run() {
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
 
                                         promise
                                                 .then(null, new TestRejectable() {
@@ -372,7 +371,7 @@ public class Test226 extends PromiseTest {
                                         final ISpy handler2 = new RejectableSpy().returns("DUMMYB");
                                         final ISpy handler3 = new RejectableSpy().returns("DUMMYC");
 
-                                        IPromise promise = getPromise();
+                                        AbstractPromise promise = getPromise();
                                         promise.then(null, handler1);
                                         promise.then(null, handler2);
                                         promise.then(null, handler3);
@@ -402,7 +401,7 @@ public class Test226 extends PromiseTest {
                                                 final ISpy handler2 = new RejectableSpy().name("handler2").returns(dummy);
                                                 final ISpy handler3 = new RejectableSpy().name("handler3").returns(dummy);
 
-                                                final IPromise promise = getPromise();
+                                                final AbstractPromise promise = getPromise();
                                                 promise.then(null, new RejectableSpy() {
                                                     @Override
                                                     public Object reject(Object o) throws Exception {

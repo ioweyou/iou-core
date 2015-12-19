@@ -1,4 +1,4 @@
-package nl.brusque.iou.promise;
+package nl.brusque.iou;
 
 class PromiseStateHandler {
     private State _state = State.PENDING;

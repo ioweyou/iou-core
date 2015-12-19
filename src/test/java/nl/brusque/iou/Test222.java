@@ -1,11 +1,9 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.helper.TestFulfillable;
-import nl.brusque.iou.helper.PromiseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Test222 extends PromiseTest {
+public class Test222 extends TestBase {
     @Test
     public void test222IfOnFulfilledIsAFunction() {
         describe("2.2.2: If `onFulfilled` is a function,", new Runnable() {

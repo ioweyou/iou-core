@@ -1,13 +1,6 @@
-package nl.brusque.iou.promise;
+package nl.brusque.iou;
 
-import nl.brusque.iou.IFulfillable;
-import nl.brusque.iou.IPromise;
-import nl.brusque.iou.IRejectable;
-import nl.brusque.iou.promise.eventdispatcher.IEventListener;
-import nl.brusque.iou.promise.eventdispatcher.events.FireRejectsEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.RejectEvent;
-
-class RejectEventListener<TResult extends IPromise, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IEventListener<RejectEvent> {
+class RejectEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IEventListener<RejectEvent> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
     private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
@@ -24,8 +17,8 @@ class RejectEventListener<TResult extends IPromise, TFulfillable extends IFulfil
             return;
         }
 
-        if (event.getValue() instanceof IPromise) {
-            _promiseResolverEventHandler.resolvePromiseValue((IPromise)event.getValue());
+        if (event.getValue() instanceof AbstractPromise) {
+            _promiseResolverEventHandler.resolvePromiseValue((AbstractPromise<TResult, TFulfillable, TRejectable>) event.getValue());
 
             return;
         }

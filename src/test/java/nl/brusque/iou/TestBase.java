@@ -1,24 +1,21 @@
-package nl.brusque.iou.helper;
-
-import nl.brusque.iou.*;
-import nl.brusque.iou.promise.AbstractPromise;
+package nl.brusque.iou;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PromiseTest {
-    private class TestPromise extends AbstractPromise<IPromise, TestFulfillable, TestRejectable> {
+class TestBase {
+    private class TestPromise extends AbstractPromise<TestPromise, TestFulfillable, TestRejectable> {
         public TestPromise() {
             super(TestFulfillable.class, TestRejectable.class);
         }
 
         @Override
-        public AbstractPromise<IPromise, TestFulfillable, TestRejectable> create() {
+        public TestPromise create() {
             return new TestPromise();
         }
     }
 
-    private class TestIOU extends AbstractIOU<TestPromise> {
+    private class TestIOU extends AbstractIOU<TestPromise, TestFulfillable, TestRejectable> {
         private final TestPromise _promise = new TestPromise();
 
         @Override
@@ -31,20 +28,20 @@ public class PromiseTest {
         return new TestIOU();
     }
 
-    public IPromise resolved() {
+    public AbstractPromise resolved() {
         return resolved(null);
     }
 
-    public IPromise resolved(Object o) {
-        return deferred().getPromise().resolve(o);
+    public AbstractPromise resolved(Object o) {
+        return deferred().resolve(o);
     }
 
-    public IPromise rejected() {
+    public AbstractPromise rejected() {
         return rejected("");
     }
 
-    public IPromise rejected(Object o) {
-        return deferred().getPromise().reject(o);
+    public AbstractPromise rejected(Object o) {
+        return deferred().reject(o);
     }
 
     public void describe(String description, Runnable runnable) {

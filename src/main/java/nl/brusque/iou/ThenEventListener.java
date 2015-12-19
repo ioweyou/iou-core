@@ -1,15 +1,6 @@
-package nl.brusque.iou.promise;
+package nl.brusque.iou;
 
-import nl.brusque.iou.IFulfillable;
-import nl.brusque.iou.IPromise;
-import nl.brusque.iou.IRejectable;
-import nl.brusque.iou.Log;
-import nl.brusque.iou.promise.eventdispatcher.IEventListener;
-import nl.brusque.iou.promise.eventdispatcher.events.FireFulfillsEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.FireRejectsEvent;
-import nl.brusque.iou.promise.eventdispatcher.events.ThenEvent;
-
-class ThenEventListener<TResult extends IPromise, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IEventListener<ThenEvent<TResult, TFulfillable, TRejectable>> {
+class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IEventListener<ThenEvent<TResult, TFulfillable, TRejectable>> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
     private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
