@@ -18,7 +18,7 @@ class RejectEventListener<TResult extends AbstractPromise<TResult, TFulfillable,
         }
 
         if (event.getValue() instanceof AbstractPromise) {
-            _promiseResolverEventHandler.resolvePromiseValue((AbstractPromise<TResult, TFulfillable, TRejectable>) event.getValue());
+            _promiseResolverEventHandler.resolvePromiseValue((AbstractPromise) event.getValue());
 
             return;
         }

@@ -8,8 +8,23 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
 
     private final ArrayDeque<FulfillableWithPromise<TResult, TFulfillable, TRejectable>> _onFulfilleds = new ArrayDeque<>();
     private final ArrayDeque<RejectableWithPromise<TResult, TFulfillable, TRejectable>> _onRejecteds   = new ArrayDeque<>();
+    private final PromiseFulfillable _promiseResolverFulfillableClass;
+    private final PromiseRejectable _promiseResolverRejectableClass;
 
-    private class PromiseRejectable implements IRejectable {
+    public PromiseResolverEventHandler(PromiseStateHandler promiseState, EventDispatcher eventDispatcher, PromiseFulfillable promiseFulfiller, PromiseRejectable promiseRejector) {
+        _promiseState    = promiseState;
+        _eventDispatcher = eventDispatcher;
+
+        _promiseResolverFulfillableClass = promiseFulfiller!=null ? promiseFulfiller : new PromiseFulfillable();
+        _promiseResolverRejectableClass  = promiseRejector!=null ? promiseRejector : new PromiseRejectable();
+
+        eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(promiseState, eventDispatcher, this));
+        eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
+        eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(promiseState, eventDispatcher, this));
+        eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
+    }
+
+    public class PromiseRejectable implements IRejectable {
         @Override
         public Object reject(Object o) throws Exception {
             _promiseState.reject(o);
@@ -19,7 +34,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    private class PromiseFulfillable implements IFulfillable {
+    public class PromiseFulfillable implements IFulfillable {
         @Override
         public Object fulfill(Object o) throws Exception {
             _promiseState.fulfill(o);
@@ -29,18 +44,8 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    public PromiseResolverEventHandler(PromiseStateHandler promiseState, EventDispatcher eventDispatcher) {
-        _promiseState    = promiseState;
-        _eventDispatcher = eventDispatcher;
-
-        eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(promiseState, eventDispatcher, this));
-        eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
-        eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(promiseState, eventDispatcher, this));
-        eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
-    }
-
-    public synchronized void resolvePromiseValue(AbstractPromise<TResult, TFulfillable, TRejectable> promise) {
-        promise.then(new PromiseFulfillable(), new PromiseRejectable());
+    public synchronized void resolvePromiseValue(AbstractPromise promise) {
+        promise.then(_promiseResolverFulfillableClass, _promiseResolverRejectableClass);
     }
 
     public synchronized void addFulfillable(TFulfillable fulfillable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
