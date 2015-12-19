@@ -10,13 +10,24 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
     private final ArrayDeque<RejectableWithPromise<TResult, TFulfillable, TRejectable>> _onRejecteds   = new ArrayDeque<>();
     private final PromiseFulfillable _promiseResolverFulfillableClass;
     private final PromiseRejectable _promiseResolverRejectableClass;
+    private final DefaultFulfiller<TFulfillable> _fulfiller;
+    private final DefaultRejector<TRejectable> _rejector;
 
-    public PromiseResolverEventHandler(PromiseStateHandler promiseState, EventDispatcher eventDispatcher, PromiseFulfillable promiseFulfiller, PromiseRejectable promiseRejector) {
+    public PromiseResolverEventHandler(
+            PromiseStateHandler promiseState,
+            EventDispatcher eventDispatcher,
+            PromiseFulfillable promiseFulfiller,
+            PromiseRejectable promiseRejector,
+            DefaultFulfiller<TFulfillable> fulfiller,
+            DefaultRejector<TRejectable> rejector
+        ) {
         _promiseState    = promiseState;
         _eventDispatcher = eventDispatcher;
 
         _promiseResolverFulfillableClass = promiseFulfiller!=null ? promiseFulfiller : new PromiseFulfillable();
         _promiseResolverRejectableClass  = promiseRejector!=null ? promiseRejector : new PromiseRejectable();
+        _fulfiller = fulfiller;
+        _rejector  = rejector;
 
         eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(promiseState, eventDispatcher, this));
         eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
@@ -60,7 +71,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
             FulfillableWithPromise<TResult, TFulfillable, TRejectable> fulfilled = _onFulfilleds.remove();
 
             try {
-                Object result = fulfilled.getFulfillable().fulfill(_promiseState.getResolvedWith());
+                Object result = _fulfiller.fulfill(fulfilled.getFulfillable(), _promiseState.getResolvedWith());
                 if (result == null) {
                     return;
                 }
@@ -79,7 +90,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
             RejectableWithPromise<TResult, TFulfillable, TRejectable> onRejected = _onRejecteds.remove();
 
             try {
-                Object result = onRejected.getRejectable().reject(_promiseState.RejectedWith());
+                Object result = _rejector.reject(onRejected.getRejectable(), _promiseState.RejectedWith());
                 if (result == null) {
                     return;
                 }

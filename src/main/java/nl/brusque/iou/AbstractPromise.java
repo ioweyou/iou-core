@@ -9,12 +9,12 @@ public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, T
 
 
     protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass) {
-        this(fulfillableClass, rejectableClass, null, null);
+        this(fulfillableClass, rejectableClass, null, null, new DefaultFulfiller<TFulfillable>(), new DefaultRejector<TRejectable>());
     }
 
-    protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseFulfillable promiseResolverFulfillableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass) {
+    protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseFulfillable promiseResolverFulfillableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass, DefaultFulfiller<TFulfillable> fulfiller, DefaultRejector<TRejectable> rejector) {
         PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler =
-                new PromiseResolverEventHandler<>(_promiseState, _eventDispatcher, promiseResolverFulfillableClass, promiseResolverRejectableClass);
+                new PromiseResolverEventHandler<>(_promiseState, _eventDispatcher, promiseResolverFulfillableClass, promiseResolverRejectableClass, fulfiller, rejector);
 
         _eventDispatcher.addListener(
                 ThenEvent.class,
