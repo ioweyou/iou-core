@@ -104,7 +104,7 @@ public class Test227 extends TestBase {
             }
         });
 
-        delay(5000);
+        delay(500);
 
     }
 }

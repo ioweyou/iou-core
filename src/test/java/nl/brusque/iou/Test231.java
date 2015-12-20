@@ -63,6 +63,6 @@ public class Test231 extends TestBase {
             }
         });
 
-        delay(5000);
+        delay(500);
     }
 }
