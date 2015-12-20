@@ -30,7 +30,7 @@ class EventDispatcher {
        _eventListeners.get(eventType).add(listener);
     }
 
-    public void queue(IEvent event) {
+    public synchronized void queue(IEvent event) {
         _eventQueue.add(event);
 
         synchronized (_looper) {
@@ -46,7 +46,7 @@ class EventDispatcher {
         return _eventQueue.remove();
     }
 
-    private synchronized void process(IEvent event) {
+    private void process(IEvent event) {
         Class<? extends IEvent> clazz = event.getClass();
         if (!_eventListeners.containsKey(clazz)) {
             return;
@@ -57,7 +57,7 @@ class EventDispatcher {
         }
     }
 
-    private synchronized void processNextEvent() {
+    private void processNextEvent() {
         IEvent event = dequeue();
         if (event != null) {
             process(event);

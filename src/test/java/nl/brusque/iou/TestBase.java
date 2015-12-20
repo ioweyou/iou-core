@@ -1,11 +1,17 @@
 package nl.brusque.iou;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static org.mockito.Mockito.spy;
 
 class TestBase {
+    private static final Logger logger = LogManager.getLogger(TestBase.class);
+
+
     private class TestPromise extends AbstractPromise<TestPromise, TestThenCallable, TestThenCallable> {
         public TestPromise() {
             super(TestThenCallable.class, TestThenCallable.class);
@@ -47,12 +53,12 @@ class TestBase {
     }
 
     public void describe(String description, Runnable runnable) {
-        Log.i(description);
+        logger.info(description);
         runnable.run();
     }
 
     public void specify(String description, Runnable test) {
-        Log.i(description);
+        logger.info(description);
         test.run();
     }
 
