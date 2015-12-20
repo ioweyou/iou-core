@@ -20,9 +20,9 @@ public class Test224 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final boolean[] onFullfilledCalled = {false};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         onFullfilledCalled[0] = true;
 
                                         return null;
@@ -43,9 +43,9 @@ public class Test224 extends TestBase {
 
                                 d.resolve(dummy);
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         onFullfilledCalled[0] = true;
 
                                         return null;
@@ -62,12 +62,12 @@ public class Test224 extends TestBase {
                                 final AbstractPromise promise = resolved();
                                 final boolean[] firstOnFulfilledFinished = {false};
 
-                                promise.then(new TestFulfillable() {
+                                promise.then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
-                                        promise.then(new TestFulfillable() {
+                                    public Object call(Object o) {
+                                        promise.then(new TestThenCallable() {
                                             @Override
-                                            public Object fulfill(Object o) {
+                                            public Object call(Object o) {
                                                 Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
                                                 return null;
                                             }
@@ -90,12 +90,12 @@ public class Test224 extends TestBase {
                                 final AbstractPromise promise2 = resolved();
                                 final boolean[] firstOnFulfilledFinished = {false};
 
-                                promise.then(null, new TestRejectable() {
+                                promise.then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
-                                        promise2.then(new TestFulfillable() {
+                                    public Object call(Object o) {
+                                        promise2.then(new TestThenCallable() {
                                             @Override
-                                            public Object fulfill(Object o) {
+                                            public Object call(Object o) {
                                                 Assert.assertTrue("first onRejected should have finished", firstOnFulfilledFinished[0]);
                                                 return null;
                                             }
@@ -117,9 +117,9 @@ public class Test224 extends TestBase {
                                 final AbstractIOU d = deferred();
                                 final boolean[] firstStackFinished = {false};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
 
                                         return null;
@@ -150,9 +150,9 @@ public class Test224 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final boolean[] onRejectedCalled = {false};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         onRejectedCalled[0] = true;
 
                                         return null;
@@ -173,9 +173,9 @@ public class Test224 extends TestBase {
 
                                 d.reject(dummy);
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         onRejectedCalled[0] = true;
 
                                         return null;
@@ -193,12 +193,12 @@ public class Test224 extends TestBase {
                                 final IThenable promise = rejected();
                                 final boolean[] firstOnRejectedFinished = {false};
 
-                                promise.then(null, new TestRejectable() {
+                                promise.then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
-                                        promise.then(new TestRejectable() {
+                                    public Object call(Object o) {
+                                        promise.then(new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) {
+                                            public Object call(Object o) {
                                                 Assert.assertTrue("first onRejected should have finished", firstOnRejectedFinished[0]);
                                                 return null;
                                             }
@@ -221,12 +221,12 @@ public class Test224 extends TestBase {
                                 final IThenable promise2 = rejected();
                                 final boolean[] firstOnFulfilledFinished = {false};
 
-                                promise.then(new TestFulfillable() {
+                                promise.then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
-                                        promise2.then(null, new TestRejectable() {
+                                    public Object call(Object o) {
+                                        promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) {
+                                            public Object call(Object o) {
                                                 Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
 
                                                 return null;
@@ -249,9 +249,9 @@ public class Test224 extends TestBase {
                                 final AbstractIOU d = deferred();
                                 final boolean[] firstStackFinished = {false};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
 
                                         return null;

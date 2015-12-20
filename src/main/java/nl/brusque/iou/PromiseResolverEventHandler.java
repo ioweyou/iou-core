@@ -2,29 +2,29 @@ package nl.brusque.iou;
 
 import java.util.ArrayDeque;
 
-class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> {
+class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
 
-    private final ArrayDeque<FulfillableWithPromise<TResult, TFulfillable, TRejectable>> _onFulfilleds = new ArrayDeque<>();
-    private final ArrayDeque<RejectableWithPromise<TResult, TFulfillable, TRejectable>> _onRejecteds   = new ArrayDeque<>();
-    private final PromiseFulfillable _promiseResolverFulfillableClass;
+    private final ArrayDeque<ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TFulfillable>> _onFulfilleds = new ArrayDeque<>();
+    private final ArrayDeque<ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TRejectable>> _onRejecteds   = new ArrayDeque<>();
+    private final PromiseThenCallable _promiseResolverFulfillableClass;
     private final PromiseRejectable _promiseResolverRejectableClass;
-    private final DefaultFulfiller<TFulfillable> _fulfiller;
-    private final DefaultRejector<TRejectable> _rejector;
+    private final DefaultThenCallable<TFulfillable> _fulfiller;
+    private final DefaultThenCallable<TRejectable> _rejector;
 
     public PromiseResolverEventHandler(
             PromiseStateHandler promiseState,
             EventDispatcher eventDispatcher,
-            PromiseFulfillable promiseFulfiller,
+            PromiseThenCallable promiseFulfiller,
             PromiseRejectable promiseRejector,
-            DefaultFulfiller<TFulfillable> fulfiller,
-            DefaultRejector<TRejectable> rejector
+            DefaultThenCallable<TFulfillable> fulfiller,
+            DefaultThenCallable<TRejectable> rejector
         ) {
         _promiseState    = promiseState;
         _eventDispatcher = eventDispatcher;
 
-        _promiseResolverFulfillableClass = promiseFulfiller!=null ? promiseFulfiller : new PromiseFulfillable();
+        _promiseResolverFulfillableClass = promiseFulfiller!=null ? promiseFulfiller : new PromiseThenCallable();
         _promiseResolverRejectableClass  = promiseRejector!=null ? promiseRejector : new PromiseRejectable();
         _fulfiller = fulfiller;
         _rejector  = rejector;
@@ -35,9 +35,9 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
     }
 
-    public class PromiseRejectable implements IRejectable {
+    public class PromiseRejectable implements IThenCallable {
         @Override
-        public Object reject(Object o) throws Exception {
+        public Object call(Object o) throws Exception {
             _promiseState.reject(o);
             _eventDispatcher.queue(new FireRejectsEvent());
 
@@ -45,9 +45,9 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    public class PromiseFulfillable implements IFulfillable {
+    public class PromiseThenCallable implements IThenCallable {
         @Override
-        public Object fulfill(Object o) throws Exception {
+        public Object call(Object o) throws Exception {
             _promiseState.fulfill(o);
             _eventDispatcher.queue(new FireFulfillsEvent());
 
@@ -60,18 +60,18 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
     }
 
     public synchronized void addFulfillable(TFulfillable fulfillable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
-        _onFulfilleds.add(new FulfillableWithPromise<>(fulfillable, nextPromise));
+        _onFulfilleds.add(new ThenCallableWithPromise<>(fulfillable, nextPromise));
     }
     public synchronized void addRejectable(TRejectable rejectable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
-        _onRejecteds.add(new RejectableWithPromise<>(rejectable, nextPromise));
+        _onRejecteds.add(new ThenCallableWithPromise<>(rejectable, nextPromise));
     }
 
     public synchronized void resolve() {
         while (!_onFulfilleds.isEmpty()) {
-            FulfillableWithPromise<TResult, TFulfillable, TRejectable> fulfilled = _onFulfilleds.remove();
+            ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TFulfillable> fulfilled = _onFulfilleds.remove();
 
             try {
-                Object result = _fulfiller.fulfill(fulfilled.getFulfillable(), _promiseState.getResolvedWith());
+                Object result = _fulfiller.call(fulfilled.getCallable(), _promiseState.getResolvedWith());
                 if (result == null) {
                     return;
                 }
@@ -87,10 +87,10 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
 
     public synchronized void reject() {
         while (!_onRejecteds.isEmpty()) {
-            RejectableWithPromise<TResult, TFulfillable, TRejectable> onRejected = _onRejecteds.remove();
+            ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TRejectable> onRejected = _onRejecteds.remove();
 
             try {
-                Object result = _rejector.reject(onRejected.getRejectable(), _promiseState.RejectedWith());
+                Object result = _rejector.call(onRejected.getCallable(), _promiseState.RejectedWith());
                 if (result == null) {
                     return;
                 }

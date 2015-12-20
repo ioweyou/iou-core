@@ -3,16 +3,16 @@ package nl.brusque.iou;
 import nl.brusque.iou.errors.TypeError;
 import nl.brusque.iou.errors.TypeErrorException;
 
-public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IThenable<AbstractPromise<TResult, TFulfillable, TRejectable>> {
+public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> implements IThenable<AbstractPromise<TResult, TFulfillable, TRejectable>> {
     private final PromiseStateHandler _promiseState = new PromiseStateHandler();
     private final EventDispatcher _eventDispatcher  = new EventDispatcher();
 
 
     protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass) {
-        this(fulfillableClass, rejectableClass, null, null, new DefaultFulfiller<TFulfillable>(), new DefaultRejector<TRejectable>());
+        this(fulfillableClass, rejectableClass, null, null, new DefaultThenCallable<TFulfillable>(), new DefaultThenCallable<TRejectable>());
     }
 
-    protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseFulfillable promiseResolverFulfillableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass, DefaultFulfiller<TFulfillable> fulfiller, DefaultRejector<TRejectable> rejector) {
+    protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseResolverEventHandler.PromiseThenCallable promiseResolverFulfillableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass, DefaultThenCallable<TFulfillable> fulfiller, DefaultThenCallable<TRejectable> rejector) {
         PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler =
                 new PromiseResolverEventHandler<>(_promiseState, _eventDispatcher, promiseResolverFulfillableClass, promiseResolverRejectableClass, fulfiller, rejector);
 

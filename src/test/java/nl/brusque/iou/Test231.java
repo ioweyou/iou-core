@@ -20,16 +20,16 @@ public class Test231 extends TestBase {
                     @Override
                     public void run() {
                         final List<IThenable> promises = new ArrayList<>();
-                        promises.add(resolved(dummy).then(new TestFulfillable() {
+                        promises.add(resolved(dummy).then(new TestThenCallable() {
                             @Override
-                            public Object fulfill(Object o) throws Exception {
+                            public Object call(Object o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
-                        promises.get(0).then(null, new TestRejectable() {
+                        promises.get(0).then(null, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) throws Exception {
+                            public Object call(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
 
                                 return null;
@@ -43,16 +43,16 @@ public class Test231 extends TestBase {
                     public void run() {
                         final List<IThenable> promises = new ArrayList<>();
 
-                        promises.add(rejected(dummy).then(null, new TestRejectable() {
+                        promises.add(rejected(dummy).then(null, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) throws Exception {
+                            public Object call(Object o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
-                        promises.get(0).then(null, new TestRejectable() {
+                        promises.get(0).then(null, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) throws Exception {
+                            public Object call(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
 
                                 return null;

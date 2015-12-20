@@ -20,9 +20,9 @@ public class Test221 extends TestBase {
                                     public void run() {
                                         AbstractIOU d = deferred();
 
-                                        d.reject(dummy).then(o, new TestRejectable() {
+                                        d.reject(dummy).then(o, new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) {
+                                            public Object call(Object o) {
                                                 return null;
                                             }
                                         });
@@ -47,15 +47,15 @@ public class Test221 extends TestBase {
                                         AbstractIOU d = deferred();
 
                                         d.reject(dummy)
-                                                .then(new TestFulfillable() {
+                                                .then(new TestThenCallable() {
                                                     @Override
-                                                    public Object fulfill(Object o) {
+                                                    public Object call(Object o) {
                                                         return null;
                                                     }
                                                 })
-                                                .then(o, new TestRejectable() {
+                                                .then(o, new TestThenCallable() {
                                                     @Override
-                                                    public Object reject(Object o) {
+                                                    public Object call(Object o) {
                                                         return null;
                                                     }
                                                 });
@@ -92,9 +92,9 @@ public class Test221 extends TestBase {
                                         AbstractIOU d = deferred();
 
                                         d.resolve(dummy)
-                                                .then(new TestFulfillable() {
+                                                .then(new TestThenCallable() {
                                                     @Override
-                                                    public Object fulfill(Object o) {
+                                                    public Object call(Object o) {
                                                         return null;
                                                     }
                                                 }, o);
@@ -119,9 +119,9 @@ public class Test221 extends TestBase {
                                         AbstractIOU d = deferred();
 
                                         d.resolve(dummy)
-                                        .then(new TestFulfillable() {
+                                        .then(new TestThenCallable() {
                                             @Override
-                                            public Object fulfill(Object o) {
+                                            public Object call(Object o) {
                                                 return null;
                                             }
                                         }, o);

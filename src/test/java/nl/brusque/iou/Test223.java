@@ -21,9 +21,9 @@ public class Test223 extends TestBase {
                             AbstractIOU d = deferred();
                             final boolean[] isRejected = {false};
 
-                            d.getPromise().then(null, new TestRejectable() {
+                            d.getPromise().then(null, new TestThenCallable() {
                                 @Override
-                                public Object reject(Object o) {
+                                public Object call(Object o) {
                                     Assert.assertTrue("isRejected should be true", isRejected[0]);
 
                                     return null;
@@ -43,9 +43,9 @@ public class Test223 extends TestBase {
                             AbstractIOU d = deferred();
                             final boolean[] onRejectedCalled = {false};
 
-                            d.getPromise().then(null, new TestRejectable() {
+                            d.getPromise().then(null, new TestThenCallable() {
                                 @Override
-                                public Object reject(Object o) {
+                                public Object call(Object o) {
                                     Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
 
                                     return null;
@@ -67,9 +67,9 @@ public class Test223 extends TestBase {
                             public void run() {
                                 final int[] timesCalled = {0};
 
-                                rejected(dummy).then(null, new TestRejectable() {
+                                rejected(dummy).then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -84,9 +84,9 @@ public class Test223 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -104,9 +104,9 @@ public class Test223 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -125,9 +125,9 @@ public class Test223 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -146,9 +146,9 @@ public class Test223 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0, 0, 0};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -156,9 +156,9 @@ public class Test223 extends TestBase {
                                 });
 
                                 delay(50);
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;
@@ -166,9 +166,9 @@ public class Test223 extends TestBase {
                                 });
 
                                 delay(50);
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
 
                                         return null;
@@ -186,9 +186,9 @@ public class Test223 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0, 0};
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Void call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -197,9 +197,9 @@ public class Test223 extends TestBase {
 
                                 d.reject(dummy);
 
-                                d.getPromise().then(null, new TestRejectable() {
+                                d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object reject(Object o) {
+                                    public Void call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;

@@ -45,16 +45,16 @@ public class Test227 extends TestBase {
                                     public void run() {
                                         final AbstractPromise promise1 = getPromise();
 
-                                        IThenable promise2 = promise1.then(new TestFulfillable() {
+                                        IThenable promise2 = promise1.then(new TestThenCallable() {
                                             @Override
-                                            public Object fulfill(Object o) throws Exception {
+                                            public Object call(Object o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
-                                        promise2.then(null, new TestRejectable() {
+                                        promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) throws Exception {
+                                            public Object call(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);
@@ -70,16 +70,16 @@ public class Test227 extends TestBase {
                                     public void run() {
                                         AbstractPromise promise1 = getPromise();
 
-                                        IThenable promise2 = promise1.then(null, new TestRejectable() {
+                                        IThenable promise2 = promise1.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) throws Exception {
+                                            public Object call(Object o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
-                                        promise2.then(null, new TestRejectable() {
+                                        promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object reject(Object o) throws Exception {
+                                            public Object call(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);

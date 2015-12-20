@@ -12,24 +12,24 @@ public class Test212 extends TestBase {
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to fulfill then immediately reject", new Runnable() {
+                specify("trying to call then immediately reject", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestFulfillable() {
+                        d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object fulfill(Object o) {
+                            public Object call(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestRejectable() {
+                        }, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) {
+                            public Object call(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -42,24 +42,24 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to fulfill then reject, delayed", new Runnable() {
+                specify("trying to call then reject, delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestFulfillable() {
+                        d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object fulfill(Object o) {
+                            public Object call(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestRejectable() {
+                        }, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) {
+                            public Object call(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -74,24 +74,24 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to fulfill immediately then reject delayed", new Runnable() {
+                specify("trying to call immediately then reject delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestFulfillable() {
+                        d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object fulfill(Object o) {
+                            public Object call(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestRejectable() {
+                        }, new TestThenCallable() {
                             @Override
-                            public Object reject(Object o) {
+                            public Object call(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", true, onFulfilledCalled[0]);
 
                                 return o;

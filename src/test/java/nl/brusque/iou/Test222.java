@@ -20,9 +20,9 @@ public class Test222 extends TestBase {
                             AbstractIOU d = deferred();
                             final boolean[] isFulfilled = {false};
 
-                            d.getPromise().then(new TestFulfillable() {
+                            d.getPromise().then(new TestThenCallable() {
                                 @Override
-                                public Object fulfill(Object o) {
+                                public Object call(Object o) {
                                     Assert.assertTrue("isFulfilled should be true", isFulfilled[0]);
 
                                     return null;
@@ -43,9 +43,9 @@ public class Test222 extends TestBase {
                             AbstractIOU d = deferred();
                             final boolean[] onFulfilledCalled = {false};
 
-                            d.getPromise().then(new TestFulfillable() {
+                            d.getPromise().then(new TestThenCallable() {
                                 @Override
-                                public Object fulfill(Object o) {
+                                public Object call(Object o) {
                                     onFulfilledCalled[0] = true;
 
                                     return null;
@@ -67,9 +67,9 @@ public class Test222 extends TestBase {
                             public void run() {
                                 final int[] timesCalled = {0};
 
-                                resolved(dummy).then(new TestFulfillable() {
+                                resolved(dummy).then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -78,15 +78,15 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to fulfill a pending promise more than once, immediately", new Runnable() {
+                        specify("trying to call a pending promise more than once, immediately", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -98,15 +98,15 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to fulfill a pending promise more than once, delayed", new Runnable() {
+                        specify("trying to call a pending promise more than once, delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -119,15 +119,15 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to fulfill a pending promise more than once, immediately then delayed", new Runnable() {
+                        specify("trying to call a pending promise more than once, immediately then delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -146,9 +146,9 @@ public class Test222 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0, 0, 0};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -156,9 +156,9 @@ public class Test222 extends TestBase {
                                 });
 
                                 delay(50);
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;
@@ -166,9 +166,9 @@ public class Test222 extends TestBase {
                                 });
 
                                 delay(50);
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
 
                                         return null;
@@ -186,9 +186,9 @@ public class Test222 extends TestBase {
                                 AbstractIOU d = deferred();
                                 final int[] timesCalled = {0, 0};
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -197,9 +197,9 @@ public class Test222 extends TestBase {
 
                                 d.resolve(dummy);
 
-                                d.getPromise().then(new TestFulfillable() {
+                                d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object fulfill(Object o) {
+                                    public Object call(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;

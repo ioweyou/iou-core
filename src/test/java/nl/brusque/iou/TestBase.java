@@ -6,9 +6,9 @@ import java.util.TimerTask;
 import static org.mockito.Mockito.spy;
 
 class TestBase {
-    private class TestPromise extends AbstractPromise<TestPromise, TestFulfillable, TestRejectable> {
+    private class TestPromise extends AbstractPromise<TestPromise, TestThenCallable, TestThenCallable> {
         public TestPromise() {
-            super(TestFulfillable.class, TestRejectable.class);
+            super(TestThenCallable.class, TestThenCallable.class);
         }
 
         @Override
@@ -17,7 +17,7 @@ class TestBase {
         }
     }
 
-    private class TestIOU extends AbstractIOU<TestPromise, TestFulfillable, TestRejectable> {
+    private class TestIOU extends AbstractIOU<TestPromise, TestThenCallable, TestThenCallable> {
         private final TestPromise _promise = new TestPromise();
 
         @Override
@@ -137,11 +137,11 @@ class TestBase {
         });
     }
 
-    public IFulfillable fulfillableStub() {
-        return spy(TestFulfillable.class);
+    public IThenCallable fulfillableStub() {
+        return spy(TestThenCallable.class);
     }
 
-    public IRejectable rejectableStub() {
-        return spy(TestRejectable.class);
+    public IThenCallable rejectableStub() {
+        return spy(TestThenCallable.class);
     }
 }

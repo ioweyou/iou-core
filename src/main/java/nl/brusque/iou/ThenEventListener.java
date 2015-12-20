@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IFulfillable, TRejectable extends IRejectable> implements IEventListener<ThenEvent<TResult, TFulfillable, TRejectable>> {
+class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> implements IEventListener<ThenEvent<TResult, TFulfillable, TRejectable>> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
     private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
@@ -16,11 +16,11 @@ class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, T
     }
 
     private boolean isFulfillable(Object onFulfilled, Class<TFulfillable> clazz) {
-        return onFulfilled != null && onFulfilled instanceof IFulfillable; // FIXME Compare to clazz
+        return onFulfilled != null && onFulfilled instanceof IThenCallable; // FIXME Compare to clazz
     }
 
     private boolean isRejectable(Object onRejected, Class<TRejectable> clazz) {
-        return onRejected != null && onRejected instanceof IRejectable; // FIXME Compare to clazz
+        return onRejected != null && onRejected instanceof IThenCallable; // FIXME Compare to clazz
     }
 
     @Override
