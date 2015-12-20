@@ -9,23 +9,10 @@ public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, T
 
 
     protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass) {
-        this(
-                fulfillableClass,
-                rejectableClass,
-                null,
-                null,
-                new DefaultThenCallable<TFulfillable>(),
-                new DefaultThenCallable<TRejectable>());
+        this(fulfillableClass, rejectableClass, null, null, new DefaultThenCallable<TFulfillable>(), new DefaultThenCallable<TRejectable>());
     }
 
-    protected AbstractPromise(
-            Class<TFulfillable> fulfillableClass,
-            Class<TRejectable> rejectableClass,
-            PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseThenCallable promiseResolverFulfillableClass,
-            PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass,
-            DefaultThenCallable<TFulfillable> fulfiller,
-            DefaultThenCallable<TRejectable> rejector) {
-
+    protected AbstractPromise(Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseResolverEventHandler.PromiseThenCallable promiseResolverFulfillableClass, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable>.PromiseRejectable promiseResolverRejectableClass, DefaultThenCallable<TFulfillable> fulfiller, DefaultThenCallable<TRejectable> rejector) {
         PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler =
                 new PromiseResolverEventHandler<>(_promiseState, _eventDispatcher, promiseResolverFulfillableClass, promiseResolverRejectableClass, fulfiller, rejector);
 
@@ -41,7 +28,7 @@ public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, T
 
     protected abstract TResult create();
 
-    public AbstractPromise<TResult, TFulfillable, TRejectable> resolve(final Object o) {
+    AbstractPromise<TResult, TFulfillable, TRejectable> resolve(final Object o) {
         if (!_promiseState.isPending()) {
             return this;
         }
@@ -61,7 +48,7 @@ public abstract class AbstractPromise<TResult extends AbstractPromise<TResult, T
         return this;
     }
 
-    public AbstractPromise<TResult, TFulfillable, TRejectable> reject(final Object o) {
+    AbstractPromise<TResult, TFulfillable, TRejectable> reject(final Object o) {
         if (!_promiseState.isPending()) {
             return this;
         }
