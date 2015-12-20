@@ -16,11 +16,11 @@ class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, T
     }
 
     private boolean isFulfillable(Object onFulfilled, Class<TFulfillable> clazz) {
-        return onFulfilled != null && clazz.isInstance(onFulfilled);
+        return onFulfilled != null && onFulfilled instanceof IFulfillable; // FIXME Compare to clazz
     }
 
     private boolean isRejectable(Object onRejected, Class<TRejectable> clazz) {
-        return onRejected != null && clazz.isInstance(onRejected);
+        return onRejected != null && onRejected instanceof IRejectable; // FIXME Compare to clazz
     }
 
     @Override

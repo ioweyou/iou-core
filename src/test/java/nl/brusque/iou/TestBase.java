@@ -3,6 +3,8 @@ package nl.brusque.iou;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static org.mockito.Mockito.spy;
+
 class TestBase {
     private class TestPromise extends AbstractPromise<TestPromise, TestFulfillable, TestRejectable> {
         public TestPromise() {
@@ -135,11 +137,11 @@ class TestBase {
         });
     }
 
-    public FulfillableSpy fulfillableStub() {
-        return new FulfillableSpy();
+    public IFulfillable fulfillableStub() {
+        return spy(TestFulfillable.class);
     }
 
-    public RejectableSpy rejectableStub() {
-        return new RejectableSpy();
+    public IRejectable rejectableStub() {
+        return spy(TestRejectable.class);
     }
 }

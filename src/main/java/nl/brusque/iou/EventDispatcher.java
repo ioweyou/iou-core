@@ -22,7 +22,7 @@ class EventDispatcher {
         _looper.start();
     }
 
-    public synchronized void addListener(Class<? extends IEvent> eventType, IEventListener<? extends IEvent> listener) {
+    public void addListener(Class<? extends IEvent> eventType, IEventListener<? extends IEvent> listener) {
         if (!_eventListeners.containsKey(eventType)) {
             _eventListeners.put(eventType, new ArrayList<IEventListener<? extends IEvent>>());
         }
@@ -30,7 +30,7 @@ class EventDispatcher {
        _eventListeners.get(eventType).add(listener);
     }
 
-    public synchronized void queue(IEvent event) {
+    public void queue(IEvent event) {
         _eventQueue.add(event);
 
         synchronized (_looper) {
@@ -38,7 +38,7 @@ class EventDispatcher {
         }
     }
 
-    private IEvent dequeue() {
+    private synchronized  IEvent dequeue() {
         if (_eventQueue.isEmpty()) {
             return null;
         }
@@ -46,7 +46,7 @@ class EventDispatcher {
         return _eventQueue.remove();
     }
 
-    private void process(IEvent event) {
+    private synchronized void process(IEvent event) {
         Class<? extends IEvent> clazz = event.getClass();
         if (!_eventListeners.containsKey(clazz)) {
             return;
@@ -57,21 +57,20 @@ class EventDispatcher {
         }
     }
 
-    private void processNextEvent() {
+    private synchronized void processNextEvent() {
         IEvent event = dequeue();
-        if (event == null) {
-            synchronized (_looper) {
-                try {
-                    _looper.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
+        if (event != null) {
+            process(event);
             return;
         }
 
-        process(event);
+        synchronized (_looper) {
+            try {
+                _looper.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
