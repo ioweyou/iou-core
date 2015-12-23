@@ -6,8 +6,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
 
-    private final ArrayDeque<ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TFulfillable>> _onFulfilleds = new ArrayDeque<>();
-    private final ArrayDeque<ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TRejectable>> _onRejecteds   = new ArrayDeque<>();
+    private final ArrayDeque<Resolvable<TResult, TFulfillable, TRejectable>> _onResolve = new ArrayDeque<>();
     private final PromiseThenCallable _promiseResolverFulfillableClass;
     private final PromiseRejectable _promiseResolverRejectableClass;
     private final DefaultThenCallable<TFulfillable> _fulfiller;
@@ -59,47 +58,54 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         promise.then(_promiseResolverFulfillableClass, _promiseResolverRejectableClass);
     }
 
-    public synchronized void addFulfillable(TFulfillable fulfillable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
-        _onFulfilleds.add(new ThenCallableWithPromise<>(fulfillable, nextPromise));
-    }
-    public synchronized void addRejectable(TRejectable rejectable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
-        _onRejecteds.add(new ThenCallableWithPromise<>(rejectable, nextPromise));
+    public synchronized void addResolvable(TFulfillable fulfillable, TRejectable rejectable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
+        _onResolve.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
     }
 
     public synchronized void resolve() {
-        while (!_onFulfilleds.isEmpty()) {
-            ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TFulfillable> fulfilled = _onFulfilleds.remove();
+        while (!_onResolve.isEmpty()) {
+            Resolvable<TResult, TFulfillable, TRejectable> resolvable = _onResolve.remove();
+            TFulfillable fulfillable = resolvable.getFulfillable();
 
             try {
-                Object result = _fulfiller.call(fulfilled.getCallable(), _promiseState.getResolvedWith());
+                Object result = null;
+                if (fulfillable!=null) {
+                    result = _fulfiller.call(resolvable.getFulfillable(), _promiseState.getResolvedWith());
+                }
+
                 if (result == null) {
                     return;
                 }
 
                 // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-                fulfilled.getPromise().resolve(result);
+                resolvable.getPromise().resolve(result);
             } catch (Exception e) {
                 // 2.2.7.2 If either onFulfilled or onRejected throws an exception e, promise2 must be rejected with e as the reason.
-                fulfilled.getPromise().reject(e);
+                resolvable.getPromise().reject(e);
             }
         }
     }
 
     public synchronized void reject() {
-        while (!_onRejecteds.isEmpty()) {
-            ThenCallableWithPromise<TResult, TFulfillable, TRejectable, TRejectable> onRejected = _onRejecteds.remove();
+        while (!_onResolve.isEmpty()) {
+            Resolvable<TResult, TFulfillable, TRejectable> resolvable = _onResolve.remove();
+            TRejectable  rejectable  = resolvable.getRejectable();
 
             try {
-                Object result = _rejector.call(onRejected.getCallable(), _promiseState.RejectedWith());
+                Object result = null;
+                if (rejectable!=null) {
+                    result = _rejector.call(rejectable, _promiseState.RejectedWith());
+                }
+
                 if (result == null) {
                     return;
                 }
 
                 // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-                onRejected.getPromise().reject(result);
+                resolvable.getPromise().reject(result);
             } catch (Exception e) {
                 // 2.2.7.2 If either onFulfilled or onRejected throws an exception e, promise2 must be rejected with e as the reason.
-                onRejected.getPromise().reject(e);
+                resolvable.getPromise().reject(e);
             }
         }
     }

@@ -37,14 +37,17 @@ class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, T
             logger.warn(String.format("isFulfillable: %s, isRejectable: %s", isFulfillable, isRejectable));
         }
 
+        TFulfillable fulfillable = null;
         if (isFulfillable) {
-            _promiseResolverEventHandler.addFulfillable(_fulfillableClass.cast(event.onFulfilled), event.nextPromise);
+            fulfillable = _fulfillableClass.cast(event.onFulfilled);
         }
 
+        TRejectable rejectable = null;
         if (isRejectable) {
-            _promiseResolverEventHandler.addRejectable(_rejectableClass.cast(event.onRejected), event.nextPromise);
+            rejectable = _rejectableClass.cast(event.onRejected);
         }
 
+        _promiseResolverEventHandler.addResolvable(fulfillable, rejectable, event.nextPromise);
         if (_promiseState.isRejected()) {
             _eventDispatcher.queue(new FireRejectsEvent());
         } else if (_promiseState.isResolved()) {
