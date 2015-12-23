@@ -68,11 +68,11 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
             TFulfillable fulfillable = resolvable.getFulfillable();
 
             try {
-                Object result = null;
-                if (fulfillable!=null) {
-                    result = _fulfiller.call(resolvable.getFulfillable(), _promiseState.getResolvedWith());
+                if (fulfillable == null) {
+                    resolvable.getPromise().resolve(_promiseState.getResolvedWith());
+                    return;
                 }
-
+                Object result = _fulfiller.call(fulfillable, _promiseState.getResolvedWith());
                 if (result == null) {
                     return;
                 }
@@ -92,14 +92,12 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
             TRejectable  rejectable  = resolvable.getRejectable();
 
             try {
-                Object result = null;
-                if (rejectable!=null) {
-                    result = _rejector.call(rejectable, _promiseState.RejectedWith());
-                }
-
-                if (result == null) {
+                if (rejectable == null) {
+                    resolvable.getPromise().reject(_promiseState.RejectedWith());
                     return;
                 }
+
+                Object result = _rejector.call(rejectable, _promiseState.RejectedWith());
 
                 // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
                 resolvable.getPromise().reject(result);
