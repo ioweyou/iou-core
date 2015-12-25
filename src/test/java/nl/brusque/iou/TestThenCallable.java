@@ -1,4 +1,4 @@
 package nl.brusque.iou;
 
-abstract class TestThenCallable implements IThenCallable {
+abstract class TestThenCallable<T, R> implements IThenCallable<T, R> {
 }

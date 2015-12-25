@@ -1,5 +1,8 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.errors.TypeError;
+import nl.brusque.iou.errors.TypeErrorException;
+
 import java.util.ArrayDeque;
 
 class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> {
@@ -9,32 +12,26 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
     private final ArrayDeque<Resolvable<TResult, TFulfillable, TRejectable>> _onResolve = new ArrayDeque<>();
     private final PromiseThenCallable _promiseResolverFulfillableClass;
     private final PromiseRejectable _promiseResolverRejectableClass;
-    private final DefaultThenCallable<TFulfillable> _fulfiller;
-    private final DefaultThenCallable<TRejectable> _rejector;
+    private final DefaultThenCaller _fulfiller;
+    private final DefaultThenCaller _rejector;
 
-    public PromiseResolverEventHandler(
-            PromiseStateHandler promiseState,
-            EventDispatcher eventDispatcher,
-            PromiseThenCallable promiseFulfiller,
-            PromiseRejectable promiseRejector,
-            DefaultThenCallable<TFulfillable> fulfiller,
-            DefaultThenCallable<TRejectable> rejector
-        ) {
-        _promiseState    = promiseState;
+    public PromiseResolverEventHandler(EventDispatcher eventDispatcher, Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass, PromiseThenCallable promiseResolverFulfillableClass, PromiseRejectable promiseResolverRejectableClass, DefaultThenCaller fulfiller, DefaultThenCaller rejector) {
+        _promiseState    = new PromiseStateHandler();
         _eventDispatcher = eventDispatcher;
 
-        _promiseResolverFulfillableClass = promiseFulfiller!=null ? promiseFulfiller : new PromiseThenCallable();
-        _promiseResolverRejectableClass  = promiseRejector!=null ? promiseRejector : new PromiseRejectable();
+        _promiseResolverFulfillableClass = promiseResolverFulfillableClass!=null ? promiseResolverFulfillableClass : new PromiseThenCallable();
+        _promiseResolverRejectableClass  = promiseResolverRejectableClass!=null ? promiseResolverRejectableClass : new PromiseRejectable();
         _fulfiller = fulfiller;
         _rejector  = rejector;
 
-        eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(promiseState, eventDispatcher, this));
+        eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(this, fulfillableClass, rejectableClass));
+        eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(_promiseState, eventDispatcher, this));
         eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
-        eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(promiseState, eventDispatcher, this));
+        eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(_promiseState, eventDispatcher, this));
         eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
     }
 
-    public class PromiseRejectable implements IThenCallable {
+    class PromiseRejectable implements IThenCallable {
         @Override
         public Object apply(Object o) throws Exception {
             _promiseState.reject(o);
@@ -44,7 +41,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    public class PromiseThenCallable implements IThenCallable {
+    class PromiseThenCallable implements IThenCallable {
         @Override
         public Object apply(Object o) throws Exception {
             _promiseState.fulfill(o);
@@ -54,15 +51,25 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    public synchronized void resolvePromiseValue(AbstractPromise promise) {
+    synchronized void resolvePromiseValue(AbstractPromise promise) {
         promise.then(_promiseResolverFulfillableClass, _promiseResolverRejectableClass);
     }
 
-    public synchronized void addResolvable(TFulfillable fulfillable, TRejectable rejectable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
+    synchronized void addResolvable(TFulfillable fulfillable, TRejectable rejectable, AbstractPromise<TResult, TFulfillable, TRejectable> nextPromise) {
         _onResolve.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
+
+        if (_promiseState.isRejected()) {
+            _eventDispatcher.queue(new FireRejectsEvent());
+        } else if (_promiseState.isResolved()) {
+            _eventDispatcher.queue(new FireFulfillsEvent());
+        }
     }
 
-    public synchronized void resolve() {
+    synchronized void addThenable(Object onFulfilled, Object onRejected, TResult nextPromise) {
+        _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
+    }
+
+    synchronized void resolve() {
         while (!_onResolve.isEmpty()) {
             Resolvable<TResult, TFulfillable, TRejectable> resolvable = _onResolve.remove();
             TFulfillable fulfillable = resolvable.getFulfillable();
@@ -86,7 +93,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
-    public synchronized void reject() {
+    synchronized void reject() {
         while (!_onResolve.isEmpty()) {
             Resolvable<TResult, TFulfillable, TRejectable> resolvable = _onResolve.remove();
             TRejectable  rejectable  = resolvable.getRejectable();
@@ -108,4 +115,35 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
         }
     }
 
+    synchronized AbstractPromise<TResult, TFulfillable, TRejectable> resolveWithValue(final AbstractPromise<TResult, TFulfillable, TRejectable> promise, final Object o) {
+        return resolvePromise(promise, FulfillEvent.class, RejectEvent.class, o);
+    }
+
+    synchronized AbstractPromise<TResult, TFulfillable, TRejectable> rejectWithValue(final AbstractPromise<TResult, TFulfillable, TRejectable> promise, final Object o) {
+        return resolvePromise(promise, RejectEvent.class, RejectEvent.class, o);
+    }
+
+    private boolean testObjectEqualsPromise(Object o, AbstractPromise<TResult, TFulfillable, TRejectable> promise) {
+        return o != null && o.equals(promise);
+    }
+
+    private AbstractPromise<TResult, TFulfillable, TRejectable> resolvePromise(final AbstractPromise<TResult, TFulfillable, TRejectable> promise, final Class<? extends AbstractEvent> event, final Class<? extends AbstractEvent> onFailEvent, final Object o) {
+        if (!_promiseState.isPending()) {
+            return promise;
+        }
+
+        try {
+            if (testObjectEqualsPromise(o, promise)) {
+                throw new TypeErrorException();
+            }
+        } catch (TypeErrorException e) {
+            // 2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.
+            _eventDispatcher.queue(EventFactory.create(onFailEvent, new TypeError()));
+            return promise;
+        }
+
+        _eventDispatcher.queue(EventFactory.create(event, o));
+
+        return promise;
+    }
 }

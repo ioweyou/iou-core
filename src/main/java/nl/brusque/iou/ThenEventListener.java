@@ -4,17 +4,13 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> implements IEventListener<ThenEvent<TResult, TFulfillable, TRejectable>> {
-    private final PromiseStateHandler _promiseState;
-    private final EventDispatcher _eventDispatcher;
     private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
     private final Class<TFulfillable> _fulfillableClass;
     private final Class<TRejectable> _rejectableClass;
 
     private static final Logger logger = LogManager.getLogger(ThenEventListener.class);
 
-    public ThenEventListener(PromiseStateHandler promiseState, EventDispatcher eventDispatcher, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler, Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass) {
-        _promiseState                = promiseState;
-        _eventDispatcher             = eventDispatcher;
+    public ThenEventListener(PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler, Class<TFulfillable> fulfillableClass, Class<TRejectable> rejectableClass) {
         _promiseResolverEventHandler = promiseResolverEventHandler;
         _fulfillableClass            = fulfillableClass;
         _rejectableClass             = rejectableClass;
@@ -30,8 +26,8 @@ class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, T
 
     @Override
     public void process(ThenEvent<TResult, TFulfillable, TRejectable> event) {
-        boolean isFulfillable = isFulfillable(event.onFulfilled, _fulfillableClass);
-        boolean isRejectable  = isRejectable(event.onRejected, _rejectableClass);
+        boolean isFulfillable = isFulfillable(event.getFulfillable(), _fulfillableClass);
+        boolean isRejectable  = isRejectable(event.getRejectable(), _rejectableClass);
 
         if (!isFulfillable || !isRejectable) {
             logger.warn(String.format("isFulfillable: %s, isRejectable: %s", isFulfillable, isRejectable));
@@ -39,19 +35,14 @@ class ThenEventListener<TResult extends AbstractPromise<TResult, TFulfillable, T
 
         TFulfillable fulfillable = null;
         if (isFulfillable) {
-            fulfillable = _fulfillableClass.cast(event.onFulfilled);
+            fulfillable = _fulfillableClass.cast(event.getFulfillable());
         }
 
         TRejectable rejectable = null;
         if (isRejectable) {
-            rejectable = _rejectableClass.cast(event.onRejected);
+            rejectable = _rejectableClass.cast(event.getRejectable());
         }
 
-        _promiseResolverEventHandler.addResolvable(fulfillable, rejectable, event.nextPromise);
-        if (_promiseState.isRejected()) {
-            _eventDispatcher.queue(new FireRejectsEvent());
-        } else if (_promiseState.isResolved()) {
-            _eventDispatcher.queue(new FireFulfillsEvent());
-        }
+        _promiseResolverEventHandler.addResolvable(fulfillable, rejectable, event.getPromise());
     }
 }
