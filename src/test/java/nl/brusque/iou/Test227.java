@@ -47,14 +47,14 @@ public class Test227 extends TestBase {
 
                                         IThenable promise2 = promise1.then(new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) throws Exception {
+                                            public Object apply(Object o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
                                         promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) throws Exception {
+                                            public Object apply(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);
@@ -72,14 +72,14 @@ public class Test227 extends TestBase {
 
                                         IThenable promise2 = promise1.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) throws Exception {
+                                            public Object apply(Object o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
                                         promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) throws Exception {
+                                            public Object apply(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);

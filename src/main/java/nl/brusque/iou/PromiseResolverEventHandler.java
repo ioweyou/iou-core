@@ -36,7 +36,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
 
     public class PromiseRejectable implements IThenCallable {
         @Override
-        public Object call(Object o) throws Exception {
+        public Object apply(Object o) throws Exception {
             _promiseState.reject(o);
             _eventDispatcher.queue(new FireRejectsEvent());
 
@@ -46,7 +46,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
 
     public class PromiseThenCallable implements IThenCallable {
         @Override
-        public Object call(Object o) throws Exception {
+        public Object apply(Object o) throws Exception {
             _promiseState.fulfill(o);
             _eventDispatcher.queue(new FireFulfillsEvent());
 
@@ -72,7 +72,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
                     resolvable.getPromise().resolve(_promiseState.getResolvedWith());
                     return;
                 }
-                Object result = _fulfiller.call(fulfillable, _promiseState.getResolvedWith());
+                Object result = _fulfiller.apply(fulfillable, _promiseState.getResolvedWith());
                 if (result == null) {
                     return;
                 }
@@ -97,7 +97,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult, TFulf
                     return;
                 }
 
-                Object result = _rejector.call(rejectable, _promiseState.RejectedWith());
+                Object result = _rejector.apply(rejectable, _promiseState.RejectedWith());
 
                 // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
                 resolvable.getPromise().reject(result);

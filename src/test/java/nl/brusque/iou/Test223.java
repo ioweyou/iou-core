@@ -23,7 +23,7 @@ public class Test223 extends TestBase {
 
                             d.getPromise().then(null, new TestThenCallable() {
                                 @Override
-                                public Object call(Object o) {
+                                public Object apply(Object o) {
                                     Assert.assertTrue("isRejected should be true", isRejected[0]);
 
                                     return null;
@@ -45,7 +45,7 @@ public class Test223 extends TestBase {
 
                             d.getPromise().then(null, new TestThenCallable() {
                                 @Override
-                                public Object call(Object o) {
+                                public Object apply(Object o) {
                                     Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
 
                                     return null;
@@ -69,7 +69,7 @@ public class Test223 extends TestBase {
 
                                 rejected(dummy).then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -86,7 +86,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -106,7 +106,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -127,7 +127,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -148,7 +148,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -158,7 +158,7 @@ public class Test223 extends TestBase {
                                 delay(50);
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;
@@ -168,7 +168,7 @@ public class Test223 extends TestBase {
                                 delay(50);
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
 
                                         return null;
@@ -188,7 +188,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Void call(Object o) {
+                                    public Void apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                         return null;
@@ -199,7 +199,7 @@ public class Test223 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Void call(Object o) {
+                                    public Void apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;

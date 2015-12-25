@@ -22,7 +22,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         onFullfilledCalled[0] = true;
 
                                         return null;
@@ -45,7 +45,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         onFullfilledCalled[0] = true;
 
                                         return null;
@@ -64,10 +64,10 @@ public class Test224 extends TestBase {
 
                                 promise.then(new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         promise.then(new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
                                                 return null;
                                             }
@@ -92,10 +92,10 @@ public class Test224 extends TestBase {
 
                                 promise.then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         promise2.then(new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 Assert.assertTrue("first onRejected should have finished", firstOnFulfilledFinished[0]);
                                                 return null;
                                             }
@@ -119,7 +119,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
 
                                         return null;
@@ -152,7 +152,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         onRejectedCalled[0] = true;
 
                                         return null;
@@ -175,7 +175,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         onRejectedCalled[0] = true;
 
                                         return null;
@@ -195,10 +195,10 @@ public class Test224 extends TestBase {
 
                                 promise.then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         promise.then(new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 Assert.assertTrue("first onRejected should have finished", firstOnRejectedFinished[0]);
                                                 return null;
                                             }
@@ -223,10 +223,10 @@ public class Test224 extends TestBase {
 
                                 promise.then(new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         promise2.then(null, new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
 
                                                 return null;
@@ -251,7 +251,7 @@ public class Test224 extends TestBase {
 
                                 d.getPromise().then(null, new TestThenCallable() {
                                     @Override
-                                    public Object call(Object o) {
+                                    public Object apply(Object o) {
                                         Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
 
                                         return null;

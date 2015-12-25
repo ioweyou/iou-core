@@ -12,7 +12,7 @@ public class Test212 extends TestBase {
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to call then immediately reject", new Runnable() {
+                specify("trying to apply then immediately reject", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
@@ -22,14 +22,14 @@ public class Test212 extends TestBase {
                         d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
                         }, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -42,7 +42,7 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to call then reject, delayed", new Runnable() {
+                specify("trying to apply then reject, delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
@@ -52,14 +52,14 @@ public class Test212 extends TestBase {
                         d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
                         }, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -74,7 +74,7 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to call immediately then reject delayed", new Runnable() {
+                specify("trying to apply immediately then reject delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
@@ -84,14 +84,14 @@ public class Test212 extends TestBase {
                         d.getPromise().then(new TestThenCallable() {
 
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
                         }, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) {
+                            public Object apply(Object o) {
                                 Assert.assertEquals("onRejected should not have been called", true, onFulfilledCalled[0]);
 
                                 return o;

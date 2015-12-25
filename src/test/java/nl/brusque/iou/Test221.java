@@ -22,7 +22,7 @@ public class Test221 extends TestBase {
 
                                         d.reject(dummy).then(o, new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 return null;
                                             }
                                         });
@@ -49,13 +49,13 @@ public class Test221 extends TestBase {
                                         d.reject(dummy)
                                                 .then(new TestThenCallable() {
                                                     @Override
-                                                    public Object call(Object o) {
+                                                    public Object apply(Object o) {
                                                         return null;
                                                     }
                                                 })
                                                 .then(o, new TestThenCallable() {
                                                     @Override
-                                                    public Object call(Object o) {
+                                                    public Object apply(Object o) {
                                                         return null;
                                                     }
                                                 });
@@ -94,7 +94,7 @@ public class Test221 extends TestBase {
                                         d.resolve(dummy)
                                                 .then(new TestThenCallable() {
                                                     @Override
-                                                    public Object call(Object o) {
+                                                    public Object apply(Object o) {
                                                         return null;
                                                     }
                                                 }, o);
@@ -121,7 +121,7 @@ public class Test221 extends TestBase {
                                         d.resolve(dummy)
                                         .then(new TestThenCallable() {
                                             @Override
-                                            public Object call(Object o) {
+                                            public Object apply(Object o) {
                                                 return null;
                                             }
                                         }, o);

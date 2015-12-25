@@ -1,5 +1,5 @@
 package nl.brusque.iou;
 
-public interface IThenCallable {
-    Object call(final Object o) throws Exception;
+public interface IThenCallable<T, R> {
+    R apply(final T o) throws Exception;
 }

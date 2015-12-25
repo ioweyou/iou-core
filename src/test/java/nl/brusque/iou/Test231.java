@@ -22,14 +22,14 @@ public class Test231 extends TestBase {
                         final List<IThenable> promises = new ArrayList<>();
                         promises.add(resolved(dummy).then(new TestThenCallable() {
                             @Override
-                            public Object call(Object o) throws Exception {
+                            public Object apply(Object o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
                         promises.get(0).then(null, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) throws Exception {
+                            public Object apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
 
                                 return null;
@@ -45,14 +45,14 @@ public class Test231 extends TestBase {
 
                         promises.add(rejected(dummy).then(null, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) throws Exception {
+                            public Object apply(Object o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
                         promises.get(0).then(null, new TestThenCallable() {
                             @Override
-                            public Object call(Object o) throws Exception {
+                            public Object apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
 
                                 return null;

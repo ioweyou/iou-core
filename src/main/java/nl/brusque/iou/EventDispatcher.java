@@ -53,7 +53,7 @@ class EventDispatcher {
         }
 
         for (IEventListener listener : _eventListeners.get(clazz)) {
-            listener.process(event); // FIXME unchecked call
+            listener.process(event); // FIXME unchecked apply
         }
     }
 
