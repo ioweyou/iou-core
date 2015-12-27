@@ -1,9 +1,9 @@
 package nl.brusque.iou;
 
-class FireRejectsEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> implements IEventListener<FireRejectsEvent> {
-    private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
+class FireRejectsEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FireRejectsEvent> {
+    private final PromiseResolverEventHandler<TResult> _promiseResolverEventHandler;
 
-    public FireRejectsEventListener(PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler) {
+    public FireRejectsEventListener(PromiseResolverEventHandler<TResult> promiseResolverEventHandler) {
         _promiseResolverEventHandler = promiseResolverEventHandler;
     }
 

@@ -1,11 +1,11 @@
 package nl.brusque.iou;
 
-class FulfillEventListener<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> implements IEventListener<FulfillEvent> {
+class FulfillEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FulfillEvent> {
     private final PromiseStateHandler _promiseState;
     private final EventDispatcher _eventDispatcher;
-    private final PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> _promiseResolverEventHandler;
+    private final PromiseResolverEventHandler<TResult> _promiseResolverEventHandler;
 
-    public FulfillEventListener(PromiseStateHandler promiseState, EventDispatcher eventDispatcher, PromiseResolverEventHandler<TResult, TFulfillable, TRejectable> promiseResolverEventHandler) {
+    public FulfillEventListener(PromiseStateHandler promiseState, EventDispatcher eventDispatcher, PromiseResolverEventHandler<TResult> promiseResolverEventHandler) {
         _promiseState    = promiseState;
         _eventDispatcher = eventDispatcher;
         _promiseResolverEventHandler = promiseResolverEventHandler;

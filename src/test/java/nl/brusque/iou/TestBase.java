@@ -12,19 +12,19 @@ class TestBase {
     private static final Logger logger = LogManager.getLogger(TestBase.class);
 
 
-    private class TestPromise extends AbstractPromise<TestPromise, TestThenCallable, TestThenCallable> {
-        public TestPromise() {
-            super(TestThenCallable.class, TestThenCallable.class);
+    private class TestPromise extends AbstractPromise<TestPromise> {
+        protected TestPromise(IThenCaller fulfiller, IThenCaller rejector) {
+            super(fulfiller, rejector);
         }
 
         @Override
         public TestPromise create() {
-            return new TestPromise();
+            return new TestPromise(new TestGenericThenCaller(), new TestGenericThenCaller());
         }
     }
 
-    private class TestIOU extends AbstractIOU<TestPromise, TestThenCallable, TestThenCallable> {
-        private final TestPromise _promise = new TestPromise();
+    private class TestIOU extends AbstractIOU<TestPromise> {
+        private final TestPromise _promise = new TestPromise(new TestGenericThenCaller(), new TestGenericThenCaller());
 
         @Override
         public TestPromise getPromise() {

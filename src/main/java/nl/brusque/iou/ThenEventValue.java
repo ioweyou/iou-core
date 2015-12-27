@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class ThenEventValue<TResult extends AbstractPromise<TResult, TFulfillable, TRejectable>, TFulfillable extends IThenCallable, TRejectable extends IThenCallable> {
+class ThenEventValue<TResult extends AbstractPromise<TResult>> {
     private final Object onFulfilled;
     private final Object onRejected;
     private final TResult nextPromise;
