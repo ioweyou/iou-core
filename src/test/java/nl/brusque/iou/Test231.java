@@ -11,7 +11,7 @@ import java.util.List;
 public class Test231 extends TestBase {
     @Test
     public void test231IfPromiseAndXReferToTheSameObjectRejectPromiseWithATypeError() {
-        describe("2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.", new Runnable() {
+        describe("2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError' as the reason.", new Runnable() {
             final String dummy     = "DUMMY";
 
             @Override

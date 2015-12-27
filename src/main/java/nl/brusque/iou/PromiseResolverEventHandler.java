@@ -10,10 +10,10 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
     private final EventDispatcher _eventDispatcher;
 
     private final ArrayDeque<Resolvable> _onResolve = new ArrayDeque<>();
-    private final IThenCaller _fulfiller;
-    private final IThenCaller _rejector;
+    private final AbstractThenCaller _fulfiller;
+    private final AbstractThenCaller _rejector;
 
-    public PromiseResolverEventHandler(EventDispatcher eventDispatcher, IThenCaller fulfiller, IThenCaller rejector) {
+    public PromiseResolverEventHandler(EventDispatcher eventDispatcher, AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
         _promiseState    = new PromiseStateHandler();
         _eventDispatcher = eventDispatcher;
 
@@ -65,7 +65,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
     }
 
-    synchronized void resolve() {
+    synchronized void fireResolvables() {
         while (!_onResolve.isEmpty()) {
             Resolvable resolvable = _onResolve.remove();
             IThenCallable fulfillable = resolvable.getFulfillable();
@@ -75,7 +75,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
                     resolvable.getPromise().resolve(_promiseState.getResolvedWith());
                     return;
                 }
-                Object result = _fulfiller.apply(fulfillable, _promiseState.getResolvedWith());
+                Object result = _fulfiller.call(fulfillable, _promiseState.getResolvedWith());
                 if (result == null) {
                     return;
                 }
@@ -89,7 +89,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         }
     }
 
-    synchronized void reject() {
+    synchronized void fireRejectables() {
         while (!_onResolve.isEmpty()) {
             Resolvable resolvable = _onResolve.remove();
             IThenCallable  rejectable  = resolvable.getRejectable();
@@ -100,7 +100,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
                     return;
                 }
 
-                Object result = _rejector.apply(rejectable, _promiseState.RejectedWith());
+                Object result = _rejector.call(rejectable, _promiseState.RejectedWith());
 
                 // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
                 resolvable.getPromise().reject(result);
@@ -133,7 +133,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
                 throw new TypeErrorException();
             }
         } catch (TypeErrorException e) {
-            // 2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.
+            // 2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError' as the reason.
             _eventDispatcher.queue(EventFactory.create(onFailEvent, new TypeError()));
             return promise;
         }

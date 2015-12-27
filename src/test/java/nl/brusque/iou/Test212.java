@@ -12,7 +12,7 @@ public class Test212 extends TestBase {
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to apply then immediately reject", new Runnable() {
+                specify("trying to call then immediately fireRejectables", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
@@ -42,7 +42,7 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to apply then reject, delayed", new Runnable() {
+                specify("trying to call then fireRejectables, delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();
@@ -74,7 +74,7 @@ public class Test212 extends TestBase {
                     }
                 });
 
-                specify("trying to apply immediately then reject delayed", new Runnable() {
+                specify("trying to call immediately then fireRejectables delayed", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU d = deferred();

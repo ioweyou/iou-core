@@ -20,10 +20,6 @@ class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEv
         return null;
     }
 
-    private boolean isRejectable(Object onRejected) {
-        return onRejected != null && onRejected instanceof IThenCallable;
-    }
-
     @Override
     public void process(ThenEvent<TResult> event) {
         IThenCallable fulfillable = castThenCallable(event.getFulfillable());

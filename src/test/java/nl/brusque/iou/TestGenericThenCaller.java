@@ -1,8 +1,20 @@
 package nl.brusque.iou;
 
-class TestGenericThenCaller implements IThenCaller {
+class TestGenericThenCaller extends AbstractThenCaller {
     @Override
-    public <T, R, TThenCallable extends IThenCallable<T, R>> R apply(final TThenCallable thenCallable, final T o) throws Exception {
-        return thenCallable.apply(o);
+    <T, R> IThenCallable<T, R> convert(final IThenCallable<T, R> thenCallable) throws Exception {
+        if (thenCallable instanceof TestThenCallable) {
+            return thenCallable;
+        }
+
+        return new TestThenCallable<T, R>() {
+
+            @Override
+            public R apply(T o) throws Exception {
+                // DO SOMETHING
+
+                return thenCallable.apply(o);
+            }
+        };
     }
 }

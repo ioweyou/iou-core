@@ -78,7 +78,7 @@ public class Test223 extends TestBase {
                             }
                         });
 
-                        specify("trying to reject a pending promise more than once, immediately", new Runnable() {
+                        specify("trying to fireRejectables a pending promise more than once, immediately", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
@@ -98,7 +98,7 @@ public class Test223 extends TestBase {
                             }
                         });
 
-                        specify("trying to reject a pending promise more than once, delayed", new Runnable() {
+                        specify("trying to fireRejectables a pending promise more than once, delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
@@ -119,7 +119,7 @@ public class Test223 extends TestBase {
                             }
                         });
 
-                        specify("trying to reject a pending promise more than once, immediately then delayed", new Runnable() {
+                        specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();

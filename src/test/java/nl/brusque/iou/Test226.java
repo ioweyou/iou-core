@@ -322,7 +322,7 @@ public class Test226 extends TestBase {
 //
 //                                        promise.then(null, new TestRejectable() {
 //                                            @Override
-//                                            public Object reject(Object o) {
+//                                            public Object fireRejectables(Object o) {
 //                                                Assert.assertEquals("Value should equal sentinel", sentinel, o);
 //
 //                                                Assert.assertEquals("Handler1 not called with sentinel", sentinel, handler1.getCalledWith());
@@ -356,7 +356,7 @@ public class Test226 extends TestBase {
 //
 //                                        promise.then(null, new TestRejectable() {
 //                                            @Override
-//                                            public Object reject(Object o) {
+//                                            public Object fireRejectables(Object o) {
 //                                                Assert.assertEquals("Value should equal sentinel", sentinel, o);
 //
 //                                                Assert.assertEquals("Handler1 not called with sentinel", sentinel, handler1.getCalledWith());
@@ -383,12 +383,12 @@ public class Test226 extends TestBase {
 //                                        promise
 //                                                .then(null, new TestRejectable() {
 //                                                    @Override
-//                                                    public Object reject(Object o) {
+//                                                    public Object fireRejectables(Object o) {
 //                                                        return sentinel;
 //                                                    }
 //                                                }).then(null, new TestRejectable() {
 //                                            @Override
-//                                            public Object reject(Object o) {
+//                                            public Object fireRejectables(Object o) {
 //                                                Assert.assertEquals("Object should equal sentinel", sentinel, o);
 //
 //                                                return null;
@@ -398,13 +398,13 @@ public class Test226 extends TestBase {
 //                                        promise
 //                                                .then(null, new TestRejectable() {
 //                                                    @Override
-//                                                    public Object reject(Object o) throws Exception {
+//                                                    public Object fireRejectables(Object o) throws Exception {
 //                                                        throw new Exception(sentinel2);
 //                                                    }
 //                                                })
 //                                                .then(null, new TestRejectable() {
 //                                                    @Override
-//                                                    public Object reject(Object o) throws Exception {
+//                                                    public Object fireRejectables(Object o) throws Exception {
 //                                                        Exception e = (Exception) o; // :')
 //                                                        Assert.assertEquals("Object should equal sentinel2", sentinel2, e.getMessage());
 //
@@ -415,13 +415,13 @@ public class Test226 extends TestBase {
 //                                        promise
 //                                                .then(null, new TestRejectable() {
 //                                                    @Override
-//                                                    public Object reject(Object o) {
+//                                                    public Object fireRejectables(Object o) {
 //                                                        return sentinel3;
 //                                                    }
 //                                                })
 //                                                .then(new TestThenCallable() {
 //                                                    @Override
-//                                                    public Object apply(Object o) {
+//                                                    public Object call(Object o) {
 //                                                        Assert.assertEquals("Object should equal sentinel3", sentinel3, o);
 //
 //                                                        return null;
@@ -450,7 +450,7 @@ public class Test226 extends TestBase {
 //
 //                                        promise.then(null, new TestRejectable() {
 //                                            @Override
-//                                            public Object reject(Object o) throws Exception {
+//                                            public Object fireRejectables(Object o) throws Exception {
 //                                                boolean a = handler1.lastCall() < handler2.lastCall();
 //                                                boolean b = handler2.lastCall() < handler3.lastCall();
 //                                                boolean c = a && b;
@@ -476,8 +476,8 @@ public class Test226 extends TestBase {
 //                                                final AbstractPromise promise = getPromise();
 //                                                promise.then(null, new RejectableSpy() {
 //                                                    @Override
-//                                                    public Object reject(Object o) throws Exception {
-//                                                        handler1.apply(o);
+//                                                    public Object fireRejectables(Object o) throws Exception {
+//                                                        handler1.call(o);
 //
 //                                                        promise.then(null, handler3);
 //
@@ -488,7 +488,7 @@ public class Test226 extends TestBase {
 //
 //                                                promise.then(null, new RejectableSpy() {
 //                                                    @Override
-//                                                    public Object reject(Object o) throws Exception {
+//                                                    public Object fireRejectables(Object o) throws Exception {
 //                                                        new Timer().schedule(new TimerTask() {
 //                                                            @Override
 //                                                            public void run() {

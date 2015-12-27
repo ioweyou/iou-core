@@ -9,6 +9,6 @@ class FireRejectsEventListener<TResult extends AbstractPromise<TResult>> impleme
 
     @Override
     public void process(FireRejectsEvent event) {
-        _promiseResolverEventHandler.reject();
+        _promiseResolverEventHandler.fireRejectables();
     }
 }

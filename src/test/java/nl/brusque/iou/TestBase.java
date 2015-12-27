@@ -13,7 +13,7 @@ class TestBase {
 
 
     private class TestPromise extends AbstractPromise<TestPromise> {
-        protected TestPromise(IThenCaller fulfiller, IThenCaller rejector) {
+        protected TestPromise(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
             super(fulfiller, rejector);
         }
 

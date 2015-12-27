@@ -3,7 +3,7 @@ package nl.brusque.iou;
 public abstract class AbstractPromise<TResult extends AbstractPromise<TResult>> implements IThenable<TResult> {
     private final PromiseResolverEventHandler<TResult> _promiseResolverEventHandler;
 
-    protected AbstractPromise(IThenCaller fulfiller, IThenCaller rejector) {
+    protected AbstractPromise(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
         _promiseResolverEventHandler =
                 new PromiseResolverEventHandler<>(
                     new EventDispatcher(),

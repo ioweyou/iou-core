@@ -78,7 +78,7 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to apply a pending promise more than once, immediately", new Runnable() {
+                        specify("trying to call a pending promise more than once, immediately", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
@@ -98,7 +98,7 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to apply a pending promise more than once, delayed", new Runnable() {
+                        specify("trying to call a pending promise more than once, delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
@@ -119,7 +119,7 @@ public class Test222 extends TestBase {
                             }
                         });
 
-                        specify("trying to apply a pending promise more than once, immediately then delayed", new Runnable() {
+                        specify("trying to call a pending promise more than once, immediately then delayed", new Runnable() {
                             @Override
                             public void run() {
                                 AbstractIOU d = deferred();
