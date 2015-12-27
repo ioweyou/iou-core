@@ -6,15 +6,12 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayDeque;
 
 class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<ThenEvent<TResult>> {
-    private final PromiseResolverEventHandler<TResult> _promiseResolverEventHandler;
-
     private static final Logger logger = LogManager.getLogger(ThenEventListener.class);
     private final EventDispatcher _eventDispatcher;
     private final PromiseStateHandler _promiseState;
     private final ArrayDeque<Resolvable> _onResolve;
 
-    public ThenEventListener(PromiseResolverEventHandler<TResult> promiseResolverEventHandler, EventDispatcher eventDispatcher, PromiseStateHandler promiseState, ArrayDeque<Resolvable> onResolve) {
-        _promiseResolverEventHandler = promiseResolverEventHandler;
+    public ThenEventListener(EventDispatcher eventDispatcher, PromiseStateHandler promiseState, ArrayDeque<Resolvable> onResolve) {
         _eventDispatcher             = eventDispatcher;
         _promiseState                = promiseState;
         _onResolve                   = onResolve;

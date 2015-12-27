@@ -17,112 +17,15 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         _fulfiller = fulfiller;
         _rejector  = rejector;
 
-        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(this, _eventDispatcher, _promiseState, _onResolve));
-        _eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(this));
-        _eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
-        _eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(this));
-        _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
+        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(_eventDispatcher, _promiseState, _onResolve));
+        _eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(_eventDispatcher, _promiseState));
+        _eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(_promiseState, _onResolve, _fulfiller));
+        _eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(_eventDispatcher, _promiseState));
+        _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(_promiseState, _onResolve, _rejector));
     }
-
-    private class PromiseRejectable implements IThenCallable {
-        @Override
-        public Object apply(Object o) throws Exception {
-            _promiseState.reject(o);
-            _eventDispatcher.queue(new FireRejectsEvent());
-
-            return o;
-        }
-    }
-
-    private class PromiseFulfillable implements IThenCallable {
-        @Override
-        public Object apply(Object o) throws Exception {
-            _promiseState.fulfill(o);
-            _eventDispatcher.queue(new FireFulfillsEvent());
-
-            return o;
-        }
-    }
-
-    synchronized void rejectWithValue(Object value) {
-        if (!_promiseState.isPending()) {
-            return;
-        }
-
-        if (value instanceof AbstractPromise) {
-            ((AbstractPromise)value).then(new PromiseFulfillable(), new PromiseRejectable());
-
-            return;
-        }
-
-        _promiseState.reject(value);
-        _eventDispatcher.queue(new FireRejectsEvent());
-    }
-
-    synchronized void fulfillWithValue(Object value) {
-        if (!_promiseState.isPending()) {
-            return;
-        }
-
-        if (value instanceof AbstractPromise) {
-            ((AbstractPromise)value).then(new PromiseFulfillable(), new PromiseRejectable());
-
-            return;
-        }
-
-        _promiseState.fulfill(value);
-        _eventDispatcher.queue(new FireFulfillsEvent());
-    }
-
 
     synchronized void addThenable(Object onFulfilled, Object onRejected, TResult nextPromise) {
         _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
-    }
-
-    synchronized void fireFulfillables() {
-        while (!_onResolve.isEmpty()) {
-            Resolvable resolvable = _onResolve.remove();
-            IThenCallable fulfillable = resolvable.getFulfillable();
-
-            try {
-                if (fulfillable == null) {
-                    resolvable.getPromise().resolve(_promiseState.getResolvedWith());
-                    return;
-                }
-                Object result = _fulfiller.call(fulfillable, _promiseState.getResolvedWith());
-                if (result == null) {
-                    return;
-                }
-
-                // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-                resolvable.getPromise().resolve(result);
-            } catch (Exception e) {
-                // 2.2.7.2 If either onFulfilled or onRejected throws an exception e, promise2 must be rejected with e as the reason.
-                resolvable.getPromise().reject(e);
-            }
-        }
-    }
-
-    synchronized void fireRejectables() {
-        while (!_onResolve.isEmpty()) {
-            Resolvable resolvable = _onResolve.remove();
-            IThenCallable  rejectable  = resolvable.getRejectable();
-
-            try {
-                if (rejectable == null) {
-                    resolvable.getPromise().reject(_promiseState.RejectedWith());
-                    return;
-                }
-
-                Object result = _rejector.call(rejectable, _promiseState.RejectedWith());
-
-                // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-                resolvable.getPromise().reject(result);
-            } catch (Exception e) {
-                // 2.2.7.2 If either onFulfilled or onRejected throws an exception e, promise2 must be rejected with e as the reason.
-                resolvable.getPromise().reject(e);
-            }
-        }
     }
 
     synchronized AbstractPromise<TResult> resolveWithValue(final AbstractPromise<TResult> promise, final Object o) {
