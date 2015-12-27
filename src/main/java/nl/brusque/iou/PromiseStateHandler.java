@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class PromiseStateHandler {
+final class PromiseStateHandler {
     private State _state = State.PENDING;
 
     private Object _rejectionReason;

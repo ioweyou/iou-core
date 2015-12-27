@@ -8,6 +8,7 @@ import org.mockito.Matchers;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static nl.brusque.iou.TestUtils.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -29,27 +30,27 @@ public class Test226 extends TestBase {
                         describe("multiple boring fulfillment handlers", new Runnable() {
                             @Override
                             public void run() {
-                                testFulfilled(sentinel, new Testable() {
+                                testFulfilled(sentinel, new Testable<Object>() {
                                     @Override
                                     public void run() {
                                         try {
-                                            final IThenCallable handler1 = fulfillableStub();
-                                            final IThenCallable handler2 = fulfillableStub();
-                                            final IThenCallable handler3 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler1 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler2 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler3 = fulfillableStub();
 
-                                            final IThenCallable spy = rejectableStub();
+                                            final IThenCallable<Object, String> spy = rejectableStub();
                                             when(handler1.apply(any(Object.class))).thenReturn(other);
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise promise = getPromise();
+                                            AbstractPromise<Object> promise = getPromise();
                                             promise.then(handler1, spy);
                                             promise.then(handler2, spy);
                                             promise.then(handler3, spy);
 
-                                            promise.then(new TestThenCallable() {
+                                            promise.then(new TestThenCallable<Object, Void>() {
                                                 @Override
-                                                public Object apply(Object o) {
+                                                public Void apply(Object o) {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
@@ -81,27 +82,27 @@ public class Test226 extends TestBase {
                         describe("multiple fulfillment handlers, one of which throws", new Runnable() {
                             @Override
                             public void run() {
-                                testFulfilled(sentinel, new Testable() {
+                                testFulfilled(sentinel, new Testable<Object>() {
                                     @Override
                                     public void run() {
                                         try {
-                                            final IThenCallable handler1 = fulfillableStub();
-                                            final IThenCallable handler2 = fulfillableStub();
-                                            final IThenCallable handler3 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler1 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler2 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler3 = fulfillableStub();
 
-                                            final IThenCallable spy = rejectableStub();
+                                            final IThenCallable<Object, String> spy = rejectableStub();
                                             when(handler1.apply(any(Object.class))).thenReturn(other);
                                             when(handler2.apply(any(Object.class))).thenThrow(new Exception());
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise promise = getPromise();
+                                            AbstractPromise<Object> promise = getPromise();
                                             promise.then(handler1, spy);
                                             promise.then(handler2, spy);
                                             promise.then(handler3, spy);
 
-                                            promise.then(new TestThenCallable() {
+                                            promise.then(new TestThenCallable<Object, Void>() {
                                                 @Override
-                                                public Object apply(Object o) {
+                                                public Void apply(Object o) {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
@@ -133,20 +134,20 @@ public class Test226 extends TestBase {
                         describe("results in multiple branching chains with their own fulfillment values", new Runnable() {
                             @Override
                             public void run() {
-                                testFulfilled(dummy, new Testable() {
+                                testFulfilled(dummy, new Testable<Object>() {
                                     @Override
                                     public void run() {
-                                        AbstractPromise promise = getPromise();
+                                        AbstractPromise<Object> promise = getPromise();
 
                                         promise
-                                            .then(new TestThenCallable() {
+                                            .then(new TestThenCallable<String, Object>() {
                                                 @Override
-                                                public Object apply(Object o) {
+                                                public Object apply(String o) {
                                                     return sentinel;
                                                 }
-                                            }).then(new TestThenCallable() {
+                                            }).then(new TestThenCallable<String, Void>() {
                                             @Override
-                                            public Object apply(Object o) {
+                                            public Void apply(String o) {
                                                 Assert.assertEquals("Object should equal sentinel", sentinel, o);
 
                                                 return null;
@@ -154,15 +155,15 @@ public class Test226 extends TestBase {
                                         });
 
                                         promise
-                                            .then(new TestThenCallable() {
+                                            .then(new TestThenCallable<String, Object>() {
                                                 @Override
-                                                public Object apply(Object o) throws Exception {
+                                                public Object apply(String o) throws Exception {
                                                     throw new Exception(sentinel2);
                                                 }
                                             })
-                                            .then(null, new TestThenCallable() {
+                                            .then(null, new TestThenCallable<Object, Void>() {
                                                 @Override
-                                                public Object apply(Object o) throws Exception {
+                                                public Void apply(Object o) throws Exception {
                                                     Exception e = (Exception)o; // :')
                                                     Assert.assertEquals("Object should equal sentinel2", sentinel2, e.getMessage());
 
@@ -171,15 +172,15 @@ public class Test226 extends TestBase {
                                             });
 
                                         promise
-                                            .then(new TestThenCallable() {
+                                            .then(new TestThenCallable<String, String>() {
                                                 @Override
-                                                public Object apply(Object o) {
+                                                public String apply(String o) {
                                                     return sentinel3;
                                                 }
                                             })
-                                            .then(new TestThenCallable() {
+                                            .then(new TestThenCallable<String, Void>() {
                                                 @Override
-                                                public Object apply(Object o) {
+                                                public Void apply(String o) {
                                                     Assert.assertEquals("Object should equal sentinel3", sentinel3, o);
 
                                                     return null;
@@ -194,29 +195,29 @@ public class Test226 extends TestBase {
                         describe("`onFulfilled` handlers are called in the original order", new Runnable() {
                             @Override
                             public void run() {
-                                testFulfilled(dummy, new Testable() {
+                                testFulfilled(dummy, new Testable<Object>() {
                                     @Override
                                     public void run() {
                                         try {
-                                            final IThenCallable handler1 = fulfillableStub();
-                                            final IThenCallable handler2 = fulfillableStub();
-                                            final IThenCallable handler3 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler1 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler2 = fulfillableStub();
+                                            final IThenCallable<Object, String> handler3 = fulfillableStub();
                                             final InOrder inOrder = inOrder(handler1, handler2, handler3);
 
                                             when(handler1.apply(any(Object.class))).thenReturn(other);
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise promise = getPromise();
+                                            AbstractPromise<Object> promise = getPromise();
                                             promise.then(handler1);
                                             promise.then(handler2);
                                             promise.then(handler3);
 
 
 
-                                            promise.then(new TestThenCallable() {
+                                            promise.then(new TestThenCallable<String, Void>() {
                                                 @Override
-                                                public Object apply(Object o) throws Exception {
+                                                public Void apply(String o) throws Exception {
 //                                                    boolean a = handler1.lastCall() < handler2.lastCall();
 //                                                    boolean b = handler2.lastCall() < handler3.lastCall();
 //                                                    boolean c = a && b;
@@ -238,23 +239,23 @@ public class Test226 extends TestBase {
                             describe("even when one handler is added inside another handler", new Runnable() { // FIXME This is not working
                                 @Override
                                 public void run() {
-                                    testFulfilled(dummy, new Testable() {
+                                    testFulfilled(dummy, new Testable<Object>() {
                                         @Override
                                         public void run() {
                                             try {
-                                                final IThenCallable handler1 = fulfillableStub();
-                                                final IThenCallable handler2 = fulfillableStub();
-                                                final IThenCallable handler3 = fulfillableStub();
+                                                final IThenCallable<Object, String> handler1 = fulfillableStub();
+                                                final IThenCallable<Object, String> handler2 = fulfillableStub();
+                                                final IThenCallable<Object, String> handler3 = fulfillableStub();
                                                 final InOrder inOrder = inOrder(handler1, handler2, handler3);
 
                                                 when(handler1.apply(any(Object.class))).thenReturn(dummy);
                                                 when(handler2.apply(any(Object.class))).thenReturn(dummy);
                                                 when(handler3.apply(any(Object.class))).thenReturn(dummy);
 
-                                                final AbstractPromise promise = getPromise();
-                                                promise.then(new TestThenCallable() {
+                                                final AbstractPromise<Object> promise = getPromise();
+                                                promise.then(new TestThenCallable<String, String>() {
                                                     @Override
-                                                    public Object apply(Object o) throws Exception {
+                                                    public String apply(String o) throws Exception {
                                                         handler1.apply(o);
 
                                                         promise.then(handler3);
@@ -265,9 +266,9 @@ public class Test226 extends TestBase {
                                                 promise.then(handler2);
 
 
-                                                promise.then(new TestThenCallable() {
+                                                promise.then(new TestThenCallable<String, Void>() {
                                                     @Override
-                                                    public Object apply(Object o) throws Exception {
+                                                    public Void apply(String o) throws Exception {
                                                         new Timer().schedule(new TimerTask() {
                                                             @Override
                                                             public void run() {

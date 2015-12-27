@@ -1,9 +1,9 @@
 package nl.brusque.iou;
 
-abstract class AbstractEvent {
+class DefaultEvent {
     private final Object _value;
 
-    public AbstractEvent(Object value) {
+    public DefaultEvent(Object value) {
         _value = value;
     }
 

@@ -8,6 +8,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.brusque.iou.TestUtils.*;
+
 public class Test231 extends TestBase {
     @Test
     public void test231IfPromiseAndXReferToTheSameObjectRejectPromiseWithATypeError() {
@@ -19,15 +21,18 @@ public class Test231 extends TestBase {
                 specify("via return from a fulfilled promise", new Runnable() {
                     @Override
                     public void run() {
-                        final List<IThenable> promises = new ArrayList<>();
-                        promises.add(resolved(dummy).then(new TestThenCallable() {
+                        final List<IThenable<Object>> promises = new ArrayList<>();
+
+                        IThenable<String> r = resolved(dummy);
+
+                        promises.add(r.then(new TestThenCallable<String, Object>() {
                             @Override
-                            public Object apply(Object o) throws Exception {
+                            public Object apply(String o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
-                        promises.get(0).then(null, new TestThenCallable() {
+                        promises.get(0).then(null, new TestThenCallable<Object, Object>() {
                             @Override
                             public Object apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
@@ -41,18 +46,20 @@ public class Test231 extends TestBase {
                 specify("via return from a rejected promise", new Runnable() {
                     @Override
                     public void run() {
-                        final List<IThenable> promises = new ArrayList<>();
+                        final List<IThenable<Object>> promises = new ArrayList<>();
 
-                        promises.add(rejected(dummy).then(null, new TestThenCallable() {
+                        IThenable<String> r = rejected(dummy);
+
+                        promises.add(r.then(null, new TestThenCallable<String, Object>() {
                             @Override
-                            public Object apply(Object o) throws Exception {
+                            public Object apply(String o) throws Exception {
                                 return promises.get(0);
                             }
                         }));
 
-                        promises.get(0).then(null, new TestThenCallable() {
+                        promises.get(0).then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Object apply(Object o) throws Exception {
+                            public Void apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
 
                                 return null;

@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class FireRejectsEvent extends AbstractEvent {
+final class FireRejectsEvent extends DefaultEvent {
 
     public FireRejectsEvent() {
         this(null);

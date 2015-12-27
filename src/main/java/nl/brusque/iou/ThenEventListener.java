@@ -3,7 +3,7 @@ package nl.brusque.iou;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<ThenEvent<TResult>> {
+final class ThenEventListener<TInput> implements IEventListener<ThenEvent<TInput>> {
     private static final Logger logger = LogManager.getLogger(ThenEventListener.class);
     private final EventDispatcher _eventDispatcher;
     private final PromiseStateHandler _promiseState;
@@ -24,7 +24,7 @@ class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEv
     }
 
     @Override
-    public void process(ThenEvent<TResult> event) {
+    public void process(ThenEvent<TInput> event) {
         IThenCallable fulfillable = castThenCallable(event.getFulfillable());
         IThenCallable rejectable = castThenCallable(event.getRejectable());
         boolean isFulfillable = fulfillable!=null;
@@ -37,7 +37,7 @@ class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEv
         addResolvable(fulfillable, rejectable, event.getPromise());
     }
 
-    private <TFulfillable, RFulfillable, TRejectable, RRejectable> void addResolvable(IThenCallable<TFulfillable, RFulfillable> fulfillable, IThenCallable<TRejectable, RRejectable> rejectable, TResult nextPromise) {
+    private <TFulfillable, RFulfillable, TRejectable, RRejectable> void addResolvable(IThenCallable<TFulfillable, RFulfillable> fulfillable, IThenCallable<TRejectable, RRejectable> rejectable, AbstractPromise<TInput> nextPromise) {
         _resolvableManager.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
 
         if (_promiseState.isRejected()) {

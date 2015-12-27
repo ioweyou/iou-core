@@ -1,13 +1,13 @@
 package nl.brusque.iou;
 
-abstract class Testable implements Runnable {
-    private AbstractPromise _p;
+abstract class Testable<TInput> implements Runnable {
+    private AbstractPromise<TInput> _p;
 
-    protected void setPromise(AbstractPromise p) {
+    protected void setPromise(AbstractPromise<TInput> p) {
         _p = p;
     }
 
-    protected AbstractPromise getPromise() {
+    protected AbstractPromise<TInput> getPromise() {
         return _p;
     }
 }

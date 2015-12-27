@@ -3,7 +3,9 @@ package nl.brusque.iou;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Test212 extends TestBase {
+import static nl.brusque.iou.TestUtils.*;
+
+public class Test212 {
     @Test
     public void test2121WhenFulfilledAPromiseMustNotTransitionToAnyOtherState() {
         describe("2.1.2.1: When fulfilled, a promise: must not transition to any other state.", new Runnable() {
@@ -15,21 +17,21 @@ public class Test212 extends TestBase {
                 specify("trying to call then immediately fireRejectables", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -45,21 +47,21 @@ public class Test212 extends TestBase {
                 specify("trying to call then fireRejectables, delayed", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
@@ -77,21 +79,21 @@ public class Test212 extends TestBase {
                 specify("trying to call immediately then fireRejectables delayed", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onFulfilledCalled[0] = true;
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onRejected should not have been called", true, onFulfilledCalled[0]);
 
                                 return o;

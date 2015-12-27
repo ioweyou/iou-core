@@ -1,17 +1,17 @@
 package nl.brusque.iou;
 
-class Resolvable<TResult extends AbstractPromise<TResult>, TFulfill, RFulfill, TReject, RReject> {
-    private final AbstractPromise<TResult> _promise;
+final class Resolvable<TInput, TFulfill, RFulfill, TReject, RReject> {
+    private final AbstractPromise<TInput> _promise;
     private final IThenCallable<TFulfill, RFulfill> _fulfillable;
     private final IThenCallable<TReject, RReject> _rejectable;
 
-    public  Resolvable(IThenCallable<TFulfill, RFulfill> fulfillable, IThenCallable<TReject, RReject> rejectable, TResult promise) {
+    public Resolvable(IThenCallable<TFulfill, RFulfill> fulfillable, IThenCallable<TReject, RReject> rejectable, AbstractPromise<TInput> promise) {
         _promise     = promise;
         _fulfillable = fulfillable;
         _rejectable  = rejectable;
     }
 
-    public AbstractPromise<TResult> getPromise() {
+    public AbstractPromise<TInput> getPromise() {
         return _promise;
     }
 

@@ -3,6 +3,8 @@ package nl.brusque.iou;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static nl.brusque.iou.TestUtils.*;
+
 public class Test213 extends TestBase {
     @Test
     public void test2131WhenRejectedAPromiseMustNotTransitionToAnyOtherState() {
@@ -14,21 +16,21 @@ public class Test213 extends TestBase {
                 specify("trying to fireRejectables then immediately call", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onRejectedCalled[0] = true;
 
                                 return o;
@@ -44,21 +46,21 @@ public class Test213 extends TestBase {
                 specify("trying to fireRejectables then call, delayed", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onRejectedCalled[0] = true;
 
                                 return o;
@@ -75,21 +77,21 @@ public class Test213 extends TestBase {
                 specify("trying to fireRejectables immediately then call delayed", new Runnable() {
                     @Override
                     public void run() {
-                        AbstractIOU d = deferred();
+                        AbstractIOU<String> d = deferred();
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable() {
+                        d.getPromise().then(new TestThenCallable<String, String>() {
 
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }
-                        }, new TestThenCallable() {
+                        }, new TestThenCallable<String, String>() {
                             @Override
-                            public Object apply(Object o) {
+                            public String apply(String o) {
                                 onRejectedCalled[0] = true;
 
                                 return o;

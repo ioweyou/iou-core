@@ -3,7 +3,7 @@ package nl.brusque.iou;
 import nl.brusque.iou.errors.TypeError;
 import nl.brusque.iou.errors.TypeErrorException;
 
-class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
+final class PromiseResolverEventHandler {
     private final PromiseStateHandler _promiseState = new PromiseStateHandler();
     private final EventDispatcher _eventDispatcher  = new EventDispatcher();
 
@@ -17,23 +17,23 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(_promiseState, resolvableManager, rejector));
     }
 
-    synchronized void addThenable(Object onFulfilled, Object onRejected, TResult nextPromise) {
+    final synchronized <TInput> void addThenable(Object onFulfilled, Object onRejected, AbstractPromise<TInput> nextPromise) {
         _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
     }
 
-    synchronized AbstractPromise<TResult> resolveWithValue(final AbstractPromise<TResult> promise, final Object o) {
+    final synchronized <TInput> AbstractPromise<TInput> resolveWithValue(final AbstractPromise<TInput> promise, final TInput o) {
         return resolvePromise(promise, FulfillEvent.class, RejectEvent.class, o);
     }
 
-    synchronized AbstractPromise<TResult> rejectWithValue(final AbstractPromise<TResult> promise, final Object o) {
+    final synchronized <TInput> AbstractPromise<TInput> rejectWithValue(final AbstractPromise<TInput> promise, final TInput o) {
         return resolvePromise(promise, RejectEvent.class, RejectEvent.class, o);
     }
 
-    private boolean testObjectEqualsPromise(Object o, AbstractPromise<TResult> promise) {
+    private <TInput> boolean testObjectEqualsPromise(Object o, AbstractPromise<TInput> promise) {
         return o != null && o.equals(promise);
     }
 
-    private AbstractPromise<TResult> resolvePromise(final AbstractPromise<TResult> promise, final Class<? extends AbstractEvent> event, final Class<? extends AbstractEvent> onFailEvent, final Object o) {
+    private <TInput> AbstractPromise<TInput> resolvePromise(final AbstractPromise<TInput> promise, final Class<? extends DefaultEvent> event, final Class<? extends DefaultEvent> onFailEvent, final Object o) {
         if (!_promiseState.isPending()) {
             return promise;
         }

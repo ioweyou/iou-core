@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class FireRejectsEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FireRejectsEvent> {
+final class FireRejectsEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FireRejectsEvent> {
     private final PromiseStateHandler _promiseState;
     private final ResolvableManager _resolvableManager;
     private final AbstractThenCaller _rejector;

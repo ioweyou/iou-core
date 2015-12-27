@@ -1,19 +1,13 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.errors.TypeError;
-import nl.brusque.iou.errors.TypeErrorException;
-
-import java.awt.*;
-import java.util.ArrayDeque;
-
-class PromiseValueResolver {
+final class PromiseValueResolver {
 
     private final EventDispatcher _eventDispatcher;
     private final PromiseStateHandler _promiseState;
 
-    class PromiseRejectable implements IThenCallable {
+    class PromiseRejectable<TInput> implements IThenCallable<TInput, TInput> {
         @Override
-        public Object apply(Object o) throws Exception {
+        public TInput apply(TInput o) throws Exception {
             _promiseState.reject(o);
             _eventDispatcher.queue(new FireRejectsEvent());
 
@@ -21,9 +15,9 @@ class PromiseValueResolver {
         }
     }
 
-    class PromiseFulfillable implements IThenCallable {
+    class PromiseFulfillable<TInput> implements IThenCallable<TInput, TInput> {
         @Override
-        public Object apply(Object o) throws Exception {
+        public TInput apply(TInput o) throws Exception {
             _promiseState.fulfill(o);
             _eventDispatcher.queue(new FireFulfillsEvent());
 
@@ -36,7 +30,7 @@ class PromiseValueResolver {
         _promiseState    = promiseState;
     }
 
-    public void resolve(AbstractPromise promise) {
-        promise.then(new PromiseFulfillable(), new PromiseRejectable());
+    public <TInput> void resolve(AbstractPromise<TInput> promise) {
+        promise.then(new PromiseFulfillable<TInput>(), new PromiseRejectable<TInput>());
     }
 }

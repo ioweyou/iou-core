@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-class EventDispatcher {
-    private final ArrayDeque<AbstractEvent> _eventQueue                                         = new ArrayDeque<>();
-    private final HashMap<Class<? extends AbstractEvent>, List<IEventListener<? extends AbstractEvent>>> _eventListeners = new HashMap<>();
+final class EventDispatcher {
+    private final ArrayDeque<DefaultEvent> _eventQueue                                         = new ArrayDeque<>();
+    private final HashMap<Class<? extends DefaultEvent>, List<IEventListener<? extends DefaultEvent>>> _eventListeners = new HashMap<>();
 
     final Thread _looper = new Thread(new Runnable() {
         @Override
@@ -22,15 +22,15 @@ class EventDispatcher {
         _looper.start();
     }
 
-    public void addListener(Class<? extends AbstractEvent> eventType, IEventListener<? extends AbstractEvent> listener) {
+    public void addListener(Class<? extends DefaultEvent> eventType, IEventListener<? extends DefaultEvent> listener) {
         if (!_eventListeners.containsKey(eventType)) {
-            _eventListeners.put(eventType, new ArrayList<IEventListener<? extends AbstractEvent>>());
+            _eventListeners.put(eventType, new ArrayList<IEventListener<? extends DefaultEvent>>());
         }
 
        _eventListeners.get(eventType).add(listener);
     }
 
-    public synchronized void queue(AbstractEvent event) {
+    public synchronized void queue(DefaultEvent event) {
         _eventQueue.add(event);
 
         synchronized (_looper) {
@@ -38,7 +38,7 @@ class EventDispatcher {
         }
     }
 
-    private synchronized AbstractEvent dequeue() {
+    private synchronized DefaultEvent dequeue() {
         if (_eventQueue.isEmpty()) {
             return null;
         }
@@ -46,8 +46,8 @@ class EventDispatcher {
         return _eventQueue.remove();
     }
 
-    private void process(AbstractEvent event) {
-        Class<? extends AbstractEvent> clazz = event.getClass();
+    private void process(DefaultEvent event) {
+        Class<? extends DefaultEvent> clazz = event.getClass();
         if (!_eventListeners.containsKey(clazz)) {
             return;
         }
@@ -58,7 +58,7 @@ class EventDispatcher {
     }
 
     private void processNextEvent() {
-        AbstractEvent event = dequeue();
+        DefaultEvent event = dequeue();
         if (event != null) {
             process(event);
             return;

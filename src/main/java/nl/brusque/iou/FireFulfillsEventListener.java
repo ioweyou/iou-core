@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class FireFulfillsEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FireFulfillsEvent> {
+final class FireFulfillsEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<FireFulfillsEvent> {
     private final PromiseStateHandler _promiseState;
     private final ResolvableManager _resolvableManager;
     private final AbstractThenCaller _fulfiller;

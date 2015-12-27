@@ -1,7 +1,6 @@
 package nl.brusque.iou;
 
-class RejectEvent extends AbstractEvent {
-
+final class RejectEvent extends DefaultEvent {
     public RejectEvent(Object value) {
         super(value);
     }

@@ -2,7 +2,7 @@ package nl.brusque.iou;
 
 import java.util.ArrayDeque;
 
-class ResolvableManager {
+final class ResolvableManager {
     private final ArrayDeque<Resolvable> _onResolve = new ArrayDeque<>();
 
     public void add(Resolvable resolvable) {

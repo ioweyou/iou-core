@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class FulfillEvent extends AbstractEvent {
+final class FulfillEvent extends DefaultEvent {
     public FulfillEvent(Object value) {
         super(value);
     }

@@ -1,11 +1,11 @@
 package nl.brusque.iou;
 
-class ThenEventValue<TResult extends AbstractPromise<TResult>> {
+final class ThenEventValue<TInput> {
     private final Object onFulfilled;
     private final Object onRejected;
-    private final TResult nextPromise;
+    private final AbstractPromise<TInput> nextPromise;
 
-    public ThenEventValue(Object onFulfilled, Object onRejected, TResult nextPromise) {
+    public ThenEventValue(Object onFulfilled, Object onRejected, AbstractPromise<TInput> nextPromise) {
         this.onFulfilled = onFulfilled;
         this.onRejected  = onRejected;
         this.nextPromise = nextPromise;
@@ -19,7 +19,7 @@ class ThenEventValue<TResult extends AbstractPromise<TResult>> {
         return onRejected;
     }
 
-    public TResult getPromise() {
+    public AbstractPromise<TInput> getPromise() {
         return nextPromise;
     }
 }

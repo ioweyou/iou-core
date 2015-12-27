@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static nl.brusque.iou.TestUtils.*;
+
 public class Test227 extends TestBase {
     @Test
     public void test227ThenMustReturnAPromise() {
@@ -40,21 +42,21 @@ public class Test227 extends TestBase {
 
                             @Override
                             public void run() {
-                                testFulfilled(dummy, new Testable() {
+                                testFulfilled(dummy, new Testable<String>() {
                                     @Override
                                     public void run() {
-                                        final AbstractPromise promise1 = getPromise();
+                                        final AbstractPromise<String> promise1 = getPromise();
 
-                                        IThenable promise2 = promise1.then(new TestThenCallable() {
+                                        IThenable<String> promise2 = promise1.then(new TestThenCallable<String, String>() {
                                             @Override
-                                            public Object apply(Object o) throws Exception {
+                                            public String apply(String o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
-                                        promise2.then(null, new TestThenCallable() {
+                                        promise2.then(null, new TestThenCallable<Object, Void>() {
                                             @Override
-                                            public Object apply(Object o) throws Exception {
+                                            public Void apply(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);
@@ -65,21 +67,21 @@ public class Test227 extends TestBase {
                                     }
                                 });
 
-                                testRejected(dummy, new Testable() {
+                                testRejected(dummy, new Testable<String>() {
                                     @Override
                                     public void run() {
-                                        AbstractPromise promise1 = getPromise();
+                                        AbstractPromise<String> promise1 = getPromise();
 
-                                        IThenable promise2 = promise1.then(null, new TestThenCallable() {
+                                        IThenable<String> promise2 = promise1.then(null, new TestThenCallable<String, String>() {
                                             @Override
-                                            public Object apply(Object o) throws Exception {
+                                            public String apply(String o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
 
-                                        promise2.then(null, new TestThenCallable() {
+                                        promise2.then(null, new TestThenCallable<Object, Void>() {
                                             @Override
-                                            public Object apply(Object o) throws Exception {
+                                            public Void apply(Object o) throws Exception {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);

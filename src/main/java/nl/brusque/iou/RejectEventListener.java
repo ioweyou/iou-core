@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class RejectEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<RejectEvent> {
+final class RejectEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<RejectEvent> {
     private final EventDispatcher _eventDispatcher;
     private final PromiseStateHandler _promiseState;
 

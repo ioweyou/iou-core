@@ -1,5 +1,5 @@
 package nl.brusque.iou;
 
-interface IEventListener<T extends AbstractEvent> {
+interface IEventListener<T extends DefaultEvent> {
     void process(T event);
 }

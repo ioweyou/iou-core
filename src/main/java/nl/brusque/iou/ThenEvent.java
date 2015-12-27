@@ -1,9 +1,9 @@
 package nl.brusque.iou;
 
-class ThenEvent<TResult extends AbstractPromise<TResult>> extends AbstractEvent {
-    private final ThenEventValue<TResult> _thenEventValue;
+final class ThenEvent<TInput> extends DefaultEvent {
+    private final ThenEventValue<TInput> _thenEventValue;
 
-    public ThenEvent(ThenEventValue<TResult> value) {
+    public ThenEvent(ThenEventValue<TInput> value) {
         super(value); // FIXME Thenable
 
         _thenEventValue = value;
@@ -17,7 +17,7 @@ class ThenEvent<TResult extends AbstractPromise<TResult>> extends AbstractEvent 
         return _thenEventValue.getRejectable();
     }
 
-    public TResult getPromise() {
+    public AbstractPromise<TInput> getPromise() {
         return _thenEventValue.getPromise();
     }
 

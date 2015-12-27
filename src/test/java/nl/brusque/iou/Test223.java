@@ -3,6 +3,8 @@ package nl.brusque.iou;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static nl.brusque.iou.TestUtils.*;
+
 
 public class Test223 extends TestBase {
     @Test
@@ -18,42 +20,42 @@ public class Test223 extends TestBase {
                     specify("rejected after a delay", new Runnable() {
                         @Override
                         public void run() {
-                            AbstractIOU d = deferred();
-                            final boolean[] isRejected = {false};
+                        AbstractIOU<String> d = deferred();
+                        final boolean[] isRejected = {false};
 
-                            d.getPromise().then(null, new TestThenCallable() {
-                                @Override
-                                public Object apply(Object o) {
-                                    Assert.assertTrue("isRejected should be true", isRejected[0]);
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                            @Override
+                            public Void apply(String o) {
+                                Assert.assertTrue("isRejected should be true", isRejected[0]);
 
-                                    return null;
-                                }
-                            });
+                                return null;
+                            }
+                        });
 
-                            delay(50);
+                        delay(50);
 
-                            d.resolve(dummy);
-                            isRejected[0] = true;
+                        d.resolve(dummy);
+                        isRejected[0] = true;
                         }
                     });
 
                     specify("never rejected", new Runnable() {
                         @Override
                         public void run() {
-                            AbstractIOU d = deferred();
-                            final boolean[] onRejectedCalled = {false};
+                        AbstractIOU<String> d = deferred();
+                        final boolean[] onRejectedCalled = {false};
 
-                            d.getPromise().then(null, new TestThenCallable() {
-                                @Override
-                                public Object apply(Object o) {
-                                    Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                            @Override
+                            public Void apply(String o) {
+                                Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
 
-                                    return null;
-                                }
-                            });
+                                return null;
+                            }
+                        });
 
-                            delay(50);
-                            Assert.assertFalse("onRejected should not have been called", onRejectedCalled[0]);
+                        delay(50);
+                        Assert.assertFalse("onRejected should not have been called", onRejectedCalled[0]);
                         }
                     });
                     }
@@ -62,151 +64,151 @@ public class Test223 extends TestBase {
                 describe("2.2.3.3: it must not be called more than once.", new Runnable() {
                     @Override
                     public void run() {
-                        specify("already-rejected", new Runnable() {
+                    specify("already-rejected", new Runnable() {
+                        @Override
+                        public void run() {
+                        final int[] timesCalled = {0};
+
+                        rejected(dummy).then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                final int[] timesCalled = {0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
-                                rejected(dummy).then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+                                return null;
+                            }
+                        });
+                        }
+                    });
 
-                                        return null;
-                                    }
-                                });
+                    specify("trying to fireRejectables a pending promise more than once, immediately", new Runnable() {
+                        @Override
+                        public void run() {
+                        AbstractIOU<String> d = deferred();
+                        final int[] timesCalled = {0};
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                            @Override
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+
+                                return null;
                             }
                         });
 
-                        specify("trying to fireRejectables a pending promise more than once, immediately", new Runnable() {
+                        d.reject(dummy);
+                        d.reject(dummy);
+                        }
+                    });
+
+                    specify("trying to fireRejectables a pending promise more than once, delayed", new Runnable() {
+                        @Override
+                        public void run() {
+                        AbstractIOU<String> d = deferred();
+                        final int[] timesCalled = {0};
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                AbstractIOU d = deferred();
-                                final int[] timesCalled = {0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
-
-                                        return null;
-                                    }
-                                });
-
-                                d.reject(dummy);
-                                d.reject(dummy);
+                                return null;
                             }
                         });
 
-                        specify("trying to fireRejectables a pending promise more than once, delayed", new Runnable() {
+                        delay(50);
+                        d.reject(dummy);
+                        d.reject(dummy);
+                        }
+                    });
+
+                    specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new Runnable() {
+                        @Override
+                        public void run() {
+                        AbstractIOU<String> d = deferred();
+                        final int[] timesCalled = {0};
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                AbstractIOU d = deferred();
-                                final int[] timesCalled = {0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
-
-                                        return null;
-                                    }
-                                });
-
-                                delay(50);
-                                d.reject(dummy);
-                                d.reject(dummy);
+                                return null;
                             }
                         });
 
-                        specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new Runnable() {
+                        d.reject(dummy);
+                        delay(50);
+                        d.reject(dummy);
+                        }
+                    });
+
+                    specify("when multiple `then` calls are made, spaced apart in time", new Runnable() {
+                        @Override
+                        public void run() {
+                        AbstractIOU<String> d = deferred();
+                        final int[] timesCalled = {0, 0, 0};
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                AbstractIOU d = deferred();
-                                final int[] timesCalled = {0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
-
-                                        return null;
-                                    }
-                                });
-
-                                d.reject(dummy);
-                                delay(50);
-                                d.reject(dummy);
+                                return null;
                             }
                         });
 
-                        specify("when multiple `then` calls are made, spaced apart in time", new Runnable() {
+                        delay(50);
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                AbstractIOU d = deferred();
-                                final int[] timesCalled = {0, 0, 0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
-
-                                        return null;
-                                    }
-                                });
-
-                                delay(50);
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
-
-                                        return null;
-                                    }
-                                });
-
-                                delay(50);
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Object apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
-
-                                        return null;
-                                    }
-                                });
-
-                                delay(50);
-                                d.reject(dummy);
+                                return null;
                             }
                         });
 
-                        specify("when `then` is interleaved with rejection", new Runnable() {
+                        delay(50);
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
-                            public void run() {
-                                AbstractIOU d = deferred();
-                                final int[] timesCalled = {0, 0};
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
 
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Void apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
-
-                                        return null;
-                                    }
-                                });
-
-                                d.reject(dummy);
-
-                                d.getPromise().then(null, new TestThenCallable() {
-                                    @Override
-                                    public Void apply(Object o) {
-                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
-
-                                        return null;
-                                    }
-                                });
+                                return null;
                             }
                         });
+
+                        delay(50);
+                        d.reject(dummy);
+                        }
+                    });
+
+                    specify("when `then` is interleaved with rejection", new Runnable() {
+                        @Override
+                        public void run() {
+                        AbstractIOU<String> d = deferred();
+                        final int[] timesCalled = {0, 0};
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                            @Override
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+
+                                return null;
+                            }
+                        });
+
+                        d.reject(dummy);
+
+                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                            @Override
+                            public Void apply(String o) {
+                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
+
+                                return null;
+                            }
+                        });
+                        }
+                    });
                     }
                 });
             }

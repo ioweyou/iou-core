@@ -1,6 +1,6 @@
 package nl.brusque.iou;
 
-class FireFulfillsEvent extends AbstractEvent {
+final class FireFulfillsEvent extends DefaultEvent {
     public FireFulfillsEvent() {
         this(null);
     }

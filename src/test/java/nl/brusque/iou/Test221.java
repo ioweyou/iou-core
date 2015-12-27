@@ -2,6 +2,10 @@ package nl.brusque.iou;
 
 import org.junit.Test;
 
+import static nl.brusque.iou.TestUtils.deferred;
+import static nl.brusque.iou.TestUtils.describe;
+import static nl.brusque.iou.TestUtils.specify;
+
 public class Test221 extends TestBase {
     @Test
     public void test2131WhenRejectedAPromiseMustNotTransitionToAnyOtherState() {
@@ -14,15 +18,15 @@ public class Test221 extends TestBase {
                     @Override
                     public void run() {
                         describe("applied to a directly-rejected promise", new Runnable() {
-                            private void testNonFunction(final Object o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
                                     @Override
                                     public void run() {
-                                        AbstractIOU d = deferred();
+                                        AbstractIOU<String> d = deferred();
 
-                                        d.reject(dummy).then(o, new TestThenCallable() {
+                                        d.reject(dummy).then(o, new TestThenCallable<String, Void>() {
                                             @Override
-                                            public Object apply(Object o) {
+                                            public Void apply(String o) {
                                                 return null;
                                             }
                                         });
@@ -40,25 +44,24 @@ public class Test221 extends TestBase {
                         });
 
                         describe("applied to a promise rejected and then chained off of", new Runnable() {
-                            private void testNonFunction(final Object o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
                                     @Override
                                     public void run() {
-                                        AbstractIOU d = deferred();
+                                        AbstractIOU<String> d = deferred();
 
-                                        d.reject(dummy)
-                                                .then(new TestThenCallable() {
-                                                    @Override
-                                                    public Object apply(Object o) {
-                                                        return null;
-                                                    }
-                                                })
-                                                .then(o, new TestThenCallable() {
-                                                    @Override
-                                                    public Object apply(Object o) {
-                                                        return null;
-                                                    }
-                                                });
+                                        d.reject(dummy).then(new TestThenCallable<String, String>() {
+                                            @Override
+                                            public String apply(String dummyString) {
+                                                return dummyString;
+                                            }
+                                        })
+                                        .then(o, new TestThenCallable<String, Void>() {
+                                            @Override
+                                            public Void apply(String dummyString) {
+                                                return null;
+                                            }
+                                        });
                                     }
                                 });
                             }
@@ -85,19 +88,18 @@ public class Test221 extends TestBase {
                     @Override
                     public void run() {
                         describe("applied to a directly-fulfilled promise", new Runnable() {
-                            private void testNonFunction(final Object o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
                                     @Override
                                     public void run() {
-                                        AbstractIOU d = deferred();
+                                    AbstractIOU<String> d = deferred();
 
-                                        d.resolve(dummy)
-                                                .then(new TestThenCallable() {
-                                                    @Override
-                                                    public Object apply(Object o) {
-                                                        return null;
-                                                    }
-                                                }, o);
+                                    d.resolve(dummy).then(new TestThenCallable<String, Void>() {
+                                        @Override
+                                        public Void apply(String o) {
+                                            return null;
+                                        }
+                                    }, o);
                                     }
                                 });
                             }
@@ -116,12 +118,11 @@ public class Test221 extends TestBase {
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
                                     @Override
                                     public void run() {
-                                        AbstractIOU d = deferred();
+                                        AbstractIOU<String> d = deferred();
 
-                                        d.resolve(dummy)
-                                        .then(new TestThenCallable() {
+                                        d.resolve(dummy).then(new TestThenCallable<String, Void>() {
                                             @Override
-                                            public Object apply(Object o) {
+                                            public Void apply(String o) {
                                                 return null;
                                             }
                                         }, o);
