@@ -8,6 +8,6 @@ class FireFulfillsEventListener<TResult extends AbstractPromise<TResult>> implem
     }
 
     public void process(FireFulfillsEvent event) {
-        _promiseResolverEventHandler.fireResolvables();
+        _promiseResolverEventHandler.fireFulfillables();
     }
 }

@@ -6,25 +6,22 @@ import nl.brusque.iou.errors.TypeErrorException;
 import java.util.ArrayDeque;
 
 class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
-    private final PromiseStateHandler _promiseState;
-    private final EventDispatcher _eventDispatcher;
-
-    private final ArrayDeque<Resolvable> _onResolve = new ArrayDeque<>();
     private final AbstractThenCaller _fulfiller;
     private final AbstractThenCaller _rejector;
 
-    public PromiseResolverEventHandler(EventDispatcher eventDispatcher, AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
-        _promiseState    = new PromiseStateHandler();
-        _eventDispatcher = eventDispatcher;
+    private final PromiseStateHandler _promiseState = new PromiseStateHandler();
+    private final EventDispatcher _eventDispatcher  = new EventDispatcher();
+    private final ArrayDeque<Resolvable> _onResolve = new ArrayDeque<>();
 
+    public PromiseResolverEventHandler(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
         _fulfiller = fulfiller;
         _rejector  = rejector;
 
-        eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(this));
-        eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(_promiseState, eventDispatcher, this));
-        eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
-        eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(_promiseState, eventDispatcher, this));
-        eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
+        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(this, _eventDispatcher, _promiseState, _onResolve));
+        _eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(this));
+        _eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(this));
+        _eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(this));
+        _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(this));
     }
 
     private class PromiseRejectable implements IThenCallable {
@@ -37,7 +34,7 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         }
     }
 
-    private class PromiseThenFulfillable implements IThenCallable {
+    private class PromiseFulfillable implements IThenCallable {
         @Override
         public Object apply(Object o) throws Exception {
             _promiseState.fulfill(o);
@@ -47,25 +44,42 @@ class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
         }
     }
 
-    synchronized void resolvePromiseValue(AbstractPromise promise) {
-        promise.then(new PromiseThenFulfillable(), new PromiseRejectable());
-    }
-
-    synchronized <TFulfillable, RFulfillable, TRejectable, RRejectable> void addResolvable(IThenCallable<TFulfillable, RFulfillable> fulfillable, IThenCallable<TRejectable, RRejectable> rejectable, TResult nextPromise) {
-        _onResolve.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
-
-        if (_promiseState.isRejected()) {
-            _eventDispatcher.queue(new FireRejectsEvent());
-        } else if (_promiseState.isResolved()) {
-            _eventDispatcher.queue(new FireFulfillsEvent());
+    synchronized void rejectWithValue(Object value) {
+        if (!_promiseState.isPending()) {
+            return;
         }
+
+        if (value instanceof AbstractPromise) {
+            ((AbstractPromise)value).then(new PromiseFulfillable(), new PromiseRejectable());
+
+            return;
+        }
+
+        _promiseState.reject(value);
+        _eventDispatcher.queue(new FireRejectsEvent());
     }
+
+    synchronized void fulfillWithValue(Object value) {
+        if (!_promiseState.isPending()) {
+            return;
+        }
+
+        if (value instanceof AbstractPromise) {
+            ((AbstractPromise)value).then(new PromiseFulfillable(), new PromiseRejectable());
+
+            return;
+        }
+
+        _promiseState.fulfill(value);
+        _eventDispatcher.queue(new FireFulfillsEvent());
+    }
+
 
     synchronized void addThenable(Object onFulfilled, Object onRejected, TResult nextPromise) {
         _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
     }
 
-    synchronized void fireResolvables() {
+    synchronized void fireFulfillables() {
         while (!_onResolve.isEmpty()) {
             Resolvable resolvable = _onResolve.remove();
             IThenCallable fulfillable = resolvable.getFulfillable();

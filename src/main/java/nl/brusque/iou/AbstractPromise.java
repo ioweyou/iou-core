@@ -6,7 +6,6 @@ public abstract class AbstractPromise<TResult extends AbstractPromise<TResult>> 
     protected AbstractPromise(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
         _promiseResolverEventHandler =
                 new PromiseResolverEventHandler<>(
-                    new EventDispatcher(),
                     fulfiller,
                     rejector);
     }
