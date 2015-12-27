@@ -3,25 +3,18 @@ package nl.brusque.iou;
 import nl.brusque.iou.errors.TypeError;
 import nl.brusque.iou.errors.TypeErrorException;
 
-import java.util.ArrayDeque;
-
 class PromiseResolverEventHandler<TResult extends AbstractPromise<TResult>> {
-    private final AbstractThenCaller _fulfiller;
-    private final AbstractThenCaller _rejector;
-
     private final PromiseStateHandler _promiseState = new PromiseStateHandler();
     private final EventDispatcher _eventDispatcher  = new EventDispatcher();
-    private final ArrayDeque<Resolvable> _onResolve = new ArrayDeque<>();
 
     public PromiseResolverEventHandler(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
-        _fulfiller = fulfiller;
-        _rejector  = rejector;
+        ResolvableManager resolvableManager = new ResolvableManager();
 
-        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(_eventDispatcher, _promiseState, _onResolve));
+        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(_eventDispatcher, _promiseState, resolvableManager));
         _eventDispatcher.addListener(FulfillEvent.class, new FulfillEventListener<>(_eventDispatcher, _promiseState));
-        _eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(_promiseState, _onResolve, _fulfiller));
+        _eventDispatcher.addListener(FireFulfillsEvent.class, new FireFulfillsEventListener<>(_promiseState, resolvableManager, fulfiller));
         _eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(_eventDispatcher, _promiseState));
-        _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(_promiseState, _onResolve, _rejector));
+        _eventDispatcher.addListener(FireRejectsEvent.class, new FireRejectsEventListener<>(_promiseState, resolvableManager, rejector));
     }
 
     synchronized void addThenable(Object onFulfilled, Object onRejected, TResult nextPromise) {

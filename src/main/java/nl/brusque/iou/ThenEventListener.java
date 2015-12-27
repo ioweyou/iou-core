@@ -3,18 +3,16 @@ package nl.brusque.iou;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayDeque;
-
 class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEventListener<ThenEvent<TResult>> {
     private static final Logger logger = LogManager.getLogger(ThenEventListener.class);
     private final EventDispatcher _eventDispatcher;
     private final PromiseStateHandler _promiseState;
-    private final ArrayDeque<Resolvable> _onResolve;
+    private final ResolvableManager _resolvableManager;
 
-    public ThenEventListener(EventDispatcher eventDispatcher, PromiseStateHandler promiseState, ArrayDeque<Resolvable> onResolve) {
-        _eventDispatcher             = eventDispatcher;
-        _promiseState                = promiseState;
-        _onResolve                   = onResolve;
+    public ThenEventListener(EventDispatcher eventDispatcher, PromiseStateHandler promiseState, ResolvableManager resolvableManager) {
+        _eventDispatcher   = eventDispatcher;
+        _promiseState      = promiseState;
+        _resolvableManager = resolvableManager;
     }
 
     private IThenCallable castThenCallable(Object maybeThenCallable) {
@@ -40,7 +38,7 @@ class ThenEventListener<TResult extends AbstractPromise<TResult>> implements IEv
     }
 
     private <TFulfillable, RFulfillable, TRejectable, RRejectable> void addResolvable(IThenCallable<TFulfillable, RFulfillable> fulfillable, IThenCallable<TRejectable, RRejectable> rejectable, TResult nextPromise) {
-        _onResolve.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
+        _resolvableManager.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
 
         if (_promiseState.isRejected()) {
             _eventDispatcher.queue(new FireRejectsEvent());
