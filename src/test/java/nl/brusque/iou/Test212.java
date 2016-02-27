@@ -1,20 +1,19 @@
 package nl.brusque.iou;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.TestUtils.*;
+import static org.junit.Assert.assertEquals;
 
-public class Test212 {
-    @Test
-    public void test2121WhenFulfilledAPromiseMustNotTransitionToAnyOtherState() {
-        describe("2.1.2.1: When fulfilled, a promise: must not transition to any other state.", new Runnable() {
+@RunWith(MiniMochaRunner.class)
+public class Test212 extends MiniMochaDescription {
+    public Test212() {
+        describe("2.1.2.1: When fulfilled, a promise: must not transition to any other state", new Runnable() {
 
             @Override
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to call then immediately fireRejectables", new Runnable() {
+                specify("trying to call then immediately reject", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -32,7 +31,7 @@ public class Test212 {
                         }, new TestThenCallable<String, String>() {
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
+                                assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
                             }
@@ -62,7 +61,7 @@ public class Test212 {
                         }, new TestThenCallable<String, String>() {
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
+                                assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
 
                                 return o;
                             }
@@ -94,7 +93,7 @@ public class Test212 {
                         }, new TestThenCallable<String, String>() {
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onRejected should not have been called", true, onFulfilledCalled[0]);
+                                assertEquals("onRejected should not have been called", true, onFulfilledCalled[0]);
 
                                 return o;
                             }

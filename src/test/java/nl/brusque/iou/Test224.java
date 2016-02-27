@@ -1,13 +1,11 @@
 package nl.brusque.iou;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.TestUtils.*;
-
-public class Test224 extends TestBase {
-    @Test
-    public void test224onFulfilledOronRejectedMustNotBeCalledUntilTheExecutionContextStackContainsOnlyPlatformCode() {
+@RunWith(MiniMochaRunner.class)
+public class Test224 extends MiniMochaDescription {
+    public Test224() {
         describe("2.2.4: `onFulfilled` or `onRejected` must not be called until the execution context stack contains only platform code.", new Runnable() {
             final String dummy = "DUMMY";
 

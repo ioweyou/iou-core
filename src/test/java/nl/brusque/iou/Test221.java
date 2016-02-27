@@ -1,14 +1,10 @@
 package nl.brusque.iou;
 
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.TestUtils.deferred;
-import static nl.brusque.iou.TestUtils.describe;
-import static nl.brusque.iou.TestUtils.specify;
-
-public class Test221 extends TestBase {
-    @Test
-    public void test2131WhenRejectedAPromiseMustNotTransitionToAnyOtherState() {
+@RunWith(MiniMochaRunner.class)
+public class Test221 extends MiniMochaDescription {
+    public Test221() {
         describe("2.2.1: Both `onFulfilled` and `onRejected` are optional arguments.", new Runnable() {
             final String dummy = "DUMMY";
 
@@ -76,15 +72,8 @@ public class Test221 extends TestBase {
                         });
                     }
                 });
-            }
-        });
 
-        describe("2.2.1.2: If `onRejected` is not a function, it must be ignored.", new Runnable() {
-            final String dummy = "DUMMY";
-
-            @Override
-            public void run() {
-                describe("2.2.1.1: If `onFulfilled` is not a function, it must be ignored.", new Runnable() {
+                describe("2.2.1.2: If `onRejected` is not a function, it must be ignored.", new Runnable() {
                     @Override
                     public void run() {
                         describe("applied to a directly-fulfilled promise", new Runnable() {
@@ -92,14 +81,14 @@ public class Test221 extends TestBase {
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
                                     @Override
                                     public void run() {
-                                    AbstractIOU<String> d = deferred();
+                                        AbstractIOU<String> d = deferred();
 
-                                    d.resolve(dummy).then(new TestThenCallable<String, Void>() {
-                                        @Override
-                                        public Void apply(String o) {
-                                            return null;
-                                        }
-                                    }, o);
+                                        d.resolve(dummy).then(new TestThenCallable<String, Void>() {
+                                            @Override
+                                            public Void apply(String o) {
+                                                return null;
+                                            }
+                                        }, o);
                                     }
                                 });
                             }

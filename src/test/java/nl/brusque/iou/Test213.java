@@ -1,19 +1,18 @@
 package nl.brusque.iou;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.TestUtils.*;
+import static org.junit.Assert.assertEquals;
 
-public class Test213 extends TestBase {
-    @Test
-    public void test2131WhenRejectedAPromiseMustNotTransitionToAnyOtherState() {
+@RunWith(MiniMochaRunner.class)
+public class Test213 extends MiniMochaDescription {
+    public Test213() {
         describe("2.1.3.1: When rejected, a promise: must not transition to any other state.", new Runnable() {
             @Override
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to fireRejectables then immediately call", new Runnable() {
+                specify("trying to reject then immediately call", new Runnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -24,7 +23,7 @@ public class Test213 extends TestBase {
 
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
+                                assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }
@@ -54,7 +53,7 @@ public class Test213 extends TestBase {
 
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
+                                assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }
@@ -85,7 +84,7 @@ public class Test213 extends TestBase {
 
                             @Override
                             public String apply(String o) {
-                                Assert.assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
+                                assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
                                 return o;
                             }

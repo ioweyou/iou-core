@@ -1,14 +1,12 @@
 package nl.brusque.iou;
 
 import org.junit.Assert;
-import org.junit.Test;
-
-import static nl.brusque.iou.TestUtils.*;
+import org.junit.runner.RunWith;
 
 
-public class Test223 extends TestBase {
-    @Test
-    public void test223IfOnRejectedIsAFunction() {
+@RunWith(MiniMochaRunner.class)
+public class Test223 extends MiniMochaDescription {
+    public Test223() {
         describe("2.2.3: If `onRejected` is a function,", new Runnable() {
             final String dummy = "DUMMY";
 

@@ -1,59 +1,48 @@
 package nl.brusque.iou;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
+public class MiniMochaDescription extends MiniMochaNode {
+    private MiniMochaDescription _descriptionContext = this;
+    private List<MiniMochaDescription> _childDescriptions = new ArrayList<>();
+    private List<MiniMochaSpecification> _specifications = new ArrayList<>();
 
-import static org.mockito.Mockito.spy;
-
-class TestUtils {
-    private static final Logger logger = LogManager.getLogger(TestUtils.class);
-
-    public static <TInput> AbstractIOU<TInput> deferred() {
-        return new TestTypedIOU<>();
+    public MiniMochaDescription() {
+        this("MiniMocha");
     }
 
-    public static <TOutput> AbstractPromise<TOutput> resolved() {
-        return resolved(null);
+    public MiniMochaDescription(String name) {
+        setName(name);
     }
 
-    public static <TInput> AbstractPromise<TInput> resolved(TInput o) {
-        AbstractIOU<TInput> d = deferred();
+    public MiniMochaDescription describe(String description, Runnable runnable) {
+        MiniMochaDescription mmDescription = new MiniMochaDescription(description);
+        MiniMochaDescription oldDescriptionContext = _descriptionContext;
+        _descriptionContext = mmDescription;
 
-        return d.resolve(o);
-    }
+        _descriptionContext.setName(description);
 
-    public static AbstractPromise<String> rejected() {
-        return rejected("");
-    }
-
-    public static <TInput> AbstractPromise<TInput> rejected(TInput o) {
-        AbstractIOU<TInput> d = deferred();
-
-        return d.reject(o);
-    }
-
-    public static void describe(String description, Runnable runnable) {
-        logger.info(description);
         runnable.run();
+        _descriptionContext = oldDescriptionContext;
+
+        _descriptionContext.addChildDescription(mmDescription);
+
+        return mmDescription;
     }
 
-    public static void specify(String description, Runnable test) {
-        logger.info(description);
-        test.run();
+    private void addChildDescription(MiniMochaDescription mmDescription) {
+        _childDescriptions.add(mmDescription);
     }
 
-    public static void delay(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void addSpecification(MiniMochaSpecification specification) {
+        _specifications.add(specification);
+    }
+    public void specify(String description, Runnable test) {
+        _descriptionContext.addSpecification(new MiniMochaSpecification(description, test));
     }
 
-    public static <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
+
+    public <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
         specify("already-fulfilled", new Runnable() {
             @Override
             public void run() {
@@ -88,7 +77,7 @@ class TestUtils {
             }
         });
     }
-    public static <TInput> void testRejected(final TInput value, final Testable<TInput> test) {
+    public <TInput> void testRejected(final TInput value, final Testable<TInput> test) {
         specify("already-rejected", new Runnable() {
             @Override
             public void run() {
@@ -126,23 +115,11 @@ class TestUtils {
         });
     }
 
-    public static class TestMockableCallable<TInput, TOutput> extends TestThenCallable<TInput, TOutput> {
-
-        @Override
-        public TOutput apply(TInput o) throws Exception {
-            return null;
-        }
+    public List<MiniMochaDescription> getChildDescriptions() {
+        return _childDescriptions;
     }
 
-    public static <TInput, TOutput> IThenCallable<TInput, TOutput> fulfillableStub() {
-        TestMockableCallable<TInput, TOutput> callable = new TestMockableCallable<>();
-
-        return spy(callable);
-    }
-
-    public static <TInput, TOutput> IThenCallable<TInput, TOutput> rejectableStub() {
-        TestMockableCallable<TInput, TOutput> callable = new TestMockableCallable<>();
-
-        return spy(callable);
+    public List<MiniMochaSpecification> getSpecifications() {
+        return _specifications;
     }
 }

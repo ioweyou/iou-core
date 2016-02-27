@@ -1,13 +1,11 @@
 package nl.brusque.iou;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.TestUtils.*;
-
-public class Test222 extends TestBase {
-    @Test
-    public void test222IfOnFulfilledIsAFunction() {
+@RunWith(MiniMochaRunner.class)
+public class Test222 extends MiniMochaDescription {
+    public Test222() {
         describe("2.2.2: If `onFulfilled` is a function,", new Runnable() {
             final String dummy = "DUMMY";
 

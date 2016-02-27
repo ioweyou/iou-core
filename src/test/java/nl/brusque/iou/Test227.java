@@ -1,15 +1,13 @@
 package nl.brusque.iou;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 
-import static nl.brusque.iou.TestUtils.*;
-
-public class Test227 extends TestBase {
-    @Test
-    public void test227ThenMustReturnAPromise() {
+@RunWith(MiniMochaRunner.class)
+public class Test227 extends MiniMochaDescription {
+    public Test227() {
         describe("2.2.7: `then` must return a promise: `promise2 = promise1.then(onFulfilled, onRejected)`", new Runnable() {
             final String dummy     = "DUMMY";
             final String other     = "other";

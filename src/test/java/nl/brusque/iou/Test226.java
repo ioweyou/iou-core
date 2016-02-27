@@ -1,20 +1,19 @@
 package nl.brusque.iou;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static nl.brusque.iou.TestUtils.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public class Test226 extends TestBase {
-    @Test
-    public void test226ThenMayBeCalledMultipleTimesOnTheSamePromise() {
+@RunWith(MiniMochaRunner.class)
+public class Test226 extends MiniMochaDescription {
+    public Test226() {
         describe("2.2.6: `then` may be called multiple times on the same promise.", new Runnable() {
             final String dummy     = "DUMMY";
             final String other     = "other";
