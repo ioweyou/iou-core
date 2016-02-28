@@ -1,4 +1,4 @@
-package nl.brusque.iou;
+package nl.brusque.iou.minimocha;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
-    private final List<AssertionError> _assertionErrors = new ArrayList<>();
     private final String _descriptionName;
     private MiniMochaSpecification _specification;
     private Date _start;
@@ -22,7 +21,7 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
     private Description _testDescription;
     private List<FrameworkMethod> _testMethods = new ArrayList<>();
 
-    public MiniMochaSpecificationRunner(String descriptionName, MiniMochaSpecification specification) throws InitializationError {
+    MiniMochaSpecificationRunner(String descriptionName, MiniMochaSpecification specification) throws InitializationError {
         super(specification.getClass());
 
         _specification = specification;
@@ -32,6 +31,7 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
 
     }
 
+    @Override
     protected void validateConstructor(List<Throwable> errors) {
         validateOnlyOneConstructor(errors);
         validateNonStaticInnerClassWithDefaultConstructor(errors);
@@ -46,6 +46,7 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    @Override
     protected Object createTest() throws Exception {
         return _specification;
     }
@@ -64,6 +65,7 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         return describeChild(null);
     }
 
+    @Override
     protected List<FrameworkMethod> computeTestMethods() {
         if (_testMethods.size() == 0) {
             try {
@@ -79,20 +81,10 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         return _testMethods;
     }
 
-    public void done() {
+    final void done() {
         _stop = new Date();
 
- //       runAssertions();
-
         System.out.println(String.format("Start %s, Stop %s", _start, _stop));
-    }
-
-    private void runAssertions() {
-        if (_assertionErrors.size() == 0) {
-            return;
-        }
-
-        throw _assertionErrors.get(0);
     }
 
     @Override

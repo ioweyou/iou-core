@@ -1,13 +1,19 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
+
+import static nl.brusque.iou.Util.deferred;
+import static nl.brusque.iou.Util.delay;
+import static nl.brusque.iou.Util.rejected;
 
 
 @RunWith(MiniMochaRunner.class)
 public class Test223 extends MiniMochaDescription {
     public Test223() {
-        describe("2.2.3: If `onRejected` is a function,", new Runnable() {
+        super("2.2.3: If `onRejected` is a function,", new IOUMiniMochaRunnableNode() {
             final String dummy = "DUMMY";
 
             @Override

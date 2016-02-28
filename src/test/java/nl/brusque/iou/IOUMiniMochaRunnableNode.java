@@ -1,47 +1,13 @@
 package nl.brusque.iou;
 
-import java.util.*;
+import nl.brusque.iou.minimocha.MiniMochaRunnableNode;
 
-public class MiniMochaDescription extends MiniMochaNode {
-    private MiniMochaDescription _descriptionContext = this;
-    private List<MiniMochaDescription> _childDescriptions = new ArrayList<>();
-    private List<MiniMochaSpecification> _specifications = new ArrayList<>();
+import java.util.Timer;
+import java.util.TimerTask;
 
-    public MiniMochaDescription() {
-        this("MiniMocha");
-    }
+import static nl.brusque.iou.Util.*;
 
-    public MiniMochaDescription(String name) {
-        setName(name);
-    }
-
-    public MiniMochaDescription describe(String description, Runnable runnable) {
-        MiniMochaDescription mmDescription = new MiniMochaDescription(description);
-        MiniMochaDescription oldDescriptionContext = _descriptionContext;
-        _descriptionContext = mmDescription;
-
-        _descriptionContext.setName(description);
-
-        runnable.run();
-        _descriptionContext = oldDescriptionContext;
-
-        _descriptionContext.addChildDescription(mmDescription);
-
-        return mmDescription;
-    }
-
-    private void addChildDescription(MiniMochaDescription mmDescription) {
-        _childDescriptions.add(mmDescription);
-    }
-
-    public void addSpecification(MiniMochaSpecification specification) {
-        _specifications.add(specification);
-    }
-    public void specify(String description, Runnable test) {
-        _descriptionContext.addSpecification(new MiniMochaSpecification(description, test));
-    }
-
-
+public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
     public <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
         specify("already-fulfilled", new Runnable() {
             @Override
@@ -113,13 +79,5 @@ public class MiniMochaDescription extends MiniMochaNode {
 
             }
         });
-    }
-
-    public List<MiniMochaDescription> getChildDescriptions() {
-        return _childDescriptions;
-    }
-
-    public List<MiniMochaSpecification> getSpecifications() {
-        return _specifications;
     }
 }

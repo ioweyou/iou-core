@@ -1,11 +1,15 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.runner.RunWith;
+
+import static nl.brusque.iou.Util.deferred;
 
 @RunWith(MiniMochaRunner.class)
 public class Test221 extends MiniMochaDescription {
     public Test221() {
-        describe("2.2.1: Both `onFulfilled` and `onRejected` are optional arguments.", new Runnable() {
+        super("2.2.1: Both `onFulfilled` and `onRejected` are optional arguments.", new IOUMiniMochaRunnableNode() {
             final String dummy = "DUMMY";
 
             @Override

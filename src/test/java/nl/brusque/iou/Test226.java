@@ -1,5 +1,7 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -8,13 +10,16 @@ import org.mockito.Matchers;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static nl.brusque.iou.Util.delay;
+import static nl.brusque.iou.Util.fulfillableStub;
+import static nl.brusque.iou.Util.rejectableStub;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MiniMochaRunner.class)
 public class Test226 extends MiniMochaDescription {
     public Test226() {
-        describe("2.2.6: `then` may be called multiple times on the same promise.", new Runnable() {
+        super("2.2.6: `then` may be called multiple times on the same promise.", new IOUMiniMochaRunnableNode() {
             final String dummy     = "DUMMY";
             final String other     = "other";
             final String sentinel  = "sentinel";

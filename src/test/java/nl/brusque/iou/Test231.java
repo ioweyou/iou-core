@@ -2,16 +2,22 @@ package nl.brusque.iou;
 
 
 import nl.brusque.iou.errors.TypeError;
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.brusque.iou.Util.delay;
+import static nl.brusque.iou.Util.rejected;
+import static nl.brusque.iou.Util.resolved;
+
 @RunWith(MiniMochaRunner.class)
 public class Test231 extends MiniMochaDescription {
     public Test231() {
-        describe("2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError' as the reason.", new Runnable() {
+        super("2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError' as the reason.", new IOUMiniMochaRunnableNode() {
             final String dummy     = "DUMMY";
 
             @Override

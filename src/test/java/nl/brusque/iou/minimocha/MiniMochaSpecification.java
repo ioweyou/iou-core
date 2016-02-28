@@ -1,4 +1,4 @@
-package nl.brusque.iou;
+package nl.brusque.iou.minimocha;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,13 @@ import static nl.brusque.iou.Util.sanitizeDescriptionName;
 
 class MiniMochaSpecification extends MiniMochaNode {
     private final Runnable _test;
-    private final String _description;
     private final ExecutorService _executor = Executors.newSingleThreadExecutor();
     private List<AssertionError> _assertionErrors = new ArrayList<>();
 
-    public MiniMochaSpecification(String description, Runnable test) {
+    MiniMochaSpecification(String description, Runnable test) {
         _test = test;
-        _description = sanitizeDescriptionName(description);
+
+        setName(description);
     }
 
     private void bindThreadExceptionHandler() {
@@ -32,12 +32,8 @@ class MiniMochaSpecification extends MiniMochaNode {
         });
     }
 
-    public String getName() {
-        return _description;
-    }
-
-    public void run() throws InterruptedException, ExecutionException, TimeoutException {
-        bindThreadExceptionHandler();
+    public final void run() throws InterruptedException, ExecutionException, TimeoutException {
+        bindThreadExceptionHandler(); // FIXME Bind to specific thread, not global
         try {
             _executor.submit(new Runnable() {
                 @Override

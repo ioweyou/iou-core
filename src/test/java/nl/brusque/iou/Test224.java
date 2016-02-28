@@ -1,12 +1,16 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
+
+import static nl.brusque.iou.Util.*;
 
 @RunWith(MiniMochaRunner.class)
 public class Test224 extends MiniMochaDescription {
     public Test224() {
-        describe("2.2.4: `onFulfilled` or `onRejected` must not be called until the execution context stack contains only platform code.", new Runnable() {
+        super("2.2.4: `onFulfilled` or `onRejected` must not be called until the execution context stack contains only platform code.", new IOUMiniMochaRunnableNode() {
             final String dummy = "DUMMY";
 
             @Override

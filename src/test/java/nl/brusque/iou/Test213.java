@@ -1,13 +1,17 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.runner.RunWith;
 
+import static nl.brusque.iou.Util.deferred;
+import static nl.brusque.iou.Util.delay;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MiniMochaRunner.class)
 public class Test213 extends MiniMochaDescription {
     public Test213() {
-        describe("2.1.3.1: When rejected, a promise: must not transition to any other state.", new Runnable() {
+        super("2.1.3.1: When rejected, a promise: must not transition to any other state.", new IOUMiniMochaRunnableNode() {
             @Override
             public void run() {
                 final String dummy = "DUMMY";

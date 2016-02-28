@@ -1,14 +1,18 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.minimocha.MiniMochaDescription;
+import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 
+import static nl.brusque.iou.Util.deferred;
+
 @RunWith(MiniMochaRunner.class)
 public class Test227 extends MiniMochaDescription {
     public Test227() {
-        describe("2.2.7: `then` must return a promise: `promise2 = promise1.then(onFulfilled, onRejected)`", new Runnable() {
+        super("2.2.7: `then` must return a promise: `promise2 = promise1.then(onFulfilled, onRejected)`", new IOUMiniMochaRunnableNode() {
             final String dummy     = "DUMMY";
             final String other     = "other";
             final String sentinel  = "sentinel";
@@ -103,8 +107,5 @@ public class Test227 extends MiniMochaDescription {
 
             }
         });
-
-        delay(500);
-
     }
 }

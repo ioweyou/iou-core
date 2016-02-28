@@ -1,4 +1,4 @@
-package nl.brusque.iou;
+package nl.brusque.iou.minimocha;
 
 
 import org.junit.runner.Description;
