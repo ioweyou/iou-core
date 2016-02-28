@@ -4,6 +4,7 @@ package nl.brusque.iou;
 import nl.brusque.iou.errors.TypeError;
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -20,7 +21,7 @@ public class Test231 extends MiniMochaDescription {
 
             @Override
             public void run() {
-                specify("via return from a fulfilled promise", new Runnable() {
+                specify("via return from a fulfilled promise", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         final List<IThenable<Object>> promises = new ArrayList<>();
@@ -45,7 +46,7 @@ public class Test231 extends MiniMochaDescription {
                     }
                 });
 
-                specify("via return from a rejected promise", new Runnable() {
+                specify("via return from a rejected promise", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         final List<IThenable<Object>> promises = new ArrayList<>();

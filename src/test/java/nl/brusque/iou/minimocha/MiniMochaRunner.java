@@ -18,7 +18,7 @@ public class MiniMochaRunner extends Runner {
         this(testClass.newInstance());
     }
 
-    public MiniMochaRunner(MiniMochaDescription mmDescription) {
+    MiniMochaRunner(MiniMochaDescription mmDescription) {
         _suiteDescription = Description.createSuiteDescription(mmDescription.getName());
         for (MiniMochaSpecification specification : mmDescription.getSpecifications()) {
             try {

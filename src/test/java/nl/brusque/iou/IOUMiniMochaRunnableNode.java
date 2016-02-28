@@ -1,6 +1,7 @@
 package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaRunnableNode;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -9,16 +10,18 @@ import static nl.brusque.iou.Util.*;
 
 public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
     public <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
-        specify("already-fulfilled", new Runnable() {
+        specify("already-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                //test.addListener(MiniMochaSpecificationRunnable.this);
+
                 test.setPromise(resolved(value));
 
                 test.run();
             }
         });
 
-        specify("immediately-fulfilled", new Runnable() {
+        specify("immediately-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
                 AbstractIOU<TInput> d = deferred();
@@ -28,7 +31,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             }
         });
 
-        specify("eventually-fulfilled", new Runnable() {
+        specify("eventually-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
                 final AbstractIOU<TInput> d = deferred();
@@ -44,7 +47,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         });
     }
     public <TInput> void testRejected(final TInput value, final Testable<TInput> test) {
-        specify("already-rejected", new Runnable() {
+        specify("already-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
                 test.setPromise(rejected(value));
@@ -53,7 +56,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             }
         });
 
-        specify("immediately-rejected", new Runnable() {
+        specify("immediately-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
                 AbstractIOU<TInput> d = deferred();
@@ -63,7 +66,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             }
         });
 
-        specify("eventually-rejected", new Runnable() {
+        specify("eventually-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
                 final AbstractIOU<TInput> d = deferred();

@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -28,7 +29,7 @@ public class Test227 extends MiniMochaDescription {
 
             @Override
             public void run() {
-                specify("is a promise", new Runnable() {
+                specify("is a promise", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractPromise promise1 = deferred().getPromise();

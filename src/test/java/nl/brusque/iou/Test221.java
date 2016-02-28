@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.runner.RunWith;
 
 import static nl.brusque.iou.Util.deferred;
@@ -19,7 +20,7 @@ public class Test221 extends MiniMochaDescription {
                     public void run() {
                         describe("applied to a directly-rejected promise", new Runnable() {
                             private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
-                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
+                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
@@ -45,7 +46,7 @@ public class Test221 extends MiniMochaDescription {
 
                         describe("applied to a promise rejected and then chained off of", new Runnable() {
                             private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
-                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
+                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
@@ -82,7 +83,7 @@ public class Test221 extends MiniMochaDescription {
                     public void run() {
                         describe("applied to a directly-fulfilled promise", new Runnable() {
                             private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
-                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
+                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
@@ -108,7 +109,7 @@ public class Test221 extends MiniMochaDescription {
 
                         describe("applied to a promise fulfilled and then chained off of", new Runnable() {
                             private void testNonFunction(final Object o, String stringRepresentation) {
-                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new Runnable() {
+                                specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
                                         AbstractIOU<String> d = deferred();

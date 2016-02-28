@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -18,7 +19,7 @@ public class Test224 extends MiniMochaDescription {
                 describe("Clean-stack execution ordering tests (fulfillment case)", new Runnable() {
                     @Override
                     public void run() {
-                    specify("when `onFulfilled` is added immediately before the promise is fulfilled", new Runnable() {
+                    specify("when `onFulfilled` is added immediately before the promise is fulfilled", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -39,7 +40,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when `onFulfilled` is added immediately after the promise is fulfilled", new Runnable() {
+                    specify("when `onFulfilled` is added immediately after the promise is fulfilled", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -60,7 +61,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when one `onFulfilled` is added inside another `onFulfilled`", new Runnable() {
+                    specify("when one `onFulfilled` is added inside another `onFulfilled`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractPromise<String> promise = resolved();
@@ -87,7 +88,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when `onFulfilled` is added inside an `onRejected`", new Runnable() {
+                    specify("when `onFulfilled` is added inside an `onRejected`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final IThenable<String> promise = rejected();
@@ -115,7 +116,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when the promise is fulfilled asynchronously", new Runnable() {
+                    specify("when the promise is fulfilled asynchronously", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractIOU<String> d = deferred();
@@ -148,7 +149,7 @@ public class Test224 extends MiniMochaDescription {
                 describe("Clean-stack execution ordering tests (rejection case)", new Runnable() {
                     @Override
                     public void run() {
-                    specify("when `onRejected` is added immediately before the promise is rejected", new Runnable() {
+                    specify("when `onRejected` is added immediately before the promise is rejected", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -169,7 +170,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when `onRejected` is added immediately after the promise is rejected", new Runnable() {
+                    specify("when `onRejected` is added immediately after the promise is rejected", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -191,7 +192,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when one `onRejected` is added inside another `onRejected`", new Runnable() {
+                    specify("when one `onRejected` is added inside another `onRejected`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final IThenable<String> promise = rejected();
@@ -219,7 +220,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when `onRejected` is added inside an `onFulfilled`", new Runnable() {
+                    specify("when `onRejected` is added inside an `onFulfilled`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractPromise<String> promise = resolved();
@@ -248,7 +249,7 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when the promise is rejected asynchronously", new Runnable() {
+                    specify("when the promise is rejected asynchronously", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractIOU<String> d = deferred();

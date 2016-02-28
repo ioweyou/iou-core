@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -19,7 +20,7 @@ public class Test223 extends MiniMochaDescription {
                 describe("2.2.3.2: it must not be called before `promise` is rejected", new Runnable() {
                     @Override
                     public void run() {
-                    specify("rejected after a delay", new Runnable() {
+                    specify("rejected after a delay", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -41,7 +42,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("never rejected", new Runnable() {
+                    specify("never rejected", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -66,7 +67,7 @@ public class Test223 extends MiniMochaDescription {
                 describe("2.2.3.3: it must not be called more than once.", new Runnable() {
                     @Override
                     public void run() {
-                    specify("already-rejected", new Runnable() {
+                    specify("already-rejected", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final int[] timesCalled = {0};
@@ -82,7 +83,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, immediately", new Runnable() {
+                    specify("trying to fireRejectables a pending promise more than once, immediately", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -102,7 +103,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, delayed", new Runnable() {
+                    specify("trying to fireRejectables a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -123,7 +124,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new Runnable() {
+                    specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -144,7 +145,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when multiple `then` calls are made, spaced apart in time", new Runnable() {
+                    specify("when multiple `then` calls are made, spaced apart in time", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -184,7 +185,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("when `then` is interleaved with rejection", new Runnable() {
+                    specify("when `then` is interleaved with rejection", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();

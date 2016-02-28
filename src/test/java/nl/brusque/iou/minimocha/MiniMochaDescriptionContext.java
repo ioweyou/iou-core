@@ -2,7 +2,7 @@ package nl.brusque.iou.minimocha;
 
 import java.util.ArrayDeque;
 
-class MiniMochaDescriptionContext extends MiniMochaNode {
+class MiniMochaDescriptionContext {
     private static ArrayDeque<MiniMochaDescription> _miniMochaContext =
             new ArrayDeque<MiniMochaDescription>() {
                 { add(MiniMochaDescription.ROOT); }

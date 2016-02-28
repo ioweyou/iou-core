@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.runner.RunWith;
 
 import static nl.brusque.iou.Util.deferred;
@@ -16,8 +17,39 @@ public class Test212 extends MiniMochaDescription {
             @Override
             public void run() {
                 final String dummy = "DUMMY";
+                testFulfilled(dummy, new Testable<Object>() {
+                    final boolean[] onFulfilledCalled = {false};
 
-                specify("trying to call then immediately reject", new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        AbstractPromise<Object> promise = getPromise();
+
+                        promise.then(new TestThenCallable<Object, Void>() {
+                            @Override
+                            public Void apply(Object o) {
+                                onFulfilledCalled[0] = true;
+
+                                return null;
+                            }
+                        }, new TestThenCallable<Object, Void>() {
+                            @Override
+                            public Void apply(Object o) throws Exception {
+                                assertEquals("OnFulfilled should not have been called", onFulfilledCalled[0], false);
+                                //FIXME
+                                //done();
+
+                                return null;
+                            }
+                        });
+
+                        //FIXME
+                        //delayedDone(100);
+                    }
+                });
+
+                specify("trying to call then immediately reject", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -29,7 +61,7 @@ public class Test212 extends MiniMochaDescription {
                             @Override
                             public String apply(String o) {
                                 onFulfilledCalled[0] = true;
-                                
+
                                 return o;
                             }
                         }, new TestThenCallable<String, String>() {
@@ -43,11 +75,11 @@ public class Test212 extends MiniMochaDescription {
 
                         d.resolve(dummy);
                         d.reject(dummy);
-                        delay(100);
+                        delayedDone(100);
                     }
                 });
 
-                specify("trying to call then fireRejectables, delayed", new Runnable() {
+                specify("trying to call then fireRejectables, delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -66,23 +98,22 @@ public class Test212 extends MiniMochaDescription {
                             @Override
                             public String apply(String o) {
                                 assertEquals("onRejected should not have been called", false, onFulfilledCalled[0]);
-
+                                done();
                                 return o;
                             }
                         });
 
-                        delay(50);
                         d.resolve(dummy);
                         d.reject(dummy);
 
-                        delay(100);
+                        delayedDone(100);
                     }
                 });
 
-                specify("trying to call immediately then fireRejectables delayed", new Runnable() {
+                specify("trying to call immediately then fireRejectables delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
 
                         final boolean[] onFulfilledCalled = {false};
 
@@ -103,11 +134,16 @@ public class Test212 extends MiniMochaDescription {
                             }
                         });
 
-                        d.resolve(dummy);
-                        delay(50);
-                        d.reject(dummy);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.resolve(dummy);
+                                d.reject(dummy);
+                            }
+                        }, 50);
 
-                        delay(100);
+
+                        delayedDone(100);
                     }
                 });
             }

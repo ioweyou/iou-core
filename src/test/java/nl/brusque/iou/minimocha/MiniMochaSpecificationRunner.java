@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
     private final String _descriptionName;
@@ -85,6 +87,31 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         _stop = new Date();
 
         System.out.println(String.format("Start %s, Stop %s", _start, _stop));
+    }
+    private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
+
+    public final void delayedDone(final long milliseconds) {
+        delayedCall(new Runnable() {
+            @Override
+            public void run() {
+                done();
+            }
+        }, milliseconds);
+    }
+
+    public final void delayedCall(final Runnable runnable, final long milliseconds) {
+        _delayedCallExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(milliseconds);
+
+                    runnable.run();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

@@ -12,7 +12,7 @@ public abstract class MiniMochaRunnableNode extends MiniMochaNode implements Run
                 .addChildDescription(childDescription);
     }
 
-    public final void specify(String description, Runnable test) {
+    public final void specify(String description, MiniMochaSpecificationRunnable test) {
         MiniMochaDescriptionContext.getContext()
                 .addSpecification(new MiniMochaSpecification(description, test));
     }

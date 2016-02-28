@@ -1,19 +1,33 @@
 package nl.brusque.iou.minimocha;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 
-class MiniMochaSpecification extends MiniMochaNode {
-    private final Runnable _test;
+class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneListener {
+    static final MiniMochaSpecification NONE = new MiniMochaSpecification("NONE");
+
+    private MiniMochaSpecificationRunnable _test;
     //private final ExecutorService _executor = Executors.newSingleThreadExecutor(new SpecificationExceptionCatchingThreadFactory());
+    private Date _start;
+    private Date _stop;
     private final ExecutorService _executor = Executors.newSingleThreadExecutor();
     private final List<AssertionError> _assertionErrors = new ArrayList<>();
 
-    MiniMochaSpecification(String description, Runnable test) {
-        _test = test;
+    private MiniMochaSpecification(String description) {
+        this(description, new MiniMochaSpecificationRunnable() {
+            @Override
+            public void run() {
 
+            }
+        });
+    }
+
+    MiniMochaSpecification(String description, MiniMochaSpecificationRunnable test) {
         setName(description);
+
+        _test = test;
     }
 
     private class SpecificationExceptionCatchingThreadFactory implements ThreadFactory {
@@ -41,18 +55,44 @@ class MiniMochaSpecification extends MiniMochaNode {
         };
     }
 
-    public final void run() throws InterruptedException, ExecutionException, TimeoutException {
+    boolean _isDoneCalled = false;
+    public final void done() {
+        _stop = new Date();
+        _isDoneCalled = true;
+        if (!_executor.isTerminated()) {
+            _executor.shutdownNow();
+        }
+
+        notify();
+
+        System.out.println(String.format("Start %s, Stop %s", _start, _stop));
+    }
+
+    private void testDone() {
+        if (!_isDoneCalled) {
+            throw new AssertionError("Test timed-out.");
+        }
+    }
+
+    public final synchronized void run() throws InterruptedException, ExecutionException, TimeoutException {
         Thread.UncaughtExceptionHandler oldUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(createUncaughtExceptionHandler());
         try {
             _executor.submit(new Runnable() {
                 @Override
                 public void run() {
+                    _start = new Date();
+                    _test.addDoneListener(MiniMochaSpecification.this);
                     _test.run();
                 }
             }).get(1000, TimeUnit.MILLISECONDS);
+
+            wait(2000);
+            testDone();
         } catch (AssertionError e) {
             throw e;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new AssertionError("Test timed-out.");
         }
 
         Thread.setDefaultUncaughtExceptionHandler(oldUncaughtExceptionHandler);

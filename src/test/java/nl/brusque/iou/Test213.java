@@ -2,6 +2,7 @@ package nl.brusque.iou;
 
 import nl.brusque.iou.minimocha.MiniMochaDescription;
 import nl.brusque.iou.minimocha.MiniMochaRunner;
+import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.runner.RunWith;
 
 import static nl.brusque.iou.Util.deferred;
@@ -16,7 +17,7 @@ public class Test213 extends MiniMochaDescription {
             public void run() {
                 final String dummy = "DUMMY";
 
-                specify("trying to reject then immediately call", new Runnable() {
+                specify("trying to reject then immediately call", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -46,7 +47,7 @@ public class Test213 extends MiniMochaDescription {
                     }
                 });
 
-                specify("trying to fireRejectables then call, delayed", new Runnable() {
+                specify("trying to fireRejectables then call, delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();
@@ -77,7 +78,7 @@ public class Test213 extends MiniMochaDescription {
                     }
                 });
 
-                specify("trying to fireRejectables immediately then call delayed", new Runnable() {
+                specify("trying to fireRejectables immediately then call delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();

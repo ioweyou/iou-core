@@ -1,25 +1,21 @@
-package nl.brusque.iou;
+package nl.brusque.iou.minimocha;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-abstract class Testable<TInput> implements Runnable {
-    private AbstractPromise<TInput> _p;
+public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode implements Runnable {
 
-    protected void setPromise(AbstractPromise<TInput> p) {
-        _p = p;
+    private List<IMiniMochaDoneListener> _doneListeners = new ArrayList<>();
+
+    public final void done() {
+        for (IMiniMochaDoneListener listener : _doneListeners) {
+            listener.done();
+        }
     }
 
-    protected AbstractPromise<TInput> getPromise() {
-        return _p;
-    }
 
-    /*final void done() {
-        _stop = new Date();
-
-        System.out.println(String.format("Start %s, Stop %s", _start, _stop));
-    }
     private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
 
     public final void delayedDone(final long milliseconds) {
@@ -44,5 +40,9 @@ abstract class Testable<TInput> implements Runnable {
                 }
             }
         });
-    }*/
+    }
+
+    public void addDoneListener(IMiniMochaDoneListener doneListener) {
+        _doneListeners.add(doneListener);
+    }
 }
