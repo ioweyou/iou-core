@@ -10,9 +10,7 @@ import org.mockito.Matchers;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static nl.brusque.iou.Util.delay;
-import static nl.brusque.iou.Util.fulfillableStub;
-import static nl.brusque.iou.Util.rejectableStub;
+import static nl.brusque.iou.Util.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 

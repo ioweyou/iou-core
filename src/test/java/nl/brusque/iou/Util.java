@@ -3,13 +3,6 @@ package nl.brusque.iou;
 import static org.mockito.Mockito.spy;
 
 public class Util {
-    public static String sanitizeDescriptionName(String name) {
-        return name
-                .replace(".", "_")
-                .replace("(", "[")
-                .replace(")", "]");
-    }
-
     public static <TInput> AbstractIOU<TInput> deferred() {
         return new TestTypedIOU<>();
     }

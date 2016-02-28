@@ -3,9 +3,6 @@ package nl.brusque.iou.minimocha;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
-import static nl.brusque.iou.Util.sanitizeDescriptionName;
-import static org.mockito.Mockito.spy;
-
 class MiniMochaNode {
 
     private Date _start;
@@ -28,5 +25,14 @@ class MiniMochaNode {
 
     void setName(String name) {
         _name = sanitizeDescriptionName(name);
+    }
+
+    public static String sanitizeDescriptionName(String name) {
+        return name
+                .replaceAll("[^a-zA-Z0-9_:,`\\)\\( ]+", "_")
+                .replaceAll("\\(", "[")
+                .replaceAll("\\)", "]")
+                .replaceAll("^_+", "")
+                .replaceAll("_+$", "");
     }
 }

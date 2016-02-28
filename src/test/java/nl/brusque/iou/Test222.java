@@ -5,9 +5,7 @@ import nl.brusque.iou.minimocha.MiniMochaRunner;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
-import static nl.brusque.iou.Util.deferred;
-import static nl.brusque.iou.Util.delay;
-import static nl.brusque.iou.Util.resolved;
+import static nl.brusque.iou.Util.*;
 
 @RunWith(MiniMochaRunner.class)
 public class Test222 extends MiniMochaDescription {

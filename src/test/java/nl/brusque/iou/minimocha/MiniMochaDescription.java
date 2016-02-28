@@ -1,6 +1,7 @@
 package nl.brusque.iou.minimocha;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MiniMochaDescription extends MiniMochaNode {
     static final MiniMochaDescription ROOT = new MiniMochaDescription("ROOT");
@@ -20,19 +21,19 @@ public class MiniMochaDescription extends MiniMochaNode {
         runnable.run();
     }
 
-    void addChildDescription(MiniMochaDescription description) {
+    final void addChildDescription(MiniMochaDescription description) {
         _childDescriptions.add(description);
     }
 
-    void addSpecification(MiniMochaSpecification specification) {
+    final void addSpecification(MiniMochaSpecification specification) {
         _specifications.add(specification);
     }
 
-    public final List<MiniMochaDescription> getChildDescriptions() {
+    final List<MiniMochaDescription> getChildDescriptions() {
         return _childDescriptions;
     }
 
-    public final List<MiniMochaSpecification> getSpecifications() {
+    final List<MiniMochaSpecification> getSpecifications() {
         return _specifications;
     }
 }

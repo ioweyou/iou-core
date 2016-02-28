@@ -29,7 +29,7 @@ public class Test212 extends MiniMochaDescription {
                             @Override
                             public String apply(String o) {
                                 onFulfilledCalled[0] = true;
-
+                                
                                 return o;
                             }
                         }, new TestThenCallable<String, String>() {
