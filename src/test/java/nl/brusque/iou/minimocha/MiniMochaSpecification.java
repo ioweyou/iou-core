@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneListener {
     static final MiniMochaSpecification NONE = new MiniMochaSpecification("NONE");
 
+    private final Object _synchronizer = new Object();
+
     private MiniMochaSpecificationRunnable _test;
     //private final ExecutorService _executor = Executors.newSingleThreadExecutor(new SpecificationExceptionCatchingThreadFactory());
     private Date _start;
@@ -62,38 +64,37 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
         if (!_executor.isTerminated()) {
             _executor.shutdownNow();
         }
-
-        notify();
+        synchronized (_synchronizer) {
+            _synchronizer.notify();
+        }
 
         System.out.println(String.format("Start %s, Stop %s", _start, _stop));
     }
 
-    private void testDone() {
+    private void testDone() throws TimeoutException {
         if (!_isDoneCalled) {
-            throw new AssertionError("Test timed-out.");
+            throw new TimeoutException("Test timed-out.");
         }
     }
 
     public final synchronized void run() throws InterruptedException, ExecutionException, TimeoutException {
         Thread.UncaughtExceptionHandler oldUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(createUncaughtExceptionHandler());
-        try {
-            _executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    _start = new Date();
-                    _test.addDoneListener(MiniMochaSpecification.this);
-                    _test.run();
-                }
-            }).get(1000, TimeUnit.MILLISECONDS);
 
-            wait(2000);
-            testDone();
-        } catch (AssertionError e) {
-            throw e;
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new AssertionError("Test timed-out.");
+        _executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                _start = new Date();
+                _test.addDoneListener(MiniMochaSpecification.this);
+                _test.run();
+            }
+        }).get(1000, TimeUnit.MILLISECONDS);
+
+        synchronized (_synchronizer) {
+            _synchronizer.wait(2000);
         }
+
+        testDone();
 
         Thread.setDefaultUncaughtExceptionHandler(oldUncaughtExceptionHandler);
 

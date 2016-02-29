@@ -37,6 +37,10 @@ public class Test224 extends MiniMochaDescription {
                         d.resolve(dummy);
 
                         Assert.assertFalse("onFulfilled should not have been called.", onFullfilledCalled[0]);
+
+                        // FIXME Invoking on another thread here to fix synchronization
+                        // FIXME Not in original APlus-tests
+                        delayedDone(0);
                         }
                     });
 
@@ -58,6 +62,10 @@ public class Test224 extends MiniMochaDescription {
                         });
 
                         Assert.assertFalse("onFulfilled should not have been called.", onFullfilledCalled[0]);
+
+                        // FIXME Invoking on another thread here to fix synchronization
+                        // FIXME Not in original APlus-tests
+                        delayedDone(0);
                         }
                     });
 
@@ -74,6 +82,8 @@ public class Test224 extends MiniMochaDescription {
                                     @Override
                                     public Void apply(String o) {
                                         Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
+                                        done();
+
                                         return null;
                                     }
                                 });
@@ -83,8 +93,6 @@ public class Test224 extends MiniMochaDescription {
                                 return null;
                             }
                         });
-
-                        delay(50);
                         }
                     });
 
@@ -102,6 +110,8 @@ public class Test224 extends MiniMochaDescription {
                                     @Override
                                     public Void apply(String o) {
                                         Assert.assertTrue("first onRejected should have finished", firstOnFulfilledFinished[0]);
+                                        done();
+
                                         return null;
                                     }
                                 });
@@ -111,8 +121,6 @@ public class Test224 extends MiniMochaDescription {
                                 return null;
                             }
                         });
-
-                        delay(50);
                         }
                     });
 
@@ -126,21 +134,20 @@ public class Test224 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
-                        new Thread() {
+
+                        delayedCall(new Runnable() {
                             @Override
                             public void run() {
                                 d.resolve(dummy);
                                 firstStackFinished[0] = true;
                             }
-                        }.start();
-
-
-                        delay(50);
+                        }, 0);
                         }
                     });
                     }
@@ -167,6 +174,10 @@ public class Test224 extends MiniMochaDescription {
                         d.reject(dummy);
 
                         Assert.assertFalse("onRejected should not have been called.", onRejectedCalled[0]);
+
+                        // FIXME Invoking on another thread here to fix synchronization
+                        // FIXME Not in original APlus-tests
+                        delayedDone(0);
                         }
                     });
 
@@ -189,6 +200,10 @@ public class Test224 extends MiniMochaDescription {
 
 
                         Assert.assertFalse("onRejected should not have been called.", onRejectedCalled[0]);
+
+                        // FIXME Invoking on another thread here to fix synchronization
+                        // FIXME Not in original APlus-tests
+                        delayedDone(0);
                         }
                     });
 
@@ -201,10 +216,11 @@ public class Test224 extends MiniMochaDescription {
                         promise.then(null, new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
-                                promise.then(new TestThenCallable<String, Void>() {
+                                promise.then(null, new TestThenCallable<String, Void>() {
                                     @Override
                                     public Void apply(String o) {
                                         Assert.assertTrue("first onRejected should have finished", firstOnRejectedFinished[0]);
+                                        done();
 
                                         return null;
                                     }
@@ -215,8 +231,6 @@ public class Test224 extends MiniMochaDescription {
                                 return null;
                             }
                         });
-
-                        delay(50);
                         }
                     });
 
@@ -234,6 +248,7 @@ public class Test224 extends MiniMochaDescription {
                                     @Override
                                     public Void apply(String o) {
                                         Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
+                                        done();
 
                                         return null;
                                     }
@@ -244,8 +259,6 @@ public class Test224 extends MiniMochaDescription {
                                 return null;
                             }
                         });
-
-                        delay(50);
                         }
                     });
 
@@ -259,22 +272,21 @@ public class Test224 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
 
-                        new Thread() {
+                        delayedCall(new Runnable() {
                             @Override
                             public void run() {
                                 d.reject(dummy);
 
                                 firstStackFinished[0] = true;
                             }
-                        }.start();
-
-                        delay(50);
+                        }, 0);
                         }
                     });
                     }

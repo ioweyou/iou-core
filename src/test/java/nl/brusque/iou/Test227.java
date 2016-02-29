@@ -36,6 +36,10 @@ public class Test227 extends MiniMochaDescription {
                         Object promise2 = promise1.then();
 
                         Assert.assertFalse("AndroidPromise should not be null", promise2 == null);
+
+                        // FIXME Invoking on another thread here to fix synchronization
+                        // FIXME Not in original APlus-tests
+                        delayedDone(0);
                     }
                 });
 
@@ -63,6 +67,7 @@ public class Test227 extends MiniMochaDescription {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);
+                                                done();
 
                                                 return null;
                                             }
@@ -88,6 +93,7 @@ public class Test227 extends MiniMochaDescription {
                                                 Throwable e = o!=null ? ((Exception)o).getCause() : null;
 
                                                 Assert.assertEquals("Incorrect reason", expectedReason, e);
+                                                done();
 
                                                 return null;
                                             }

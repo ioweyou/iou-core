@@ -23,22 +23,26 @@ public class Test223 extends MiniMochaDescription {
                     specify("rejected after a delay", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
                         final boolean[] isRejected = {false};
 
                         d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertTrue("isRejected should be true", isRejected[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
-                        delay(50);
-
-                        d.resolve(dummy);
-                        isRejected[0] = true;
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.reject(dummy);
+                                isRejected[0] = true;
+                            }
+                        }, 50);
                         }
                     });
 
@@ -52,13 +56,20 @@ public class Test223 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
-                        delay(50);
-                        Assert.assertFalse("onRejected should not have been called", onRejectedCalled[0]);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                Assert.assertFalse("onRejected should not have been called", onRejectedCalled[0]);
+                                done();
+                            }
+                        }, 150);
+
                         }
                     });
                     }
@@ -76,6 +87,7 @@ public class Test223 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+                                done();
 
                                 return null;
                             }
@@ -93,6 +105,7 @@ public class Test223 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+                                done();
 
                                 return null;
                             }
@@ -106,49 +119,60 @@ public class Test223 extends MiniMochaDescription {
                     specify("trying to fireRejectables a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0};
 
                         d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
-                        delay(50);
-                        d.reject(dummy);
-                        d.reject(dummy);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.reject(dummy);
+                                d.reject(dummy);
+                            }
+                        }, 50);
+
                         }
                     });
 
                     specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0};
 
                         d.getPromise().then(null, new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
+                                done();
 
                                 return null;
                             }
                         });
 
                         d.reject(dummy);
-                        delay(50);
-                        d.reject(dummy);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.reject(dummy);
+                            }
+                        }, 50);
                         }
                     });
 
                     specify("when multiple `then` calls are made, spaced apart in time", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0, 0, 0};
 
                         d.getPromise().then(null, new TestThenCallable<String, Void>() {
@@ -160,28 +184,41 @@ public class Test223 extends MiniMochaDescription {
                             }
                         });
 
-                        delay(50);
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        delayedCall(new Runnable() {
                             @Override
-                            public Void apply(String o) {
-                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
+                            public void run() {
+                                d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) {
+                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
-                                return null;
+                                        return null;
+                                    }
+                                });
                             }
-                        });
+                        }, 50);
 
-                        delay(50);
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        delayedCall(new Runnable() {
                             @Override
-                            public Void apply(String o) {
-                                Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
+                            public void run() {
+                                d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) {
+                                        Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
+                                        done();
 
-                                return null;
+                                        return null;
+                                    }
+                                });
                             }
-                        });
+                        }, 100);
 
-                        delay(50);
-                        d.reject(dummy);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.reject(dummy);
+                            }
+                        }, 150);
                         }
                     });
 
@@ -206,6 +243,7 @@ public class Test223 extends MiniMochaDescription {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
+                                done();
 
                                 return null;
                             }

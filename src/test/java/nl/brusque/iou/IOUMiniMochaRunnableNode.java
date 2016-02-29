@@ -13,7 +13,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         specify("already-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
-                //test.addListener(MiniMochaSpecificationRunnable.this);
+                test.setDoneHandler(this);
 
                 test.setPromise(resolved(value));
 
@@ -25,6 +25,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             @Override
             public void run() {
                 AbstractIOU<TInput> d = deferred();
+                test.setDoneHandler(this);
                 test.setPromise(d.getPromise());
                 test.run();
                 d.resolve(value);
@@ -35,6 +36,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             @Override
             public void run() {
                 final AbstractIOU<TInput> d = deferred();
+                test.setDoneHandler(this);
                 test.setPromise(d.getPromise());
                 test.run();
                 new Timer().schedule(new TimerTask() {
@@ -50,6 +52,8 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         specify("already-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                test.setDoneHandler(this);
+
                 test.setPromise(rejected(value));
 
                 test.run();
@@ -60,9 +64,11 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             @Override
             public void run() {
                 AbstractIOU<TInput> d = deferred();
+                test.setDoneHandler(this);
+
                 test.setPromise(d.getPromise());
                 test.run();
-                d.resolve(value);
+                d.reject(value);
             }
         });
 
@@ -70,6 +76,8 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             @Override
             public void run() {
                 final AbstractIOU<TInput> d = deferred();
+
+                test.setDoneHandler(this);
                 test.setPromise(d.getPromise());
                 test.run();
 

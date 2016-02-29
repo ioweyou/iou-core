@@ -39,6 +39,7 @@ public class Test231 extends MiniMochaDescription {
                             @Override
                             public Object apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
+                                done();
 
                                 return null;
                             }
@@ -64,6 +65,7 @@ public class Test231 extends MiniMochaDescription {
                             @Override
                             public Void apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
+                                done();
 
                                 return null;
                             }

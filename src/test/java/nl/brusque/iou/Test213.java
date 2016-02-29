@@ -6,7 +6,6 @@ import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.runner.RunWith;
 
 import static nl.brusque.iou.Util.deferred;
-import static nl.brusque.iou.Util.delay;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MiniMochaRunner.class)
@@ -43,14 +42,14 @@ public class Test213 extends MiniMochaDescription {
 
                         d.reject(dummy);
                         d.resolve(dummy);
-                        delay(100);
+                        delayedDone(100);
                     }
                 });
 
                 specify("trying to fireRejectables then call, delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
 
                         final boolean[] onRejectedCalled = {false};
 
@@ -71,17 +70,23 @@ public class Test213 extends MiniMochaDescription {
                             }
                         });
 
-                        delay(50);
-                        d.reject(dummy);
-                        d.resolve(dummy);
-                        delay(100);
+
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.reject(dummy);
+                                d.resolve(dummy);
+                            }
+                        }, 50);
+
+                        delayedDone(100);
                     }
                 });
 
                 specify("trying to fireRejectables immediately then call delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
-                        AbstractIOU<String> d = deferred();
+                        final AbstractIOU<String> d = deferred();
 
                         final boolean[] onRejectedCalled = {false};
 
@@ -102,10 +107,16 @@ public class Test213 extends MiniMochaDescription {
                             }
                         });
 
+
                         d.reject(dummy);
-                        delay(50);
-                        d.resolve(dummy);
-                        delay(100);
+                        delayedCall(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.resolve(dummy);
+                            }
+                        }, 50);
+
+                        delayedDone(100);
                     }
                 });
             }

@@ -7,9 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import static nl.brusque.iou.Util.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -60,8 +57,10 @@ public class Test226 extends MiniMochaDescription {
                                                         verify(handler2, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
+
+                                                        done();
                                                     } catch (Exception e) {
-                                                        e.printStackTrace();
+                                                        throw new AssertionError(e);
                                                     }
 
 
@@ -112,8 +111,10 @@ public class Test226 extends MiniMochaDescription {
                                                         verify(handler2, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
+
+                                                        done();
                                                     } catch (Exception e) {
-                                                        e.printStackTrace();
+                                                        throw new AssertionError(e);
                                                     }
 
 
@@ -228,12 +229,12 @@ public class Test226 extends MiniMochaDescription {
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
-
+                                                    done();
                                                     return null;
                                                 }
                                             });
                                         } catch (Exception e) {
-                                            e.printStackTrace();
+                                            throw new AssertionError(e);
                                         }
                                     }
                                 });
@@ -271,15 +272,17 @@ public class Test226 extends MiniMochaDescription {
                                                 promise.then(new TestThenCallable<String, Void>() {
                                                     @Override
                                                     public Void apply(String o) throws Exception {
-                                                        new Timer().schedule(new TimerTask() {
+                                                        delayedCall(new Runnable() {
                                                             @Override
                                                             public void run() {
                                                                 try {
                                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                                     inOrder.verify(handler3).apply(any(Object.class));
+
+                                                                    done();
                                                                 } catch (Exception e) {
-                                                                    e.printStackTrace();
+                                                                    throw new AssertionError(e);
                                                                 }
 //                                                                boolean a = handler1.lastCall() < handler2.lastCall();
 //                                                                boolean b = handler2.lastCall() < handler3.lastCall();
@@ -287,13 +290,13 @@ public class Test226 extends MiniMochaDescription {
 //
 //                                                                Assert.assertTrue("Handlers called in incorrect order", c);
                                                             }
-                                                        }, 50);
+                                                        }, 15);
 
                                                         return null;
                                                     }
                                                 });
                                             } catch (Exception e) {
-                                                e.printStackTrace();
+                                                throw new AssertionError(e);
                                             }
                                         }
                                     });

@@ -6,7 +6,6 @@ import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
 import org.junit.runner.RunWith;
 
 import static nl.brusque.iou.Util.deferred;
-import static nl.brusque.iou.Util.delay;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MiniMochaRunner.class)
@@ -37,15 +36,14 @@ public class Test212 extends MiniMochaDescription {
                             @Override
                             public Void apply(Object o) throws Exception {
                                 assertEquals("OnFulfilled should not have been called", onFulfilledCalled[0], false);
-                                //FIXME
-                                //done();
+
+                                done();
 
                                 return null;
                             }
                         });
 
-                        //FIXME
-                        //delayedDone(100);
+                        delayedDone(100);
                     }
                 });
 

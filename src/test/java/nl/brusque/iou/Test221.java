@@ -28,6 +28,8 @@ public class Test221 extends MiniMochaDescription {
                                         d.reject(dummy).then(o, new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
+                                                done();
+
                                                 return null;
                                             }
                                         });
@@ -60,6 +62,8 @@ public class Test221 extends MiniMochaDescription {
                                         .then(o, new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String dummyString) {
+                                                done();
+
                                                 return null;
                                             }
                                         });
@@ -91,6 +95,8 @@ public class Test221 extends MiniMochaDescription {
                                         d.resolve(dummy).then(new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
+                                                done();
+
                                                 return null;
                                             }
                                         }, o);
@@ -117,6 +123,8 @@ public class Test221 extends MiniMochaDescription {
                                         d.resolve(dummy).then(new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
+                                                done();
+
                                                 return null;
                                             }
                                         }, o);
