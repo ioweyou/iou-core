@@ -95,7 +95,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, immediately", new MiniMochaSpecificationRunnable() {
+                    specify("trying to reject a pending promise more than once, immediately", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -116,7 +116,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
+                    specify("trying to reject a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractIOU<String> d = deferred();
@@ -143,7 +143,7 @@ public class Test223 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to fireRejectables a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
+                    specify("trying to reject a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractIOU<String> d = deferred();

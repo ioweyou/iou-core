@@ -46,7 +46,7 @@ public class Test213 extends MiniMochaDescription {
                     }
                 });
 
-                specify("trying to fireRejectables then call, delayed", new MiniMochaSpecificationRunnable() {
+                specify("trying to reject then fulfill, delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         final AbstractIOU<String> d = deferred();
@@ -83,7 +83,7 @@ public class Test213 extends MiniMochaDescription {
                     }
                 });
 
-                specify("trying to fireRejectables immediately then call delayed", new MiniMochaSpecificationRunnable() {
+                specify("trying to reject immediately then fulfill delayed", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         final AbstractIOU<String> d = deferred();
