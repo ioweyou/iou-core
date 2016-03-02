@@ -21,6 +21,26 @@ abstract class Testable<TInput> implements Runnable {
         _doneHandler = doneHandler;
     }
 
+    class CallbackAggregator {
+        private int _soFar = 0;
+        private final int _times;
+        private final Runnable _runnable;
+
+        public CallbackAggregator(int times, Runnable runnable) {
+            _times    = times;
+
+            _runnable = runnable;
+        }
+
+        public void done() {
+            _soFar++;
+
+            if (_soFar == _times) {
+                Testable.this.done();
+            }
+        }
+    }
+
     final void done() {
         _doneHandler.done();
     }

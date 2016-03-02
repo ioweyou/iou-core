@@ -28,7 +28,7 @@ final class FireRejectsEventListener<TResult extends AbstractPromise<TResult>> i
                     Object result = _rejector.call(rejectable, _promiseState.RejectedWith());
 
                     // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-                    resolvable.getPromise().reject(result);
+                    resolvable.getPromise().resolve(result);
                 } catch (Exception e) {
                     // 2.2.7.2 If either onFulfilled or onRejected throws an exception e, promise2 must be rejected with e as the reason.
                     resolvable.getPromise().reject(e);

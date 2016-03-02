@@ -43,7 +43,7 @@ final class PromiseResolverEventHandler {
                 throw new TypeErrorException();
             }
         } catch (TypeErrorException e) {
-            // 2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError' as the reason.
+            // 2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.
             _eventDispatcher.queue(EventFactory.create(onFailEvent, new TypeError()));
             return promise;
         }

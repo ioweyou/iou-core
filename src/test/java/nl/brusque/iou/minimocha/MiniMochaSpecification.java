@@ -91,7 +91,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
         }).get(1000, TimeUnit.MILLISECONDS);
 
         synchronized (_synchronizer) {
-            _synchronizer.wait(2000);
+            _synchronizer.wait(5000);
         }
 
         testDone();
