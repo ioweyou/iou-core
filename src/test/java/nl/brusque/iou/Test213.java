@@ -15,8 +15,38 @@ public class Test213 extends MiniMochaDescription {
             @Override
             public void run() {
                 final String dummy = "DUMMY";
+                testRejected(dummy, new Testable<Object>() {
+                    final boolean[] onRejectedCalled = {false};
 
-                specify("trying to reject then immediately call", new MiniMochaSpecificationRunnable() {
+
+                    @Override
+                    public void run() {
+
+                        AbstractPromise<Object> promise = getPromise();
+
+                        promise.then(new TestThenCallable<Object, Void>() {
+                            @Override
+                            public Void apply(Object o) {
+                                assertEquals("onRejected should not have been called", onRejectedCalled[0], false);
+
+                                done();
+
+                                return null;
+                            }
+                        }, new TestThenCallable<Object, Void>() {
+                            @Override
+                            public Void apply(Object o) throws Exception {
+                                onRejectedCalled[0] = true;
+
+                                return null;
+                            }
+                        });
+
+                        delayedDone(100);
+                    }
+                });
+
+                specify("trying to reject then immediately fulfill", new MiniMochaSpecificationRunnable() {
                     @Override
                     public void run() {
                         AbstractIOU<String> d = deferred();

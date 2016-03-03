@@ -16,6 +16,52 @@ public class Test224 extends MiniMochaDescription {
 
             @Override
             public void run() {
+                describe("`then` returns before the promise becomes fulfilled or rejected", new Runnable() {
+                    @Override
+                    public void run() {
+                        final boolean[] thenHasReturned = {false};
+                        testFulfilled(dummy, new Testable<String>() {
+                            @Override
+                            public void run() {
+                                AbstractPromise<String> promise = getPromise();
+
+                                promise.then(new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) throws Exception {
+                                        Assert.assertEquals(thenHasReturned[0], true);
+                                        done();
+
+                                        return null;
+                                    }
+                                });
+
+                                thenHasReturned[0] = true;
+                            }
+                        });
+
+                        testRejected(dummy, new Testable<String>() {
+                            @Override
+                            public void run() {
+                                thenHasReturned[0] = false;
+
+                                AbstractPromise<String> promise = getPromise();
+
+                                promise.then(null, new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) throws Exception {
+                                        Assert.assertEquals(thenHasReturned[0], true);
+                                        done();
+
+                                        return null;
+                                    }
+                                });
+
+                                thenHasReturned[0] = true;
+                            }
+                        });
+                    }
+                });
+
                 describe("Clean-stack execution ordering tests (fulfillment case)", new Runnable() {
                     @Override
                     public void run() {
@@ -207,6 +253,34 @@ public class Test224 extends MiniMochaDescription {
                         }
                     });
 
+                    specify("when `onRejected` is added inside an `onFulfilled`", new MiniMochaSpecificationRunnable() {
+                        @Override
+                        public void run() {
+                            final AbstractPromise<String> promise = resolved();
+                            final IThenable<String> promise2 = rejected();
+                            final boolean[] firstOnFulfilledFinished = {false};
+
+                            promise.then(new TestThenCallable<String, Void>() {
+                                @Override
+                                public Void apply(String o) {
+                                    promise2.then(null, new TestThenCallable<String, Void>() {
+                                        @Override
+                                        public Void apply(String o) {
+                                            Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
+                                            done();
+
+                                            return null;
+                                        }
+                                    });
+
+                                    firstOnFulfilledFinished[0] = true;
+
+                                    return null;
+                                }
+                            });
+                        }
+                    });
+
                     specify("when one `onRejected` is added inside another `onRejected`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
@@ -227,34 +301,6 @@ public class Test224 extends MiniMochaDescription {
                                 });
 
                                 firstOnRejectedFinished[0] = true;
-
-                                return null;
-                            }
-                        });
-                        }
-                    });
-
-                    specify("when `onRejected` is added inside an `onFulfilled`", new MiniMochaSpecificationRunnable() {
-                        @Override
-                        public void run() {
-                        final AbstractPromise<String> promise = resolved();
-                        final IThenable<String> promise2 = rejected();
-                        final boolean[] firstOnFulfilledFinished = {false};
-
-                        promise.then(new TestThenCallable<String, Void>() {
-                            @Override
-                            public Void apply(String o) {
-                                promise2.then(null, new TestThenCallable<String, Void>() {
-                                    @Override
-                                    public Void apply(String o) {
-                                        Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
-                                        done();
-
-                                        return null;
-                                    }
-                                });
-
-                                firstOnFulfilledFinished[0] = true;
 
                                 return null;
                             }

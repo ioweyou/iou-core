@@ -112,6 +112,42 @@ public class Test227 extends MiniMochaDescription {
                     }
                 });
 
+                describe("2.2.7.3: If `onFulfilled` is not a function and `promise1` is fulfilled, `promise2` must be fulfilled with the same value.", new Runnable() {
+                    private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                        describe(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
+                            @Override
+                            public void run() {
+                                testFulfilled(dummy, new Testable<Object>() {
+                                    @Override
+                                    public void run() {
+                                        final AbstractPromise<Object> promise1 = getPromise();
+
+                                        IThenable<Object> promise2 = promise1.then(nonFunction);
+
+                                        promise2.then(new TestThenCallable<Object, Void>() {
+                                            @Override
+                                            public Void apply(Object o) throws Exception {
+                                                Assert.assertEquals(o, dummy);
+
+                                                done();
+
+                                                return null;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void run() {
+                        testNonFunction(null, "`null`");
+                        testNonFunction(false, "`false`");
+                        testNonFunction(5, "`5`");
+                        testNonFunction(new Object(), "an object");
+                    }
+                });
             }
         });
     }

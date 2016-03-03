@@ -16,6 +16,28 @@ public class Test222 extends MiniMochaDescription {
 
             @Override
             public void run() {
+                describe("2.2.2.1: it must be called after `promise` is fulfilled, with `promise`’s fulfillment value as its first argument.", new Runnable() {
+                    @Override
+                    public void run() {
+                        testFulfilled(dummy, new Testable<String>() {
+                            @Override
+                            public void run() {
+                                AbstractPromise<String> promise = getPromise();
+
+                                promise.then(new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) throws Exception {
+                                        Assert.assertEquals(o, dummy);
+                                        done();
+
+                                        return null;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
                 describe("2.2.2.2: it must not be called before `promise` is fulfilled", new Runnable() {
                     @Override
                     public void run() {
@@ -33,8 +55,6 @@ public class Test222 extends MiniMochaDescription {
                                 return null;
                             }
                         });
-
-                        delay(50);
 
                         delayedCall(new Runnable() {
                             @Override
@@ -95,7 +115,7 @@ public class Test222 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to call a pending promise more than once, immediately", new MiniMochaSpecificationRunnable() {
+                    specify("trying to fulfill a pending promise more than once, immediately", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         AbstractIOU<String> d = deferred();
@@ -116,7 +136,7 @@ public class Test222 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to call a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
+                    specify("trying to fulfill a pending promise more than once, delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                         final AbstractIOU<String> d = deferred();
@@ -143,7 +163,7 @@ public class Test222 extends MiniMochaDescription {
                         }
                     });
 
-                    specify("trying to call a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
+                    specify("trying to fulfill a pending promise more than once, immediately then delayed", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
                             final AbstractIOU<String> d = deferred();

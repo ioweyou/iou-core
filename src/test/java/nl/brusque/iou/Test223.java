@@ -17,9 +17,33 @@ public class Test223 extends MiniMochaDescription {
 
             @Override
             public void run() {
+                describe("2.2.3.1: it must be called after `promise` is rejected, with `promise`’s rejection reason as its first argument.", new Runnable() {
+                    @Override
+                    public void run() {
+                        testRejected(dummy, new Testable<String>() {
+                            @Override
+                            public void run() {
+                                AbstractPromise<String> promise = getPromise();
+
+                                promise.then(null, new TestThenCallable<String, Void>() {
+                                    @Override
+                                    public Void apply(String o) throws Exception {
+                                        Assert.assertEquals(o, dummy);
+                                        done();
+
+                                        return null;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
                 describe("2.2.3.2: it must not be called before `promise` is rejected", new Runnable() {
                     @Override
                     public void run() {
+
+
                     specify("rejected after a delay", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
