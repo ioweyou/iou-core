@@ -148,6 +148,43 @@ public class Test227 extends MiniMochaDescription {
                         testNonFunction(new Object(), "an object");
                     }
                 });
+
+                describe("2.2.7.4: If `onRejected` is not a function and `promise1` is rejected, `promise2` must be rejected with the same reason.", new Runnable() {
+                    private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                        describe(String.format("`onRejected` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
+                            @Override
+                            public void run() {
+                                testRejected(dummy, new Testable<Object>() {
+                                    @Override
+                                    public void run() {
+                                        final AbstractPromise<Object> promise1 = getPromise();
+
+                                        IThenable<Object> promise2 = promise1.then(nonFunction);
+
+                                        promise2.then(null, new TestThenCallable<Object, Void>() {
+                                            @Override
+                                            public Void apply(Object o) throws Exception {
+                                                Assert.assertEquals(o, dummy);
+
+                                                done();
+
+                                                return null;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void run() {
+                        testNonFunction(null, "`null`");
+                        testNonFunction(false, "`false`");
+                        testNonFunction(5, "`5`");
+                        testNonFunction(new Object(), "an object");
+                    }
+                });
             }
         });
     }
