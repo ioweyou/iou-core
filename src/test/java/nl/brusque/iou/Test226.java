@@ -125,10 +125,10 @@ public class Test226 extends MiniMochaDescription {
                         describe("results in multiple branching chains with their own fulfillment values", new Runnable() {
                             @Override
                             public void run() {
-                                testFulfilled(dummy, new Testable<Object>() {
+                                testFulfilled(dummy, new Testable<String>() {
                                     @Override
                                     public void run() {
-                                        AbstractPromise<Object> promise = getPromise();
+                                        AbstractPromise<String> promise = getPromise();
                                         final CallbackAggregator semiDone = new CallbackAggregator(3, this);
 
                                         promise
@@ -137,9 +137,9 @@ public class Test226 extends MiniMochaDescription {
                                                 public Object apply(String o) {
                                                     return sentinel;
                                                 }
-                                            }).then(new TestThenCallable<String, Void>() {
+                                            }).then(new TestThenCallable<Object, Void>() {
                                             @Override
-                                            public Void apply(String o) {
+                                            public Void apply(Object o) {
                                                 Assert.assertEquals("Object should equal sentinel", sentinel, o);
                                                 semiDone.done();
 
@@ -210,9 +210,9 @@ public class Test226 extends MiniMochaDescription {
 
 
 
-                                            promise.then(new TestThenCallable<String, Void>() {
+                                            promise.then(new TestThenCallable<Object, Void>() {
                                                 @Override
-                                                public Void apply(String o) throws Exception {
+                                                public Void apply(Object o) throws Exception {
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
@@ -243,9 +243,9 @@ public class Test226 extends MiniMochaDescription {
                                                 when(handler3.apply(any(Object.class))).thenReturn(null);
 
                                                 final AbstractPromise<Object> promise = getPromise();
-                                                promise.then(new TestThenCallable<String, Void>() {
+                                                promise.then(new TestThenCallable<Object, Void>() {
                                                     @Override
-                                                    public Void apply(String o) throws Exception {
+                                                    public Void apply(Object o) throws Exception {
                                                         handler1.apply(o);
 
                                                         promise.then(handler3);
@@ -256,9 +256,9 @@ public class Test226 extends MiniMochaDescription {
                                                 promise.then(handler2);
 
 
-                                                promise.then(new TestThenCallable<String, Void>() {
+                                                promise.then(new TestThenCallable<Object, Void>() {
                                                     @Override
-                                                    public Void apply(String o) throws Exception {
+                                                    public Void apply(Object o) throws Exception {
                                                         delayedCall(new Runnable() {
                                                             @Override
                                                             public void run() {

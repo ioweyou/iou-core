@@ -24,9 +24,7 @@ public class Test227 extends MiniMochaDescription {
                 put("`null`", null);
                 put("an error", new Error());
             }};
-
-
-
+            
             @Override
             public void run() {
                 specify("is a promise", new MiniMochaSpecificationRunnable() {
@@ -113,20 +111,25 @@ public class Test227 extends MiniMochaDescription {
                 });
 
                 describe("2.2.7.3: If `onFulfilled` is not a function and `promise1` is fulfilled, `promise2` must be fulfilled with the same value.", new Runnable() {
-                    private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                    private <TAnything, TNonFunction> void testNonFunction(final TNonFunction nonFunction, final String stringRepresentation) {
                         describe(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                             @Override
                             public void run() {
-                                testFulfilled(dummy, new Testable<Object>() {
+                                if (nonFunction != null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
+                                testFulfilled(dummy, new Testable<String>() {
                                     @Override
                                     public void run() {
-                                        final AbstractPromise<Object> promise1 = getPromise();
+                                        final AbstractPromise<String> promise1 = getPromise();
 
-                                        IThenable<Object> promise2 = promise1.then(nonFunction);
+                                        IThenable<TAnything> promise2 = promise1.then((IThenCallable<String, TAnything>)nonFunction);
 
-                                        promise2.then(new TestThenCallable<Object, Void>() {
+                                        promise2.then(new TestThenCallable<TAnything, Void>() {
                                             @Override
-                                            public Void apply(Object o) throws Exception {
+                                            public Void apply(TAnything o) throws Exception {
                                                 Assert.assertEquals(o, dummy);
 
                                                 done();
@@ -150,20 +153,25 @@ public class Test227 extends MiniMochaDescription {
                 });
 
                 describe("2.2.7.4: If `onRejected` is not a function and `promise1` is rejected, `promise2` must be rejected with the same reason.", new Runnable() {
-                    private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                    private <TAnything> void testNonFunction(final TAnything nonFunction, final String stringRepresentation) {
                         describe(String.format("`onRejected` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                             @Override
                             public void run() {
-                                testRejected(dummy, new Testable<Object>() {
+                                if (nonFunction != null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
+                                testRejected(dummy, new Testable<String>() {
                                     @Override
                                     public void run() {
-                                        final AbstractPromise<Object> promise1 = getPromise();
+                                        final AbstractPromise<String> promise1 = getPromise();
 
-                                        IThenable<Object> promise2 = promise1.then(nonFunction);
+                                        IThenable<TAnything> promise2 = promise1.then((IThenCallable<String, TAnything>)nonFunction);
 
-                                        promise2.then(null, new TestThenCallable<Object, Void>() {
+                                        promise2.then(null, new TestThenCallable<TAnything, Void>() {
                                             @Override
-                                            public Void apply(Object o) throws Exception {
+                                            public Void apply(TAnything o) throws Exception {
                                                 Assert.assertEquals(o, dummy);
 
                                                 done();

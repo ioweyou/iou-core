@@ -13,45 +13,29 @@ public abstract class AbstractPromise<TInput> implements IThenable<TInput> {
     protected abstract <TOutput> AbstractPromise<TOutput> create();
 
     final AbstractPromise<TInput> resolve(final TInput o) {
-        return _promiseResolverEventHandler.resolveWithValue(this, o);
+        _promiseResolverEventHandler.resolveWithValue(this, o);
+
+        return this;
     }
 
-    final AbstractPromise<TInput> reject(final TInput o) {
-        return _promiseResolverEventHandler.rejectWithValue(this, o);
+    final <TAnything> AbstractPromise<TInput> reject(final TAnything reason) {
+        _promiseResolverEventHandler.rejectWithReason(this, reason);
+
+        return this;
     }
 
     @Override
     public final <TOutput> IThenable<TOutput> then() {
-        return then((TInput) null, (TInput) null);
-    }
-
-    @Override
-    public final <TOutput> IThenable<TOutput> then(TInput onFulfilled) {
-        return then(onFulfilled, (TInput)null);
-    }
-
-    @Override
-    public final <TOutput> IThenable<TOutput> then(TInput onFulfilled, TInput onRejected) {
-        return addThenable(onFulfilled, onRejected);
-    }
-
-    @Override
-    public final <TOutput, TAnything> AbstractPromise<TOutput> then(TAnything onFulfilled, IThenCallable<TInput, TOutput> onRejected) {
-        return addThenable(onFulfilled, onRejected);
-    }
-
-    @Override
-    public final <TOutput, TAnything> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled, TAnything onRejected) {
-        return addThenable(onFulfilled, onRejected);
+        return then((IThenCallable<TInput, TOutput>) null, null);
     }
 
     @Override
     public final <TOutput> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled) {
-        return then(onFulfilled, null);
+        return addThenable(onFulfilled, null);
     }
 
     @Override
-    public final <TOutput> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled, IThenCallable<TInput, TOutput> onRejected) {
+    public final <TOutput, TAnythingInput> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled, IThenCallable<TAnythingInput, TOutput> onRejected) {
         return addThenable(onFulfilled, onRejected);
     }
 

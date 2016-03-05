@@ -18,6 +18,19 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         abstract AbstractPromise<TInput> create();
     }
 
+    void handleNonSensicalTest(String stringRepresentation) {
+        specify(String.format("Testing %s does not make sense in Java", stringRepresentation), new MiniMochaSpecificationRunnable() {
+            @Override
+            public void run() {
+                delayedCall(new Runnable() {
+                    @Override
+                    public void run() {
+                        done();
+                    }
+                }, 0);
+            }
+        });
+    }
 
     protected <TAnything, TAnything2> void testPromiseResolution(final PromiseFactory<TAnything> xFactory, final Testable<TAnything2> promiseTest) {
         final String dummy     = "DUMMY";

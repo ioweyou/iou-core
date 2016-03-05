@@ -19,13 +19,18 @@ public class Test221 extends MiniMochaDescription {
                     @Override
                     public void run() {
                         describe("applied to a directly-rejected promise", new Runnable() {
-                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                                if (nonFunction!=null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
 
-                                        d.reject(dummy).then(o, new TestThenCallable<String, Void>() {
+                                        d.reject(dummy).then((IThenCallable)nonFunction, new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
                                                 done();
@@ -47,7 +52,12 @@ public class Test221 extends MiniMochaDescription {
                         });
 
                         describe("applied to a promise rejected and then chained off of", new Runnable() {
-                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                                if (nonFunction!=null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
@@ -59,7 +69,7 @@ public class Test221 extends MiniMochaDescription {
                                                 return dummyString;
                                             }
                                         })
-                                        .then(o, new TestThenCallable<String, Void>() {
+                                        .then((IThenCallable)nonFunction, new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String dummyString) {
                                                 done();
@@ -86,7 +96,12 @@ public class Test221 extends MiniMochaDescription {
                     @Override
                     public void run() {
                         describe("applied to a directly-fulfilled promise", new Runnable() {
-                            private <TAnything> void testNonFunction(final TAnything o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                                if (nonFunction!=null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
@@ -99,7 +114,7 @@ public class Test221 extends MiniMochaDescription {
 
                                                 return null;
                                             }
-                                        }, o);
+                                        }, (IThenCallable)nonFunction);
                                     }
                                 });
                             }
@@ -114,7 +129,12 @@ public class Test221 extends MiniMochaDescription {
                         });
 
                         describe("applied to a promise fulfilled and then chained off of", new Runnable() {
-                            private void testNonFunction(final Object o, String stringRepresentation) {
+                            private <TAnything> void testNonFunction(final TAnything nonFunction, String stringRepresentation) {
+                                if (nonFunction!=null) {
+                                    handleNonSensicalTest(stringRepresentation);
+                                    return;
+                                }
+
                                 specify(String.format("`onFulfilled` is %s", stringRepresentation), new MiniMochaSpecificationRunnable() {
                                     @Override
                                     public void run() {
@@ -127,7 +147,7 @@ public class Test221 extends MiniMochaDescription {
 
                                                 return null;
                                             }
-                                        }, o);
+                                        }, (IThenCallable)nonFunction);
                                     }
                                 });
                             }

@@ -21,21 +21,21 @@ final class PromiseResolverEventHandler {
         _eventDispatcher.queue(new ThenEvent<>(new ThenEventValue<>(onFulfilled, onRejected, nextPromise)));
     }
 
-    final synchronized <TInput> AbstractPromise<TInput> resolveWithValue(final AbstractPromise<TInput> promise, final TInput o) {
-        return resolvePromise(promise, FulfillEvent.class, RejectEvent.class, o);
+    final synchronized <TInput> void resolveWithValue(final AbstractPromise<TInput> promise, final TInput o) {
+        resolvePromise(promise, FulfillEvent.class, RejectEvent.class, o);
     }
 
-    final synchronized <TInput> AbstractPromise<TInput> rejectWithValue(final AbstractPromise<TInput> promise, final TInput o) {
-        return resolvePromise(promise, RejectEvent.class, RejectEvent.class, o);
+    final synchronized <TInput, TAnything> void rejectWithReason(final AbstractPromise<TInput> promise, final TAnything o) {
+        resolvePromise(promise, RejectEvent.class, RejectEvent.class, o);
     }
 
     private <TInput> boolean testObjectEqualsPromise(Object o, AbstractPromise<TInput> promise) {
         return o != null && o.equals(promise);
     }
 
-    private <TInput> AbstractPromise<TInput> resolvePromise(final AbstractPromise<TInput> promise, final Class<? extends DefaultEvent> event, final Class<? extends DefaultEvent> onFailEvent, final Object o) {
+    private <TInput, TAnything> void resolvePromise(final AbstractPromise<TInput> promise, final Class<? extends DefaultEvent> event, final Class<? extends DefaultEvent> onFailEvent, final TAnything o) {
         if (!_promiseState.isPending()) {
-            return promise;
+            return;
         }
 
         try {
@@ -45,11 +45,9 @@ final class PromiseResolverEventHandler {
         } catch (TypeErrorException e) {
             // 2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError' as the reason.
             _eventDispatcher.queue(EventFactory.create(onFailEvent, new TypeError()));
-            return promise;
+            return;
         }
 
         _eventDispatcher.queue(EventFactory.create(event, o));
-
-        return promise;
     }
 }

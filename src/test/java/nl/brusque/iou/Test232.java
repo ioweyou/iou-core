@@ -114,9 +114,9 @@ public class Test232 extends MiniMochaDescription {
                                         }, new Testable<Object>() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
+                                                getPromise().then(new IThenCallable<Object, Void>() {
                                                     @Override
-                                                    public Void apply(String value) throws Exception {
+                                                    public Void apply(Object value) throws Exception {
                                                         assertEquals(sentinel, value);
                                                         done();
 
