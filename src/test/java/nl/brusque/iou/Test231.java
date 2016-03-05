@@ -16,7 +16,7 @@ import static nl.brusque.iou.Util.*;
 @RunWith(MiniMochaRunner.class)
 public class Test231 extends MiniMochaDescription {
     public Test231() {
-        super("2.3.1: If `promise` and `x` refer to the same object, fireRejectables `promise` with a `TypeError` as the reason.", new IOUMiniMochaRunnableNode() {
+        super("2.3.1: If `promise` and `x` refer to the same object, reject `promise` with a `TypeError` as the reason.", new IOUMiniMochaRunnableNode() {
             final String dummy     = "DUMMY";
 
             @Override
@@ -74,7 +74,5 @@ public class Test231 extends MiniMochaDescription {
                 });
             }
         });
-
-        delay(500);
     }
 }

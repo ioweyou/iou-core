@@ -16,7 +16,7 @@ public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode imple
     }
 
 
-    private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
+
 
     public final void delayedDone(final long milliseconds) {
         delayedCall(new Runnable() {
@@ -25,21 +25,6 @@ public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode imple
                 done();
             }
         }, milliseconds);
-    }
-
-    public final void delayedCall(final Runnable runnable, final long milliseconds) {
-        _delayedCallExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(milliseconds);
-
-                    runnable.run();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     public void addDoneListener(IMiniMochaDoneListener doneListener) {

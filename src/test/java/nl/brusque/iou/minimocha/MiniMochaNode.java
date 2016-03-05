@@ -1,5 +1,8 @@
 package nl.brusque.iou.minimocha;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 class MiniMochaNode {
 
     private String _name;
@@ -10,6 +13,23 @@ class MiniMochaNode {
 
     void setName(String name) {
         _name = sanitizeDescriptionName(name);
+    }
+
+    private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
+
+    public final void delayedCall(final Runnable runnable, final long milliseconds) {
+        _delayedCallExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(milliseconds);
+
+                    runnable.run();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public static String sanitizeDescriptionName(String name) {

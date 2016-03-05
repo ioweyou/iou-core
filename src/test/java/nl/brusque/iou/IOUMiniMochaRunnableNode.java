@@ -9,6 +9,54 @@ import java.util.TimerTask;
 import static nl.brusque.iou.Util.*;
 
 public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
+
+
+    abstract class PromiseFactory<TInput> {
+        abstract AbstractPromise<TInput> create();
+    }
+
+    protected <TAnything, TAnything2> void testPromiseResolution(final PromiseFactory<TAnything> xFactory, final Testable<TAnything2> promiseTest) {
+        final String dummy     = "DUMMY";
+
+        specify("via return from a fulfilled promise", new MiniMochaSpecificationRunnable() {
+            @Override
+            public void run() {
+                final AbstractPromise<String> resolvedPromise = resolved(dummy);
+
+                final AbstractPromise promise = resolvedPromise.then(new TestThenCallable<String, AbstractPromise>() {
+                    @Override
+                    public AbstractPromise apply(String o) throws Exception {
+                        return xFactory.create();
+                    }
+                });
+
+                promiseTest.setDoneHandler(this);
+                promiseTest.setPromise(promise);
+
+                promiseTest.run();
+            }
+        });
+
+        specify("via return from a rejected promise", new MiniMochaSpecificationRunnable() {
+            @Override
+            public void run() {
+                final AbstractPromise<String> rejectedPromise = rejected(dummy);
+
+                final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<String, AbstractPromise>() {
+                    @Override
+                    public AbstractPromise apply(String o) throws Exception {
+                        return xFactory.create();
+                    }
+                });
+
+                promiseTest.setDoneHandler(this);
+                promiseTest.setPromise(promise);
+
+                promiseTest.run();
+            }
+        });
+    }
+
     public <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
         specify("already-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
