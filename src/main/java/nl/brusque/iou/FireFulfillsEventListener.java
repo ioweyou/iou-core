@@ -23,10 +23,8 @@ final class FireFulfillsEventListener<TResult extends AbstractPromise<TResult>> 
                         resolvable.getPromise().resolve(_promiseState.getResolvedWith());
                         return null;
                     }
+
                     Object result = _fulfiller.call(fulfillable, _promiseState.getResolvedWith());
-                    if (result == null) {
-                        return null;
-                    }
 
                     // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
                     resolvable.getPromise().resolve(result);

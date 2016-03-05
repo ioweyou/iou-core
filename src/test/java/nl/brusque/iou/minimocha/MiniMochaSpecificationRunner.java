@@ -1,12 +1,11 @@
 package nl.brusque.iou.minimocha;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,20 +16,19 @@ import java.util.concurrent.Executors;
 
 class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
     private final String _descriptionName;
+    private final MiniMochaRules _rules;
     private MiniMochaSpecification _specification;
     private Date _start;
     private Date _stop;
     private Description _testDescription;
     private List<FrameworkMethod> _testMethods = new ArrayList<>();
 
-    MiniMochaSpecificationRunner(String descriptionName, MiniMochaSpecification specification) throws InitializationError {
+    MiniMochaSpecificationRunner(String descriptionName, MiniMochaRules rules, MiniMochaSpecification specification) throws InitializationError {
         super(specification.getClass());
 
-        _specification = specification;
-
         _descriptionName = descriptionName;
-
-
+        _rules           = rules;
+        _specification   = specification;
     }
 
     @Override
@@ -43,8 +41,9 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         try {
             getTestClass().getJavaClass().getConstructor(MiniMochaSpecificationRunner.this.getTestClass().getJavaClass());
         } catch (NoSuchMethodException e) {
-            String gripe = "Nested test classes should be non-static and have a public zero-argument constructor";
-            errors.add(new Exception(gripe));
+            String reason = "Test classes should be non-static and have a public zero-argument constructor";
+
+            errors.add(new Exception(reason));
         }
     }
 
@@ -114,6 +113,12 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
         });
     }
 
+    // FIXME withBefores is deprecated, use rules
+    @Override
+    protected Statement withBefores(FrameworkMethod method, Object target, Statement statement) {
+        return new MiniMochaRunBefores(statement,_rules);
+    }
+
     @Override
     public void run(final RunNotifier notifier) {
         _start = new Date();
@@ -123,7 +128,6 @@ class MiniMochaSpecificationRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void collectInitializationErrors(List<Throwable> errors) {
-        validatePublicVoidNoArgMethods(BeforeClass.class, true, errors);
-        validatePublicVoidNoArgMethods(AfterClass.class, true, errors);
+        // Ignore all regular initalization errors
     }
 }

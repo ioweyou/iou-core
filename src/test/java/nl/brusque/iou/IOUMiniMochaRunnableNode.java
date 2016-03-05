@@ -10,10 +10,14 @@ import static nl.brusque.iou.Util.*;
 
 public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
 
+    abstract class AnythingFactory<TAnything> {
+        abstract TAnything create();
+    }
 
-    abstract class PromiseFactory<TInput> {
+    abstract class PromiseFactory<TInput> extends AnythingFactory<AbstractPromise<TInput>>{
         abstract AbstractPromise<TInput> create();
     }
+
 
     protected <TAnything, TAnything2> void testPromiseResolution(final PromiseFactory<TAnything> xFactory, final Testable<TAnything2> promiseTest) {
         final String dummy     = "DUMMY";

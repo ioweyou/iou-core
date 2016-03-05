@@ -9,6 +9,8 @@ public class MiniMochaDescription extends MiniMochaNode {
     private List<MiniMochaDescription> _childDescriptions = new ArrayList<>();
     private List<MiniMochaSpecification> _specifications = new ArrayList<>();
 
+    private MiniMochaRules _rules = new MiniMochaRules();
+
     MiniMochaDescription(String description) {
         setName(description);
     }
@@ -36,4 +38,10 @@ public class MiniMochaDescription extends MiniMochaNode {
     final List<MiniMochaSpecification> getSpecifications() {
         return _specifications;
     }
+
+    void addBeforeEach(Runnable runnable) {
+        _rules.add(MiniMochaRules.RuleType.RunBefore, runnable);
+    }
+
+    final MiniMochaRules getRules() { return _rules; }
 }

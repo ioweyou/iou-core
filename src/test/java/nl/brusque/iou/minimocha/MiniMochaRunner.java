@@ -22,7 +22,7 @@ public class MiniMochaRunner extends Runner {
         _suiteDescription = Description.createSuiteDescription(mmDescription.getName());
         for (MiniMochaSpecification specification : mmDescription.getSpecifications()) {
             try {
-                MiniMochaSpecificationRunner specificationRunner = new MiniMochaSpecificationRunner(mmDescription.getName(), specification);
+                MiniMochaSpecificationRunner specificationRunner = new MiniMochaSpecificationRunner(mmDescription.getName(), mmDescription.getRules(), specification);
 
                 _suiteDescription.addChild(specificationRunner.getDescription());
                 _specificationRunners.add(specificationRunner);

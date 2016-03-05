@@ -1,6 +1,10 @@
 package nl.brusque.iou.minimocha;
 
 public abstract class MiniMochaRunnableNode extends MiniMochaNode implements Runnable {
+    public final void beforeEach(Runnable runnable) {
+        MiniMochaDescriptionContext.getContext().addBeforeEach(runnable);
+    }
+
     public final void describe(String description, Runnable runnable) {
         MiniMochaDescriptionContext.push(new MiniMochaDescription(description));
 
