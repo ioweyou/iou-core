@@ -1,7 +1,6 @@
 package nl.brusque.iou;
 
-public interface IThenable<TInput> {
-    <TOutput> IThenable<TOutput> then();
-    <TOutput> IThenable<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled);
-    <TOutput, TAnythingInput> IThenable<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled, IThenCallable<TAnythingInput, TOutput> onRejected);
+public interface IThenable<TFulfill> {
+    <TAnythingOutput> AbstractPromise<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled);
+    <TAnythingOutput> AbstractPromise<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected);
 }

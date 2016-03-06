@@ -46,9 +46,9 @@ public class Test224 extends MiniMochaDescription {
 
                                 AbstractPromise<String> promise = getPromise();
 
-                                promise.then(null, new TestThenCallable<String, Void>() {
+                                promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(String o) throws Exception {
+                                    public Void apply(Object o) throws Exception {
                                         Assert.assertEquals(thenHasReturned[0], true);
                                         done();
 
@@ -149,9 +149,9 @@ public class Test224 extends MiniMochaDescription {
                         final AbstractPromise<String> promise2 = resolved();
                         final boolean[] firstOnFulfilledFinished = {false};
 
-                        promise.then(null, new TestThenCallable<String, Void>() {
+                        promise.then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 promise2.then(new TestThenCallable<String, Void>() {
                                     @Override
                                     public Void apply(String o) {
@@ -208,9 +208,9 @@ public class Test224 extends MiniMochaDescription {
                         AbstractIOU<String> d = deferred();
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 onRejectedCalled[0] = true;
 
                                 return null;
@@ -235,9 +235,9 @@ public class Test224 extends MiniMochaDescription {
 
                         d.reject(dummy);
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 onRejectedCalled[0] = true;
 
                                 return null;
@@ -263,9 +263,9 @@ public class Test224 extends MiniMochaDescription {
                             promise.then(new TestThenCallable<String, Void>() {
                                 @Override
                                 public Void apply(String o) {
-                                    promise2.then(null, new TestThenCallable<String, Void>() {
+                                    promise2.then(null, new TestThenCallable<Object, Void>() {
                                         @Override
-                                        public Void apply(String o) {
+                                        public Void apply(Object o) {
                                             Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
                                             done();
 
@@ -287,12 +287,12 @@ public class Test224 extends MiniMochaDescription {
                         final IThenable<String> promise = rejected();
                         final boolean[] firstOnRejectedFinished = {false};
 
-                        promise.then(null, new TestThenCallable<String, Void>() {
+                        promise.then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
-                                promise.then(null, new TestThenCallable<String, Void>() {
+                            public Void apply(Object o) {
+                                promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(String o) {
+                                    public Void apply(Object o) {
                                         Assert.assertTrue("first onRejected should have finished", firstOnRejectedFinished[0]);
                                         done();
 
@@ -314,9 +314,9 @@ public class Test224 extends MiniMochaDescription {
                         final AbstractIOU<String> d = deferred();
                         final boolean[] firstStackFinished = {false};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
                                 done();
 

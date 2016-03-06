@@ -29,22 +29,22 @@ public class Test232 extends MiniMochaDescription {
 
                                 return d.getPromise();
                             }
-                        }, new Testable<AbstractPromise>() {
+                        }, new Testable<String>() {
                             @Override
                             public void run() {
                                 final boolean[] wasFulfilled = {false};
                                 final boolean[] wasRejected = {false};
 
-                                getPromise().then(new IThenCallable<AbstractPromise, Void>() {
+                                getPromise().then(new IThenCallable<String, Void>() {
                                     @Override
-                                    public Void apply(AbstractPromise o) throws Exception {
+                                    public Void apply(String o) throws Exception {
                                         wasFulfilled[0] = true;
 
                                         return null;
                                     }
-                                }, new IThenCallable<AbstractPromise, Void>() {
+                                }, new IThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(AbstractPromise o) throws Exception {
+                                    public Void apply(Object o) throws Exception {
                                         wasRejected[0] = true;
 
                                         return null;
@@ -111,12 +111,12 @@ public class Test232 extends MiniMochaDescription {
 
                                                 return d.getPromise();
                                             }
-                                        }, new Testable<Object>() {
+                                        }, new Testable<String>() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(new IThenCallable<Object, Void>() {
+                                                getPromise().then(new IThenCallable<String, Void>() {
                                                     @Override
-                                                    public Void apply(Object value) throws Exception {
+                                                    public Void apply(String value) throws Exception {
                                                         assertEquals(sentinel, value);
                                                         done();
 
@@ -147,9 +147,9 @@ public class Test232 extends MiniMochaDescription {
                                         }, new Testable<String>() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(null, new IThenCallable<String, Void>() {
+                                                getPromise().then(null, new IThenCallable<Object, Void>() {
                                                     @Override
-                                                    public Void apply(String value) throws Exception {
+                                                    public Void apply(Object value) throws Exception {
                                                         assertEquals(sentinel, value);
                                                         done();
 
@@ -178,12 +178,12 @@ public class Test232 extends MiniMochaDescription {
 
                                                 return d.getPromise();
                                             }
-                                        }, new Testable<Object>() {
+                                        }, new Testable<String>() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(null, new IThenCallable<String, Void>() {
+                                                getPromise().then(null, new IThenCallable<Object, Void>() {
                                                     @Override
-                                                    public Void apply(String value) throws Exception {
+                                                    public Void apply(Object value) throws Exception {
                                                         assertEquals(sentinel, value);
                                                         done();
 

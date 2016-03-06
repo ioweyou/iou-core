@@ -53,20 +53,20 @@ public class Test213 extends MiniMochaDescription {
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable<String, String>() {
+                        d.getPromise().then(new TestThenCallable<String, Void>() {
 
                             @Override
-                            public String apply(String o) {
+                            public Void apply(String o) {
                                 assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
-                                return o;
+                                return null;
                             }
-                        }, new TestThenCallable<String, String>() {
+                        }, new TestThenCallable<Object, Void>() {
                             @Override
-                            public String apply(String o) {
+                            public Void apply(Object o) {
                                 onRejectedCalled[0] = true;
 
-                                return o;
+                                return null;
                             }
                         });
 
@@ -83,20 +83,20 @@ public class Test213 extends MiniMochaDescription {
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable<String, String>() {
+                        d.getPromise().then(new TestThenCallable<String, Void>() {
 
                             @Override
-                            public String apply(String o) {
+                            public Void apply(String o) {
                                 assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
-                                return o;
+                                return null;
                             }
-                        }, new TestThenCallable<String, String>() {
+                        }, new TestThenCallable<Object, Void>() {
                             @Override
-                            public String apply(String o) {
+                            public Void apply(Object o) {
                                 onRejectedCalled[0] = true;
 
-                                return o;
+                                return null;
                             }
                         });
 
@@ -120,20 +120,20 @@ public class Test213 extends MiniMochaDescription {
 
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(new TestThenCallable<String, String>() {
+                        d.getPromise().then(new TestThenCallable<String, Void>() {
 
                             @Override
-                            public String apply(String o) {
+                            public Void apply(String o) {
                                 assertEquals("onFulfilled should not have been called", false, onRejectedCalled[0]);
 
-                                return o;
+                                return null;
                             }
-                        }, new TestThenCallable<String, String>() {
+                        }, new TestThenCallable<Object, Void>() {
                             @Override
-                            public String apply(String o) {
+                            public Void apply(Object o) {
                                 onRejectedCalled[0] = true;
 
-                                return o;
+                                return null;
                             }
                         });
 

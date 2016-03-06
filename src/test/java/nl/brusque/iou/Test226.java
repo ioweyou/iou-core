@@ -132,14 +132,14 @@ public class Test226 extends MiniMochaDescription {
                                         final CallbackAggregator semiDone = new CallbackAggregator(3, this);
 
                                         promise
-                                            .then(new TestThenCallable<String, Object>() {
+                                            .then(new TestThenCallable<String, String>() {
                                                 @Override
-                                                public Object apply(String o) {
+                                                public String apply(String o) {
                                                     return sentinel;
                                                 }
-                                            }).then(new TestThenCallable<Object, Void>() {
+                                            }).then(new TestThenCallable<String, Void>() {
                                             @Override
-                                            public Void apply(Object o) {
+                                            public Void apply(String o) {
                                                 Assert.assertEquals("Object should equal sentinel", sentinel, o);
                                                 semiDone.done();
 
@@ -210,9 +210,9 @@ public class Test226 extends MiniMochaDescription {
 
 
 
-                                            promise.then(new TestThenCallable<Object, Void>() {
+                                            promise.then(new TestThenCallable<Object, String>() {
                                                 @Override
-                                                public Void apply(Object o) throws Exception {
+                                                public String apply(Object o) throws Exception {
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
@@ -243,9 +243,9 @@ public class Test226 extends MiniMochaDescription {
                                                 when(handler3.apply(any(Object.class))).thenReturn(null);
 
                                                 final AbstractPromise<Object> promise = getPromise();
-                                                promise.then(new TestThenCallable<Object, Void>() {
+                                                promise.then(new TestThenCallable<Object, String>() {
                                                     @Override
-                                                    public Void apply(Object o) throws Exception {
+                                                    public String apply(Object o) throws Exception {
                                                         handler1.apply(o);
 
                                                         promise.then(handler3);
@@ -256,9 +256,9 @@ public class Test226 extends MiniMochaDescription {
                                                 promise.then(handler2);
 
 
-                                                promise.then(new TestThenCallable<Object, Void>() {
+                                                promise.then(new TestThenCallable<Object, String>() {
                                                     @Override
-                                                    public Void apply(Object o) throws Exception {
+                                                    public String apply(Object o) throws Exception {
                                                         delayedCall(new Runnable() {
                                                             @Override
                                                             public void run() {
@@ -313,9 +313,9 @@ public class Test226 extends MiniMochaDescription {
                                             promise.then(spy, handler2);
                                             promise.then(spy, handler3);
 
-                                            promise.then(null, new TestThenCallable<Object, Void>() {
+                                            promise.then(null, new TestThenCallable<Object, String>() {
                                                 @Override
-                                                public Void apply(Object o) {
+                                                public String apply(Object o) {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
@@ -361,9 +361,9 @@ public class Test226 extends MiniMochaDescription {
                                             promise.then(spy, handler2);
                                             promise.then(spy, handler3);
 
-                                            promise.then(null, new TestThenCallable<Object, Void>() {
+                                            promise.then(null, new TestThenCallable<Object, String>() {
                                                 @Override
-                                                public Void apply(Object o) {
+                                                public String apply(Object o) {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
@@ -398,14 +398,14 @@ public class Test226 extends MiniMochaDescription {
                                         final CallbackAggregator semiDone = new CallbackAggregator(3, this);
 
                                         promise
-                                                .then(null, new TestThenCallable<String, String>() {
+                                                .then(null, new TestThenCallable<Object, String>() {
                                                     @Override
-                                                    public String apply(String o) {
+                                                    public String apply(Object o) {
                                                         return sentinel;
                                                     }
-                                                }).then(new TestThenCallable<String, Void>() {
+                                                }).then(new TestThenCallable<String, Object>() {
                                                     @Override
-                                                    public Void apply(String o) {
+                                                    public Object apply(String o) {
                                                         Assert.assertEquals("Object should equal sentinel", sentinel, o);
                                                         semiDone.done();
 
@@ -414,15 +414,15 @@ public class Test226 extends MiniMochaDescription {
                                                 });
 
                                         promise
-                                                .then(null, new TestThenCallable<String, String>() {
+                                                .then(null, new TestThenCallable<Object, String>() {
                                                     @Override
-                                                    public String apply(String o) throws Exception {
+                                                    public String apply(Object o) throws Exception {
                                                         throw new Exception(sentinel2);
                                                     }
                                                 })
-                                                .then(null, new TestThenCallable<Object, Void>() {
+                                                .then(null, new TestThenCallable<Object, Object>() {
                                                     @Override
-                                                    public Void apply(Object o) throws Exception {
+                                                    public Object apply(Object o) throws Exception {
                                                         Exception e = (Exception)o; // :')
                                                         Assert.assertEquals("Object should equal sentinel2", sentinel2, e.getMessage());
                                                         semiDone.done();
@@ -432,15 +432,15 @@ public class Test226 extends MiniMochaDescription {
                                                 });
 
                                         promise
-                                                .then(null, new TestThenCallable<String, String>() {
+                                                .then(null, new TestThenCallable<Object, String>() {
                                                     @Override
-                                                    public String apply(String o) {
+                                                    public String apply(Object o) {
                                                         return sentinel3;
                                                     }
                                                 })
-                                                .then(new TestThenCallable<String, Void>() {
+                                                .then(new TestThenCallable<String, Object>() {
                                                     @Override
-                                                    public Void apply(String o) {
+                                                    public Object apply(String o) {
                                                         Assert.assertEquals("Object should equal sentinel3", sentinel3, o);
                                                         semiDone.done();
 
@@ -474,9 +474,9 @@ public class Test226 extends MiniMochaDescription {
                                             promise.then(null, handler2);
                                             promise.then(null, handler3);
 
-                                            promise.then(null, new TestThenCallable<String, Void>() {
+                                            promise.then(null, new TestThenCallable<Object, String>() {
                                                 @Override
-                                                public Void apply(String o) throws Exception {
+                                                public String apply(Object o) throws Exception {
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
@@ -507,9 +507,9 @@ public class Test226 extends MiniMochaDescription {
                                                     when(handler3.apply(any(Object.class))).thenReturn(null);
 
                                                     final AbstractPromise<Object> promise = getPromise();
-                                                    promise.then(null, new TestThenCallable<String, Void>() {
+                                                    promise.then(null, new TestThenCallable<Object, String>() {
                                                         @Override
-                                                        public Void apply(String o) throws Exception {
+                                                        public String apply(Object o) throws Exception {
                                                             handler1.apply(o);
 
                                                             promise.then(null, handler3);
@@ -520,9 +520,9 @@ public class Test226 extends MiniMochaDescription {
                                                     promise.then(null, handler2);
 
 
-                                                    promise.then(null, new TestThenCallable<String, Void>() {
+                                                    promise.then(null, new TestThenCallable<Object, String>() {
                                                         @Override
-                                                        public Void apply(String o) throws Exception {
+                                                        public String apply(Object o) throws Exception {
                                                             delayedCall(new Runnable() {
                                                                 @Override
                                                                 public void run() {

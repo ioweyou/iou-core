@@ -1,23 +1,23 @@
 package nl.brusque.iou;
 
-final class ThenEvent<TInput> extends DefaultEvent {
-    private final ThenEventValue<TInput> _thenEventValue;
+final class ThenEvent<TFulfill, TOutput> extends DefaultEvent<ThenEventValue<TFulfill, TOutput>> {
+    private final ThenEventValue<TFulfill, TOutput> _thenEventValue;
 
-    public ThenEvent(ThenEventValue<TInput> value) {
-        super(value); // FIXME Thenable
+    public ThenEvent(ThenEventValue<TFulfill, TOutput> value) {
+        super(value);
 
         _thenEventValue = value;
     }
 
-    public Object getFulfillable() {
+    public IThenCallable<TFulfill, TOutput> getFulfillable() {
         return _thenEventValue.getFulfillable();
     }
 
-    public Object getRejectable() {
+    public IThenCallable<Object, TOutput> getRejectable() {
         return _thenEventValue.getRejectable();
     }
 
-    public AbstractPromise<TInput> getPromise() {
+    public AbstractPromise<TOutput> getPromise() {
         return _thenEventValue.getPromise();
     }
 

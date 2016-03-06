@@ -7,14 +7,16 @@ public class Util {
         return new TestTypedIOU<>();
     }
 
-    public static <TOutput> AbstractPromise<TOutput> resolved() {
+    public static <TInput> AbstractPromise<TInput> resolved() {
         return resolved(null);
     }
 
     public static <TInput> AbstractPromise<TInput> resolved(TInput o) {
         AbstractIOU<TInput> d = deferred();
 
-        return d.resolve(o);
+        d.resolve(o);
+
+        return d.getPromise();
     }
 
     public static AbstractPromise<String> rejected() {
@@ -24,7 +26,9 @@ public class Util {
     public static <TInput> AbstractPromise<TInput> rejected(TInput o) {
         AbstractIOU<TInput> d = deferred();
 
-        return d.reject(o);
+        d.reject(o);
+
+        return d.getPromise();
     }
 
     public static void delay(long milliseconds) {

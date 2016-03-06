@@ -31,11 +31,14 @@ public class Test231 extends MiniMochaDescription {
                         promises.add(r.then(new TestThenCallable<String, Object>() {
                             @Override
                             public Object apply(String o) throws Exception {
+                                allowMainThreadToFinish();
                                 return promises.get(0);
                             }
                         }));
 
+                        allowMainThreadToFinish();
                         promises.get(0).then(null, new TestThenCallable<Object, Object>() {
+
                             @Override
                             public Object apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
@@ -54,17 +57,20 @@ public class Test231 extends MiniMochaDescription {
 
                         IThenable<String> r = rejected(dummy);
 
-                        promises.add(r.then(null, new TestThenCallable<String, Object>() {
+                        promises.add(r.then(null, new TestThenCallable<Object, Object>() {
                             @Override
-                            public Object apply(String o) throws Exception {
+                            public Object apply(Object o) throws Exception {
+                                allowMainThreadToFinish();
                                 return promises.get(0);
                             }
                         }));
 
+                        allowMainThreadToFinish();
                         promises.get(0).then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) throws Exception {
                                 Assert.assertTrue("Object should be TypeError", o instanceof TypeError);
+
                                 done();
 
                                 return null;

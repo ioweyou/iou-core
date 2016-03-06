@@ -1,47 +1,35 @@
 package nl.brusque.iou;
 
-public abstract class AbstractPromise<TInput> implements IThenable<TInput> {
-    private final PromiseResolverEventHandler _promiseResolverEventHandler;
+public abstract class AbstractPromise<TFulfill> implements IThenable<TFulfill> {
+    private final PromiseEventHandler<TFulfill> _promiseEventHandler;
 
-    protected AbstractPromise(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
-        _promiseResolverEventHandler =
-                new PromiseResolverEventHandler(
-                    fulfiller,
-                    rejector);
+    protected AbstractPromise() {
+        _promiseEventHandler = new PromiseEventHandler<>(this);
     }
 
-    protected abstract <TOutput> AbstractPromise<TOutput> create();
+    protected abstract <TAnythingFulfill> AbstractPromise<TAnythingFulfill> create();
 
-    final AbstractPromise<TInput> resolve(final TInput o) {
-        _promiseResolverEventHandler.resolveWithValue(this, o);
-
-        return this;
+    final void resolve(final TFulfill o) {
+        _promiseEventHandler.resolve(o);
     }
 
-    final <TAnything> AbstractPromise<TInput> reject(final TAnything reason) {
-        _promiseResolverEventHandler.rejectWithReason(this, reason);
-
-        return this;
+    final void reject(final Object reason) {
+        _promiseEventHandler.reject(reason);
     }
 
     @Override
-    public final <TOutput> IThenable<TOutput> then() {
-        return then((IThenCallable<TInput, TOutput>) null, null);
-    }
-
-    @Override
-    public final <TOutput> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled) {
+    public final <TAnythingOutput> AbstractPromise<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled) {
         return addThenable(onFulfilled, null);
     }
 
     @Override
-    public final <TOutput, TAnythingInput> AbstractPromise<TOutput> then(IThenCallable<TInput, TOutput> onFulfilled, IThenCallable<TAnythingInput, TOutput> onRejected) {
+    public final <TAnythingOutput> AbstractPromise<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected) {
         return addThenable(onFulfilled, onRejected);
     }
 
-    private <TOutput, TFulfilled, TRejected> AbstractPromise<TOutput> addThenable(TFulfilled onFulfilled, TRejected onRejected) {
-        AbstractPromise<TOutput> nextPromise = create();
-        _promiseResolverEventHandler.addThenable(onFulfilled, onRejected, nextPromise);
+    private <TAnythingOutput> AbstractPromise<TAnythingOutput> addThenable(IThenCallable<TFulfill, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected) {
+        AbstractPromise<TAnythingOutput> nextPromise = create();
+        _promiseEventHandler.addThenable(onFulfilled, onRejected, nextPromise);
 
         return nextPromise;
     }

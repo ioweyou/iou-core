@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 final class EventDispatcher {
-    private final ArrayDeque<DefaultEvent> _eventQueue                                         = new ArrayDeque<>();
+    private final ArrayDeque<DefaultEvent> _eventQueue = new ArrayDeque<>();
     private final HashMap<Class<? extends DefaultEvent>, List<IEventListener<? extends DefaultEvent>>> _eventListeners = new HashMap<>();
 
     final Thread _looper = new Thread(new Runnable() {

@@ -31,7 +31,7 @@ public class Test227 extends MiniMochaDescription {
                     @Override
                     public void run() {
                         AbstractPromise promise1 = deferred().getPromise();
-                        Object promise2 = promise1.then();
+                        Object promise2 = promise1.then(null);
 
                         Assert.assertFalse("AndroidPromise should not be null", promise2 == null);
 
@@ -78,9 +78,9 @@ public class Test227 extends MiniMochaDescription {
                                     public void run() {
                                         AbstractPromise<String> promise1 = getPromise();
 
-                                        IThenable<String> promise2 = promise1.then(null, new TestThenCallable<String, String>() {
+                                        IThenable<String> promise2 = promise1.then(null, new TestThenCallable<Object, String>() {
                                             @Override
-                                            public String apply(String o) throws Exception {
+                                            public String apply(Object o) throws Exception {
                                                 throw new Exception(expectedReason);
                                             }
                                         });
@@ -169,9 +169,9 @@ public class Test227 extends MiniMochaDescription {
 
                                         IThenable<TAnything> promise2 = promise1.then((IThenCallable<String, TAnything>)nonFunction);
 
-                                        promise2.then(null, new TestThenCallable<TAnything, Void>() {
+                                        promise2.then(null, new TestThenCallable<Object, Void>() {
                                             @Override
-                                            public Void apply(TAnything o) throws Exception {
+                                            public Void apply(Object o) throws Exception {
                                                 Assert.assertEquals(o, dummy);
 
                                                 done();

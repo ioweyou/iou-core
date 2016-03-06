@@ -32,7 +32,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         });
     }
 
-    protected <TAnything, TAnything2> void testPromiseResolution(final PromiseFactory<TAnything> xFactory, final Testable<TAnything2> promiseTest) {
+    protected void testPromiseResolution(final PromiseFactory<?> xFactory, final Testable<String> promiseTest) {
         final String dummy     = "DUMMY";
 
         specify("via return from a fulfilled promise", new MiniMochaSpecificationRunnable() {
@@ -59,9 +59,9 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 final AbstractPromise<String> rejectedPromise = rejected(dummy);
 
-                final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<String, AbstractPromise>() {
+                final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<Object, AbstractPromise>() {
                     @Override
-                    public AbstractPromise apply(String o) throws Exception {
+                    public AbstractPromise apply(Object o) throws Exception {
                         return xFactory.create();
                     }
                 });
@@ -80,7 +80,8 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 test.setDoneHandler(this);
 
-                test.setPromise(resolved(value));
+                final AbstractPromise<TInput> d = resolved(value);
+                test.setPromise(d);
 
                 test.run();
             }
@@ -119,7 +120,8 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 test.setDoneHandler(this);
 
-                test.setPromise(rejected(value));
+                final AbstractPromise<TInput> d = rejected(value);
+                test.setPromise(d);
 
                 test.run();
             }

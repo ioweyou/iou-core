@@ -1,7 +1,7 @@
 package nl.brusque.iou;
 
 
-public class RejectReason<TTInput> {
+public final class RejectReason<TTInput> {
     private final TTInput _value;
     private final String _reason;
 

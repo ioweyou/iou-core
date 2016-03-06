@@ -25,9 +25,9 @@ public class Test223 extends MiniMochaDescription {
                             public void run() {
                                 AbstractPromise<String> promise = getPromise();
 
-                                promise.then(null, new TestThenCallable<String, Void>() {
+                                promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(String o) throws Exception {
+                                    public Void apply(Object o) throws Exception {
                                         Assert.assertEquals(o, dummy);
                                         done();
 
@@ -50,9 +50,9 @@ public class Test223 extends MiniMochaDescription {
                         final AbstractIOU<String> d = deferred();
                         final boolean[] isRejected = {false};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertTrue("isRejected should be true", isRejected[0]);
                                 done();
 
@@ -76,9 +76,9 @@ public class Test223 extends MiniMochaDescription {
                         AbstractIOU<String> d = deferred();
                         final boolean[] onRejectedCalled = {false};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertTrue("isRejected should be true", onRejectedCalled[0]);
                                 done();
 
@@ -107,9 +107,11 @@ public class Test223 extends MiniMochaDescription {
                         public void run() {
                         final int[] timesCalled = {0};
 
-                        rejected(dummy).then(null, new TestThenCallable<String, Void>() {
+                        AbstractPromise<String> d = rejected(dummy);
+
+                        d.then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
                                 done();
 
@@ -125,9 +127,9 @@ public class Test223 extends MiniMochaDescription {
                         AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
                                 done();
 
@@ -146,9 +148,9 @@ public class Test223 extends MiniMochaDescription {
                         final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
                                 done();
 
@@ -173,9 +175,9 @@ public class Test223 extends MiniMochaDescription {
                         final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
                                 done();
 
@@ -199,9 +201,9 @@ public class Test223 extends MiniMochaDescription {
                         final AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0, 0, 0};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                 return null;
@@ -211,9 +213,9 @@ public class Test223 extends MiniMochaDescription {
                         delayedCall(new Runnable() {
                             @Override
                             public void run() {
-                                d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                                d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(String o) {
+                                    public Void apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
 
                                         return null;
@@ -225,9 +227,9 @@ public class Test223 extends MiniMochaDescription {
                         delayedCall(new Runnable() {
                             @Override
                             public void run() {
-                                d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                                d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                                     @Override
-                                    public Void apply(String o) {
+                                    public Void apply(Object o) {
                                         Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[2]);
                                         done();
 
@@ -252,9 +254,9 @@ public class Test223 extends MiniMochaDescription {
                         AbstractIOU<String> d = deferred();
                         final int[] timesCalled = {0, 0};
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);
 
                                 return null;
@@ -263,9 +265,9 @@ public class Test223 extends MiniMochaDescription {
 
                         d.reject(dummy);
 
-                        d.getPromise().then(null, new TestThenCallable<String, Void>() {
+                        d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
-                            public Void apply(String o) {
+                            public Void apply(Object o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
                                 done();
 

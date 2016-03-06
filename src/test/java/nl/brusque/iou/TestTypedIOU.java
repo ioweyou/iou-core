@@ -1,7 +1,7 @@
 package nl.brusque.iou;
 
 public class TestTypedIOU<TInput> extends AbstractIOU<TInput> {
-    private final TestTypedPromise<TInput> _promise = new TestTypedPromise<>(new TestGenericThenCaller(), new TestGenericThenCaller());
+    private final TestTypedPromise<TInput> _promise = new TestTypedPromise<>();
 
     @Override
     public AbstractPromise<TInput> getPromise() {

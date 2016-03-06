@@ -45,9 +45,9 @@ public class Test234 extends MiniMochaDescription {
                         testRejected(dummy, new Testable<String>() {
                             @Override
                             public void run() {
-                                IThenable <TAnything> promise2 = getPromise().then(null, new IThenCallable<String, TAnything>() {
+                                IThenable <TAnything> promise2 = getPromise().then(null, new IThenCallable<Object, TAnything>() {
                                     @Override
-                                    public TAnything apply(String o) throws Exception {
+                                    public TAnything apply(Object o) throws Exception {
                                         return expectedValue;
                                     }
                                 });

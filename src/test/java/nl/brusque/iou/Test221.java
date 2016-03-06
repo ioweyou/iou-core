@@ -30,9 +30,11 @@ public class Test221 extends MiniMochaDescription {
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
 
-                                        d.reject(dummy).then((IThenCallable)nonFunction, new TestThenCallable<String, Void>() {
+                                        d.reject(dummy);
+
+                                        d.getPromise().then((IThenCallable)nonFunction, new TestThenCallable<Object, Void>() {
                                             @Override
-                                            public Void apply(String o) {
+                                            public Void apply(Object o) {
                                                 done();
 
                                                 return null;
@@ -63,15 +65,17 @@ public class Test221 extends MiniMochaDescription {
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
 
-                                        d.reject(dummy).then(new TestThenCallable<String, String>() {
+                                        d.reject(dummy);
+
+                                        d.getPromise().then(new TestThenCallable<String, String>() {
                                             @Override
                                             public String apply(String dummyString) {
                                                 return dummyString;
                                             }
                                         })
-                                        .then((IThenCallable)nonFunction, new TestThenCallable<String, Void>() {
+                                        .then((IThenCallable)nonFunction, new TestThenCallable<Object, Object>() {
                                             @Override
-                                            public Void apply(String dummyString) {
+                                            public String apply(Object dummyString) {
                                                 done();
 
                                                 return null;
@@ -107,7 +111,9 @@ public class Test221 extends MiniMochaDescription {
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
 
-                                        d.resolve(dummy).then(new TestThenCallable<String, Void>() {
+                                        d.resolve(dummy);
+
+                                        d.getPromise().then(new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
                                                 done();
@@ -140,7 +146,9 @@ public class Test221 extends MiniMochaDescription {
                                     public void run() {
                                         AbstractIOU<String> d = deferred();
 
-                                        d.resolve(dummy).then(new TestThenCallable<String, Void>() {
+                                        d.resolve(dummy);
+
+                                        d.getPromise().then(new TestThenCallable<String, Void>() {
                                             @Override
                                             public Void apply(String o) {
                                                 done();

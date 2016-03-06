@@ -1,13 +1,13 @@
 package nl.brusque.iou;
 
-public abstract class AbstractIOU<TInput> {
-    public abstract AbstractPromise<TInput> getPromise();
+public abstract class AbstractIOU<TFulfill> {
+    public abstract AbstractPromise<TFulfill>  getPromise();
 
-    public AbstractPromise<TInput> resolve(TInput o) {
-        return getPromise().resolve(o);
+    public void resolve(TFulfill o) {
+        getPromise().resolve(o);
     }
 
-    public AbstractPromise<TInput> reject(TInput o) {
-        return getPromise().reject(o);
+    public void reject(Object o) {
+        getPromise().reject(o);
     }
 }

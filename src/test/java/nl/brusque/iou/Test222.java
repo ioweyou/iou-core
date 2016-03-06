@@ -103,7 +103,9 @@ public class Test222 extends MiniMochaDescription {
                         public void run() {
                         final int[] timesCalled = {0};
 
-                        resolved(dummy).then(new TestThenCallable<String, Void>() {
+                        AbstractPromise<String> d = resolved(dummy);
+
+                        d.then(new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[0]);

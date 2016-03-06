@@ -1,13 +1,13 @@
 package nl.brusque.iou;
 
-class DefaultEvent {
-    private final Object _value;
+class DefaultEvent<TValue> {
+    private final TValue _value;
 
-    public DefaultEvent(Object value) {
+    public DefaultEvent(TValue value) {
         _value = value;
     }
 
-    public final Object getValue() {
+    public final TValue getValue() {
         return _value;
     }
 }

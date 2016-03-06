@@ -1,19 +1,22 @@
 package nl.brusque.iou;
 
+import nl.brusque.iou.errors.TypeError;
+
 import java.lang.reflect.Method;
 
-public class PromiseResolver {
-    private final PromiseStateHandler _stateHandler;
+final class PromiseResolver<TFulfill, TOutput> {
+    private final PromiseState<TFulfill, TOutput> _stateHandler;
 
-    public PromiseResolver(PromiseStateHandler stateHandler) {
-        _stateHandler = stateHandler;
+    public PromiseResolver(PromiseState<TFulfill, TOutput> stateHandler) {
+        _stateHandler    = stateHandler;
     }
-    public <TInput> void resolve(AbstractPromise<TInput> promise, Object x) {
+
+    public void resolve(AbstractPromise<TFulfill> promise, Object x) {
         Boolean promiseAndXReferToTheSameObject = promise == x;
         Boolean xIsAPromise = x instanceof AbstractPromise;
 
         if (promiseAndXReferToTheSameObject) {
-            promise.reject(new RejectReason<TInput>(null, "TypeError"));
+            promise.reject(new TypeError());
             return;
         } else if (xIsAPromise) {
             resolveXIsAPromise(promise, (AbstractPromise)x);
@@ -23,12 +26,11 @@ public class PromiseResolver {
         resolveThenablesAndValues(promise, x);
     }
 
-
-    private <TInput> void resolveXIsAPromise(AbstractPromise<TInput> promise, AbstractPromise x) {
-        _stateHandler.fulfill(x);
+    private void resolveXIsAPromise(AbstractPromise<TFulfill> promise, AbstractPromise x) {
+        throw new Error("resolveXIsAPromise not implemented.");
     }
 
-    private <TInput> void resolveThenablesAndValues(AbstractPromise<TInput> promise, Object x) {
+    private void resolveThenablesAndValues(AbstractPromise<TFulfill> promise, Object x) {
         Boolean isXNonExpensiveThenable = x instanceof IThenable;
         if (isXNonExpensiveThenable) {
             resolveThenable(promise, (IThenable)x);
@@ -44,14 +46,14 @@ public class PromiseResolver {
                 return;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
-        resolveValue(promise, x);
+        resolveValue((TFulfill)x);
     }
 
-    private <TInput, TThenable> void resolveThenable(final AbstractPromise<TInput> promise, IThenable<TThenable> x) {
-        x.then(new IThenCallable<TThenable, Void>() {
+    private <TThenable> void resolveThenable(final AbstractPromise<TFulfill> promise, IThenable<TThenable> x) {
+        /*x.then(new IThenCallable<TThenable, Void>() {
             @Override
             public Void apply(TThenable y) throws Exception {
                 resolve(promise, y);
@@ -65,15 +67,14 @@ public class PromiseResolver {
 
                 return null;
             }
-        });
+        });*/
     }
 
     private <TInput> void resolveExpensiveThenable(AbstractPromise<TInput> promise, Object x, Method then) throws Exception {
-        throw new Exception("Resolving anonymous thenables not implemented.");
-        //then.invoke(x)
+        //throw new Exception("Resolving anonymous thenables not implemented.");
     }
 
-    private <TInput> void resolveValue(AbstractPromise<TInput> promise, Object x) {
+    private void resolveValue(TFulfill x) {
         _stateHandler.fulfill(x);
     }
 }

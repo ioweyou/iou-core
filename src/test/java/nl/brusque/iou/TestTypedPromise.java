@@ -1,12 +1,8 @@
 package nl.brusque.iou;
 
-class TestTypedPromise<TInput> extends AbstractPromise<TInput> {
-    protected TestTypedPromise(AbstractThenCaller fulfiller, AbstractThenCaller rejector) {
-        super(fulfiller, rejector);
-    }
-
+class TestTypedPromise<TFulfill> extends AbstractPromise<TFulfill> {
     @Override
-    protected <TOutput> AbstractPromise<TOutput> create() {
-        return new TestTypedPromise<>(new TestGenericThenCaller(), new TestGenericThenCaller());
+    protected <TAnyFulfill> AbstractPromise<TAnyFulfill> create() {
+        return new TestTypedPromise<>();
     }
 }

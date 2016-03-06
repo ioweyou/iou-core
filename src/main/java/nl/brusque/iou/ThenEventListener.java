@@ -3,30 +3,23 @@ package nl.brusque.iou;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-final class ThenEventListener<TInput> implements IEventListener<ThenEvent<TInput>> {
-    private static final Logger logger = LogManager.getLogger(ThenEventListener.class);
-    private final EventDispatcher _eventDispatcher;
-    private final PromiseStateHandler _promiseState;
-    private final ResolvableManager _resolvableManager;
+final class ThenEventListener<TFulfill, TOutput> implements IEventListener<ThenEvent<TFulfill, TOutput>> {
+    private static final Logger logger                 = LogManager.getLogger(ThenEventListener.class);
+    private final ResolvableManager<TFulfill> _resolvableManager;
+    private final PromiseState<TFulfill, TOutput> _promiseState;
+    private final PromiseEventHandler<TFulfill> _promiseEventHandler;
 
-    public ThenEventListener(EventDispatcher eventDispatcher, PromiseStateHandler promiseState, ResolvableManager resolvableManager) {
-        _eventDispatcher   = eventDispatcher;
-        _promiseState      = promiseState;
-        _resolvableManager = resolvableManager;
-    }
 
-    private IThenCallable castThenCallable(Object maybeThenCallable) {
-        if (maybeThenCallable != null && maybeThenCallable instanceof IThenCallable) {
-            return (IThenCallable)maybeThenCallable;
-        }
-
-        return null;
+    public ThenEventListener(PromiseState<TFulfill, TOutput> promiseState, ResolvableManager<TFulfill> resolvableManager, PromiseEventHandler<TFulfill> promiseEventHandler) {
+        _promiseState        = promiseState;
+        _resolvableManager   = resolvableManager;
+        _promiseEventHandler = promiseEventHandler;
     }
 
     @Override
-    public void process(ThenEvent<TInput> event) {
-        IThenCallable fulfillable = castThenCallable(event.getFulfillable());
-        IThenCallable rejectable = castThenCallable(event.getRejectable());
+    public void process(ThenEvent<TFulfill, TOutput> event) {
+        IThenCallable<TFulfill, TOutput> fulfillable = event.getFulfillable();
+        IThenCallable<Object, TOutput> rejectable  = event.getRejectable();
         boolean isFulfillable = fulfillable!=null;
         boolean isRejectable  = rejectable!=null;
 
@@ -37,13 +30,13 @@ final class ThenEventListener<TInput> implements IEventListener<ThenEvent<TInput
         addResolvable(fulfillable, rejectable, event.getPromise());
     }
 
-    private <TFulfillable, RFulfillable, TRejectable, RRejectable> void addResolvable(IThenCallable<TFulfillable, RFulfillable> fulfillable, IThenCallable<TRejectable, RRejectable> rejectable, AbstractPromise<TInput> nextPromise) {
+    private void addResolvable(IThenCallable<TFulfill, TOutput> fulfillable, IThenCallable<Object, TOutput> rejectable, AbstractPromise<TOutput> nextPromise) {
         _resolvableManager.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
 
         if (_promiseState.isRejected()) {
-            _eventDispatcher.queue(new FireRejectsEvent());
+            _promiseEventHandler.reject(_promiseState.getRejectedWith());
         } else if (_promiseState.isResolved()) {
-            _eventDispatcher.queue(new FireFulfillsEvent());
+            _promiseEventHandler.resolve(_promiseState.getResolvedWith());
         }
     }
 }
