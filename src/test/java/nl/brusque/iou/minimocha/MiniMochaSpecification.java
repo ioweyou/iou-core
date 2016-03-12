@@ -6,41 +6,18 @@ import java.util.List;
 import java.util.concurrent.*;
 
 class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneListener {
-    static final MiniMochaSpecification NONE = new MiniMochaSpecification("NONE");
-
     private final Object _synchronizer = new Object();
 
     private MiniMochaSpecificationRunnable _test;
-    //private final ExecutorService _executor = Executors.newSingleThreadExecutor(new SpecificationExceptionCatchingThreadFactory());
     private Date _start;
     private Date _stop;
     private final ExecutorService _executor = Executors.newSingleThreadExecutor();
     private final List<AssertionError> _assertionErrors = new ArrayList<>();
 
-    private MiniMochaSpecification(String description) {
-        this(description, new MiniMochaSpecificationRunnable() {
-            @Override
-            public void run() {
-
-            }
-        });
-    }
-
     MiniMochaSpecification(String description, MiniMochaSpecificationRunnable test) {
         setName(description);
 
         _test = test;
-    }
-
-    private class SpecificationExceptionCatchingThreadFactory implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable runnable) {
-            Thread threadForRunnable = new Thread(runnable);
-
-            threadForRunnable.setUncaughtExceptionHandler(createUncaughtExceptionHandler());
-
-            return threadForRunnable;
-        }
     }
 
     private Thread.UncaughtExceptionHandler createUncaughtExceptionHandler() {
@@ -52,6 +29,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
                     return;
                 }
 
+                System.out.print(throwable.getMessage());
                 throw new Error("Unexpected uncaughtException", throwable);
             }
         };

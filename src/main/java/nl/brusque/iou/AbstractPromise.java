@@ -17,6 +17,11 @@ public abstract class AbstractPromise<TFulfill> implements IThenable<TFulfill> {
         _promiseEventHandler.reject(reason);
     }
 
+    @Deprecated
+    public PromiseState<TFulfill> leakState() {
+        return _promiseEventHandler.leakState();
+    }
+
     @Override
     public final <TAnythingOutput> AbstractPromise<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled) {
         return addThenable(onFulfilled, null);

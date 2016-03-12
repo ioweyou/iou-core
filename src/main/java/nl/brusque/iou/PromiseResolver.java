@@ -4,10 +4,10 @@ import nl.brusque.iou.errors.TypeError;
 
 import java.lang.reflect.Method;
 
-final class PromiseResolver<TFulfill, TOutput> {
-    private final PromiseState<TFulfill, TOutput> _stateHandler;
+final class PromiseResolver<TFulfill> {
+    private final PromiseState<TFulfill> _stateHandler;
 
-    public PromiseResolver(PromiseState<TFulfill, TOutput> stateHandler) {
+    public PromiseResolver(PromiseState<TFulfill> stateHandler) {
         _stateHandler    = stateHandler;
     }
 
@@ -19,15 +19,15 @@ final class PromiseResolver<TFulfill, TOutput> {
             promise.reject(new TypeError());
             return;
         } else if (xIsAPromise) {
-            resolveXIsAPromise(promise, (AbstractPromise)x);
+            resolveXIsAPromise((AbstractPromise)x);
             return;
         }
 
         resolveThenablesAndValues(promise, x);
     }
 
-    private void resolveXIsAPromise(AbstractPromise<TFulfill> promise, AbstractPromise x) {
-        throw new Error("resolveXIsAPromise not implemented.");
+    private void resolveXIsAPromise(AbstractPromise x) {
+        _stateHandler.adopt(x);
     }
 
     private void resolveThenablesAndValues(AbstractPromise<TFulfill> promise, Object x) {
@@ -72,6 +72,7 @@ final class PromiseResolver<TFulfill, TOutput> {
 
     private <TInput> void resolveExpensiveThenable(AbstractPromise<TInput> promise, Object x, Method then) throws Exception {
         //throw new Exception("Resolving anonymous thenables not implemented.");
+
     }
 
     private void resolveValue(TFulfill x) {

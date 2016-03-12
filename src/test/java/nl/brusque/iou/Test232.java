@@ -80,7 +80,9 @@ public class Test232 extends MiniMochaDescription {
                                         }, new Testable<String>() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
+                                                AbstractPromise<String> testPromise = getPromise();
+
+                                                testPromise.then(new IThenCallable<String, Void>() {
                                                     @Override
                                                     public Void apply(String value) throws Exception {
                                                         assertEquals(sentinel, value);
@@ -97,10 +99,10 @@ public class Test232 extends MiniMochaDescription {
                                 describe("`x` is eventually-fulfilled", new Runnable() {
                                     @Override
                                     public void run() {
-                                        testPromiseResolution(new PromiseFactory<Object>() {
+                                        testPromiseResolution(new PromiseFactory<String>() {
                                             @Override
-                                            AbstractPromise<Object> create() {
-                                                final AbstractIOU<Object> d = deferred();
+                                            AbstractPromise<String> create() {
+                                                final AbstractIOU<String> d = deferred();
 
                                                 delayedCall(new Runnable() {
                                                     @Override
@@ -164,10 +166,10 @@ public class Test232 extends MiniMochaDescription {
                                 describe("`x` is eventually-rejected", new Runnable() {
                                     @Override
                                     public void run() {
-                                        testPromiseResolution(new PromiseFactory<Object>() {
+                                        testPromiseResolution(new PromiseFactory<String>() {
                                             @Override
-                                            AbstractPromise<Object> create() {
-                                                final AbstractIOU<Object> d = deferred();
+                                            AbstractPromise<String> create() {
+                                                final AbstractIOU<String> d = deferred();
 
                                                 delayedCall(new Runnable() {
                                                     @Override

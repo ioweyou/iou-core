@@ -10,8 +10,10 @@ final class ResolvableManager<TFulfill> {
     }
 
     public void process(Function<Resolvable<TFulfill, ?>, Void> f) {
-        while (!_onResolve.isEmpty()) {
-            f.apply(_onResolve.remove());
+        synchronized (_onResolve) {
+            while (!_onResolve.isEmpty()) {
+                f.apply(_onResolve.remove());
+            }
         }
     }
 }

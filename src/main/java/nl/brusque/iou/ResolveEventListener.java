@@ -1,10 +1,10 @@
 package nl.brusque.iou;
 
-final class ResolveEventListener<TFulfill, TOutput> implements IEventListener<ResolveEvent<TFulfill>> {
-    private final PromiseResolver<TFulfill, TOutput> _promiseResolver;
+final class ResolveEventListener<TFulfill> implements IEventListener<ResolveEvent<TFulfill>> {
+    private final PromiseResolver<TFulfill> _promiseResolver;
     private final AbstractPromise<TFulfill> _promise;
 
-    public ResolveEventListener(AbstractPromise<TFulfill> promise, PromiseState<TFulfill, TOutput> promiseState) {
+    public ResolveEventListener(AbstractPromise<TFulfill> promise, PromiseState<TFulfill> promiseState) {
         _promiseResolver = new PromiseResolver<>(promiseState);
 
         _promise = promise;

@@ -6,11 +6,11 @@ import org.apache.logging.log4j.LogManager;
 final class ThenEventListener<TFulfill, TOutput> implements IEventListener<ThenEvent<TFulfill, TOutput>> {
     private static final Logger logger                 = LogManager.getLogger(ThenEventListener.class);
     private final ResolvableManager<TFulfill> _resolvableManager;
-    private final PromiseState<TFulfill, TOutput> _promiseState;
+    private final PromiseState<TFulfill> _promiseState;
     private final PromiseEventHandler<TFulfill> _promiseEventHandler;
 
 
-    public ThenEventListener(PromiseState<TFulfill, TOutput> promiseState, ResolvableManager<TFulfill> resolvableManager, PromiseEventHandler<TFulfill> promiseEventHandler) {
+    public ThenEventListener(PromiseState<TFulfill> promiseState, ResolvableManager<TFulfill> resolvableManager, PromiseEventHandler<TFulfill> promiseEventHandler) {
         _promiseState        = promiseState;
         _resolvableManager   = resolvableManager;
         _promiseEventHandler = promiseEventHandler;
@@ -34,7 +34,7 @@ final class ThenEventListener<TFulfill, TOutput> implements IEventListener<ThenE
         _resolvableManager.add(new Resolvable<>(fulfillable, rejectable, nextPromise));
 
         if (_promiseState.isRejected()) {
-            _promiseEventHandler.reject(_promiseState.getRejectedWith());
+            _promiseEventHandler.reject(_promiseState.getRejectionReason());
         } else if (_promiseState.isResolved()) {
             _promiseEventHandler.resolve(_promiseState.getResolvedWith());
         }

@@ -15,7 +15,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
     }
 
     abstract class PromiseFactory<TInput> extends AnythingFactory<AbstractPromise<TInput>>{
-        abstract AbstractPromise<TInput> create();
+
     }
 
     void handleNonSensicalTest(String stringRepresentation) {
@@ -32,7 +32,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         });
     }
 
-    protected void testPromiseResolution(final PromiseFactory<?> xFactory, final Testable<String> promiseTest) {
+    protected void testPromiseResolution(final PromiseFactory<String> xFactory, final Testable<String> promiseTest) {
         final String dummy     = "DUMMY";
 
         specify("via return from a fulfilled promise", new MiniMochaSpecificationRunnable() {

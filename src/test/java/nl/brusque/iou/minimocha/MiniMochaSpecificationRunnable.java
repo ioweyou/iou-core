@@ -2,8 +2,6 @@ package nl.brusque.iou.minimocha;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode implements Runnable {
 
@@ -14,9 +12,6 @@ public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode imple
             listener.done();
         }
     }
-
-
-
 
     public final void delayedDone(final long milliseconds) {
         delayedCall(new Runnable() {
