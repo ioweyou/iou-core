@@ -1,10 +1,6 @@
 package nl.brusque.iou;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 final class ThenEventListener<TFulfill, TOutput> implements IEventListener<ThenEvent<TFulfill, TOutput>> {
-    private static final Logger logger                 = LogManager.getLogger(ThenEventListener.class);
     private final ResolvableManager<TFulfill> _resolvableManager;
     private final PromiseState<TFulfill> _promiseState;
     private final PromiseEventHandler<TFulfill> _promiseEventHandler;
@@ -22,10 +18,6 @@ final class ThenEventListener<TFulfill, TOutput> implements IEventListener<ThenE
         IThenCallable<Object, TOutput> rejectable  = event.getRejectable();
         boolean isFulfillable = fulfillable!=null;
         boolean isRejectable  = rejectable!=null;
-
-        if (!isFulfillable || !isRejectable) {
-            logger.warn(String.format("isFulfillable: %s, isRejectable: %s", isFulfillable, isRejectable));
-        }
 
         addResolvable(fulfillable, rejectable, event.getPromise());
     }

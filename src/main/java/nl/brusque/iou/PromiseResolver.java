@@ -53,26 +53,38 @@ final class PromiseResolver<TFulfill> {
     }
 
     private <TThenable> void resolveThenable(final AbstractPromise<TFulfill> promise, IThenable<TThenable> x) {
-        /*x.then(new IThenCallable<TThenable, Void>() {
-            @Override
-            public Void apply(TThenable y) throws Exception {
-                resolve(promise, y);
+        final Boolean[] isResolvePromiseCalled = new Boolean[]{false};
+        final Boolean[] isRejectPromiseCalled = new Boolean[]{false};
 
-                return null;
-            }
-        }, new IThenCallable<Object, Void>() {
-            @Override
-            public Void apply(Object r) throws Exception {
-                promise.reject(new RejectReason<>(r));
+        try {
+            x.then(new IThenCallable<TThenable, Void>() {
+                @Override
+                public Void apply(TThenable y) throws Exception {
+                    isResolvePromiseCalled[0] = true;
+                    resolve(promise, y);
 
-                return null;
+                    return null;
+                }
+            }, new IThenCallable<Object, Void>() {
+                @Override
+                public Void apply(Object r) throws Exception {
+                    isRejectPromiseCalled[0] = true;
+                    promise.reject(new RejectReason<>(r));
+
+                    return null;
+                }
+            });
+        } catch (Error | Exception e) {
+            boolean ignoreException = isResolvePromiseCalled[0] || isRejectPromiseCalled[0];
+            if (!ignoreException) {
+                promise.reject(new RejectReason<>(e));
+                //_stateHandler.reject(new RejectReason<>(e));
             }
-        });*/
+        }
     }
 
     private <TInput> void resolveExpensiveThenable(AbstractPromise<TInput> promise, Object x, Method then) throws Exception {
-        //throw new Exception("Resolving anonymous thenables not implemented.");
-
+        throw new Exception("Resolving anonymous thenables not implemented.");
     }
 
     private void resolveValue(TFulfill x) {

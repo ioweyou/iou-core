@@ -29,7 +29,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
                     return;
                 }
 
-                System.out.print(throwable.getMessage());
+                throwable.printStackTrace();
                 throw new Error("Unexpected uncaughtException", throwable);
             }
         };
@@ -42,11 +42,8 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
         if (!_executor.isTerminated()) {
             _executor.shutdownNow();
         }
-        synchronized (_synchronizer) {
-            _synchronizer.notify();
-        }
 
-        System.out.println(String.format("Start %s, Stop %s", _start, _stop));
+        notify();
     }
 
     private void testDone() throws TimeoutException {

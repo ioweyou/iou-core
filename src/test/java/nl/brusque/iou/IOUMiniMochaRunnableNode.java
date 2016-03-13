@@ -14,7 +14,12 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         abstract TAnything create();
     }
 
-    abstract class PromiseFactory<TInput> extends AnythingFactory<AbstractPromise<TInput>>{
+
+    abstract class ThenableFactory<TInput> extends AnythingFactory<IThenable<TInput>>{
+
+    }
+
+    abstract class PromiseFactory<TInput> extends ThenableFactory<TInput>{
 
     }
 
@@ -32,7 +37,7 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         });
     }
 
-    protected void testPromiseResolution(final PromiseFactory<String> xFactory, final Testable<String> promiseTest) {
+    protected <TFulfill> void testPromiseResolution(final ThenableFactory<TFulfill> xFactory, final Testable<TFulfill> promiseTest) {
         final String dummy     = "DUMMY";
 
         specify("via return from a fulfilled promise", new MiniMochaSpecificationRunnable() {
@@ -40,9 +45,9 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 final AbstractPromise<String> resolvedPromise = resolved(dummy);
 
-                final AbstractPromise promise = resolvedPromise.then(new TestThenCallable<String, AbstractPromise>() {
+                final AbstractPromise promise = resolvedPromise.then(new TestThenCallable<String, IThenable>() {
                     @Override
-                    public AbstractPromise apply(String o) throws Exception {
+                    public IThenable apply(String o) throws Exception {
                         return xFactory.create();
                     }
                 });
@@ -59,9 +64,9 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 final AbstractPromise<String> rejectedPromise = rejected(dummy);
 
-                final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<Object, AbstractPromise>() {
+                final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<Object, IThenable>() {
                     @Override
-                    public AbstractPromise apply(Object o) throws Exception {
+                    public IThenable apply(Object o) throws Exception {
                         return xFactory.create();
                     }
                 });
