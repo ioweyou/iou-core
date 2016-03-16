@@ -1,57 +1,33 @@
 package nl.brusque.iou;
 
-import nl.brusque.iou.minimocha.MiniMochaSpecificationRunnable;
+abstract class Testable<TInput> {
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-abstract class Testable<TInput> implements Runnable {
-    private MiniMochaSpecificationRunnable _doneHandler;
-    private AbstractPromise<TInput> _p;
-
-    protected void setPromise(AbstractPromise<TInput> p) {
-        _p = p;
-    }
-
-    protected AbstractPromise<TInput> getPromise() {
-        return _p;
-    }
-
-    protected void setDoneHandler(MiniMochaSpecificationRunnable doneHandler) {
-        _doneHandler = doneHandler;
-    }
+    public abstract void run(TestableParameters parameters);
 
     class CallbackAggregator {
         private int _soFar = 0;
         private final int _times;
-        private final Runnable _runnable;
+        private final TestableParameters _parameters;
 
-        public CallbackAggregator(int times, Runnable runnable) {
-            _times    = times;
-
-            _runnable = runnable;
+        CallbackAggregator(int times, TestableParameters parameters) {
+            _times      = times;
+            _parameters = parameters;
         }
 
-        public void done() {
+        public synchronized void done() {
             _soFar++;
 
             if (_soFar == _times) {
-                Testable.this.done();
+                _parameters.done();
             }
         }
     }
-
-    final void done() {
-        _doneHandler.done();
+    final void allowMainThreadToFinish() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
-
-    public final void delayedDone(final long milliseconds) {
-        _doneHandler.delayedDone(milliseconds);
-    }
-
-    public final void delayedCall(final Runnable runnable, final long milliseconds) {
-        _doneHandler.delayedCall(runnable, milliseconds);
-    }
 }
