@@ -22,14 +22,15 @@ public class Test223 extends MiniMochaDescription {
                     public void run() {
                         testRejected(dummy, new Testable<String>() {
                             @Override
-                            public void run() {
-                                AbstractPromise<String> promise = getPromise();
+                            public void run(final TestableParameters parameters) {
+                                AbstractPromise<String> promise = parameters.getPromise();
 
+                                allowMainThreadToFinish();
                                 promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
                                     public Void apply(Object o) throws Exception {
                                         Assert.assertEquals(o, dummy);
-                                        done();
+                                        parameters.done();
 
                                         return null;
                                     }
@@ -53,6 +54,7 @@ public class Test223 extends MiniMochaDescription {
                         d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
+                                allowMainThreadToFinish();
                                 Assert.assertTrue("isRejected should be true", isRejected[0]);
                                 done();
 
@@ -268,6 +270,7 @@ public class Test223 extends MiniMochaDescription {
                         d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
+                                allowMainThreadToFinish();
                                 Assert.assertEquals("timesCalled should be 0", 1, ++timesCalled[1]);
                                 done();
 

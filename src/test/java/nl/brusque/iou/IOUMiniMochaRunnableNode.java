@@ -25,8 +25,10 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
 
     void handleNonSensicalTest(String stringRepresentation) {
         specify(String.format("Testing %s does not make sense in Java", stringRepresentation), new MiniMochaSpecificationRunnable() {
+
             @Override
             public void run() {
+                //done();
                 delayedCall(new Runnable() {
                     @Override
                     public void run() {
@@ -48,14 +50,14 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
                 final AbstractPromise promise = resolvedPromise.then(new TestThenCallable<String, IThenable>() {
                     @Override
                     public IThenable apply(String o) throws Exception {
+                        allowMainThreadToFinish();
                         return xFactory.create();
                     }
                 });
 
-                promiseTest.setDoneHandler(this);
-                promiseTest.setPromise(promise);
+                allowMainThreadToFinish();
 
-                promiseTest.run();
+                promiseTest.run(new TestableParameters(promise, this));
             }
         });
 
@@ -64,41 +66,82 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             public void run() {
                 final AbstractPromise<String> rejectedPromise = rejected(dummy);
 
+                allowMainThreadToFinish();
                 final AbstractPromise promise = rejectedPromise.then(null, new TestThenCallable<Object, IThenable>() {
                     @Override
                     public IThenable apply(Object o) throws Exception {
+                        allowMainThreadToFinish();
                         return xFactory.create();
                     }
                 });
 
-                promiseTest.setDoneHandler(this);
-                promiseTest.setPromise(promise);
+                allowMainThreadToFinish();
 
-                promiseTest.run();
+                promiseTest.run(new TestableParameters(promise, this));
             }
         });
     }
 
-    public <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <TInput> void testFulfilled(final TInput value, final Testable<TInput> test) {
         specify("already-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
-                test.setDoneHandler(this);
+                allowMainThreadToFinish();
 
                 final AbstractPromise<TInput> d = resolved(value);
-                test.setPromise(d);
 
-                test.run();
+                test.run(new TestableParameters(d, this));
             }
         });
 
         specify("immediately-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                allowMainThreadToFinish();
+
                 AbstractIOU<TInput> d = deferred();
-                test.setDoneHandler(this);
-                test.setPromise(d.getPromise());
-                test.run();
+                test.run(new TestableParameters(d.getPromise(), this));
                 d.resolve(value);
             }
         });
@@ -106,10 +149,9 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         specify("eventually-fulfilled", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                allowMainThreadToFinish();
                 final AbstractIOU<TInput> d = deferred();
-                test.setDoneHandler(this);
-                test.setPromise(d.getPromise());
-                test.run();
+                test.run(new TestableParameters(d.getPromise(), this));
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -119,27 +161,25 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
             }
         });
     }
-    public <TInput> void testRejected(final TInput value, final Testable<TInput> test) {
+
+    <TInput> void testRejected(final TInput value, final Testable<TInput> test) {
         specify("already-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
-                test.setDoneHandler(this);
+                allowMainThreadToFinish();
 
                 final AbstractPromise<TInput> d = rejected(value);
-                test.setPromise(d);
 
-                test.run();
+                test.run(new TestableParameters(d, this));
             }
         });
 
         specify("immediately-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                allowMainThreadToFinish();
                 AbstractIOU<TInput> d = deferred();
-                test.setDoneHandler(this);
-
-                test.setPromise(d.getPromise());
-                test.run();
+                test.run(new TestableParameters(d.getPromise(), this));
                 d.reject(value);
             }
         });
@@ -147,11 +187,10 @@ public abstract class IOUMiniMochaRunnableNode extends MiniMochaRunnableNode {
         specify("eventually-rejected", new MiniMochaSpecificationRunnable() {
             @Override
             public void run() {
+                allowMainThreadToFinish();
                 final AbstractIOU<TInput> d = deferred();
 
-                test.setDoneHandler(this);
-                test.setPromise(d.getPromise());
-                test.run();
+                test.run(new TestableParameters(d.getPromise(), this));
 
                 new Timer().schedule(new TimerTask() {
                     @Override

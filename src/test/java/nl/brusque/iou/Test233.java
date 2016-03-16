@@ -42,6 +42,7 @@ public class Test233 extends MiniMochaDescription {
                                             @Override
                                             public IThenable then(IThenCallable onFulfilled, IThenCallable onRejected) {
                                                 try {
+                                                    allowMainThreadToFinish();
                                                     onFulfilled.apply(yFactory.create());
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
@@ -77,6 +78,7 @@ public class Test233 extends MiniMochaDescription {
                                                     @Override
                                                     public void run() {
                                                         try {
+                                                            allowMainThreadToFinish();
                                                             onFulfilled.apply(yFactory.create());
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
@@ -116,6 +118,7 @@ public class Test233 extends MiniMochaDescription {
                                             @Override
                                             public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<TFulfill, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected) {
                                                 try {
+                                                    allowMainThreadToFinish();
                                                     onRejected.apply(r);
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
@@ -150,6 +153,7 @@ public class Test233 extends MiniMochaDescription {
                                                     @Override
                                                     public void run() {
                                                         try {
+                                                            allowMainThreadToFinish();
                                                             onRejected.apply(r);
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
@@ -173,12 +177,12 @@ public class Test233 extends MiniMochaDescription {
             <TFulfill> void testCallingResolvePromiseFulfillsWith(final AnythingFactory<TFulfill> yFactory, final String stringRepresentation, final TFulfill fulfillmentValue) {
                 testCallingResolvePromise(yFactory, stringRepresentation, new Testable<TFulfill>() {
                     @Override
-                    public void run() {
-                        getPromise().then(new IThenCallable<TFulfill, Void>() {
+                    public void run(final TestableParameters parameters) {
+                        parameters.getPromise().then(new IThenCallable<TFulfill, Void>() {
                             @Override
                             public Void apply(TFulfill value) throws Exception {
                                 assertEquals("value should equal fulfillmentValue", fulfillmentValue, value);
-                                done();
+                                parameters.done();
 
                                 return null;
                             }
@@ -190,21 +194,21 @@ public class Test233 extends MiniMochaDescription {
             void testCallingResolvePromiseRejectsWith(final AnythingFactory<String> yFactory, final String stringRepresentation, final String rejectionReason) {
                 testCallingResolvePromise(yFactory, stringRepresentation, new Testable<String>() {
                     @Override
-                    public void run() {
-                        getPromise().then(null, new IThenCallable<Object, Void>() {
+                        public void run(final TestableParameters parameters) {
+                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object reason) throws Exception {
                                 // FIXME So much unchecked typecasting
                                 String stringReason = "?";
 
                                 try {
-                                    stringReason = (String) ((RejectReason) reason).getValue();
+                                    stringReason = (String)reason;
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
 
                                 assertEquals("reason should equal rejectionReason", rejectionReason, stringReason);
-                                done();
+                                parameters.done();
 
                                 return null;
                             }
@@ -216,15 +220,12 @@ public class Test233 extends MiniMochaDescription {
             <TFulfill, TAnything> void testCallingRejectPromiseRejectsWith(final TAnything reason, String stringRepresentation) {
                 testCallingRejectPromise(reason, stringRepresentation, new Testable<TFulfill>() {
                     @Override
-                    public void run() {
-                        getPromise().then(null, new IThenCallable<Object, Void>() {
+                    public void run(final TestableParameters parameters) {
+                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object rejectionReason) throws Exception {
-                                // FIXME So much unchecked typecasting
-                                Object theReason = rejectionReason instanceof RejectReason ? ((RejectReason)reason).getValue() : reason;
-
-                                assertEquals("reason should equal rejectionReason", ((RejectReason)reason).getValue(), theReason);
-                                done();
+                                assertEquals("reason should equal rejectionReason", reason, rejectionReason);
+                                parameters.done();
 
                                 return null;
                             }
@@ -277,12 +278,13 @@ public class Test233 extends MiniMochaDescription {
 
                                 testPromiseResolution(xFactory, new Testable<String>() {
                                     @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Object>() {
+                                    public void run(final TestableParameters parameters) {
+                                        parameters.getPromise().then(new IThenCallable<String, Object>() {
                                             @Override
                                             public Object apply(String o) throws Exception {
+                                                allowMainThreadToFinish();
                                                 assertEquals("Then should be retrieved one time", 1, numberOfTimesThenWasRetrieved[0]);
-                                                done();
+                                                parameters.done();
 
                                                 return null;
                                             }
@@ -294,9 +296,16 @@ public class Test233 extends MiniMochaDescription {
 
                         handleNonSensicalTest("`x` is an object with normal Object.prototype");
                         handleNonSensicalTest("`x` is a function");
-                        handleNonSensicalTest("2.3.3.2: If retrieving the property `x.then` results in a thrown exception `e`, reject `promise` with `e` as the reason.");
                     }
                 });
+
+                describe("2.3.3.2: If retrieving the property `x.then` results in a thrown exception `e`, reject `promise` with `e` as the reason.", new MiniMochaRunnableNode() {
+                    @Override
+                    public void run() {
+                        handleNonSensicalTest("Not implemented.");
+                    }
+                });
+
 
                 describe("2.3.3.3: If `then` is a function, call it with `x` as `this`, first argument `resolvePromise`, and second argument `rejectPromise`", new MiniMochaRunnableNode() {
                     @Override
@@ -406,962 +415,22 @@ public class Test233 extends MiniMochaDescription {
                                 });
                             }
                         });
-                    }
-                });
 
-                describe("2.3.3.3.2: If/when `rejectPromise` is called with reason `r`, reject `promise` with `r`", new MiniMochaRunnableNode() {
-                    @Override
-                    public void run() {
-                        final HashMap<String, Reasons.ReasonsFactory> reasons = new Reasons().getReasons();
-
-                        for (final String stringRepresentation : reasons.keySet()) {
-                            testCallingRejectPromiseRejectsWith(reasons.get(stringRepresentation).create(), stringRepresentation);
-                        }
-                    }
-                });
-
-                describe("2.3.3.3.3: If both `resolvePromise` and `rejectPromise` are called, or multiple calls to the same argument are made, the first call takes precedence, and any further calls are ignored.", new MiniMochaRunnableNode() {
-                    @Override
-                    public void run() {
-                        describe("calling `resolvePromise` then `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
+                        describe("2.3.3.3.2: If/when `rejectPromise` is called with reason `r`, reject `promise` with `r`", new MiniMochaRunnableNode() {
                             @Override
                             public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
+                                HashMap<String, Reasons.ReasonsFactory> reasons = new Reasons().getReasons();
 
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onFulfilled.apply(DUMMY);
-                                                    onRejected.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
+                                for (final String stringRepresentation : reasons.keySet()) {
+                                    testCallingRejectPromiseRejectsWith(reasons.get(stringRepresentation).create(), stringRepresentation);
+                                }
                             }
                         });
 
-                        describe("calling `resolvePromise` synchronously then `rejectPromise` asynchronously", new MiniMochaRunnableNode() {
+                        describe("2.3.3.3.3: If both `resolvePromise` and `rejectPromise` are called, or multiple calls to the same argument are made, the first call takes precedence, and any further calls are ignored.", new MiniMochaRunnableNode() {
                             @Override
                             public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onFulfilled.apply(DUMMY);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` then `rejectPromise`, both asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(DUMMY);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` with an asynchronously-fulfilled promise, then calling `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        final AbstractIOU<Object> d = deferred();
-                                        delayedCall(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                d.resolve(DUMMY);
-                                            }
-                                        }, 50);
-
-                                        return new IThenable() {
-                                            @Override
-                                            public IThenable then(IThenCallable onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                try {
-                                                    onFulfilled.apply(d.getPromise());
-                                                    onRejected.apply(OTHER);
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-
-
-                        describe("calling `resolvePromise` with an asynchronously-rejected promise, then calling `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        final AbstractIOU<Object> d = deferred();
-                                        delayedCall(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                d.reject(DUMMY);
-                                            }
-                                        }, 50);
-
-                                        return new IThenable() {
-                                            @Override
-                                            public IThenable then(IThenCallable onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                try {
-                                                    onFulfilled.apply(d.getPromise());
-                                                    onRejected.apply(OTHER);
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `rejectPromise` then `resolvePromise`, both synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onRejected.apply(DUMMY);
-                                                    onFulfilled.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `rejectPromise` synchronously then `resolvePromise` asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onRejected.apply(DUMMY);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-
-                        describe("calling `rejectPromise` then `resolvePromise`, both asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(DUMMY);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` twice synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onFulfilled.apply(DUMMY);
-                                                    onFulfilled.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` twice, first synchronously then asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onFulfilled.apply(DUMMY);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` twice, both times asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(DUMMY);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onFulfilled.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` with an asynchronously-fulfilled promise, then calling it again, both times synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable() {
-                                            @Override
-                                            public IThenable then(IThenCallable onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                try {
-                                                    final AbstractIOU<Object> d = deferred();
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            d.resolve(DUMMY);
-                                                        }
-                                                    }, 50);
-
-                                                    onFulfilled.apply(d.getPromise());
-                                                    onFulfilled.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(new IThenCallable<String, Void>() {
-                                            @Override
-                                            public Void apply(String value) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `resolvePromise` with an asynchronously-rejected promise, then calling it again, both times synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable() {
-                                            @Override
-                                            public IThenable then(IThenCallable onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                try {
-                                                    final AbstractIOU<Object> d = deferred();
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            d.reject(DUMMY);
-                                                        }
-                                                    }, 50);
-
-                                                    onFulfilled.apply(d.getPromise());
-                                                    onFulfilled.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                assertEquals("Value should equal DUMMY", DUMMY, reason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `rejectPromise` twice synchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onRejected.apply(DUMMY);
-                                                    onRejected.apply(OTHER);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-
-                        describe("calling `rejectPromise` twice, first synchronously then asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    onRejected.apply(DUMMY);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("calling `rejectPromise` twice, both times asynchronously", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                    @Override
-                                    IThenable<String> create() {
-                                        return new IThenable<String>() {
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                return then(onFulfilled, null);
-                                            }
-
-                                            @Override
-                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                try {
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(DUMMY);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-
-                                                    delayedCall(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                onRejected.apply(OTHER);
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }, 0);
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                return null;
-                                            }
-                                        };
-                                    }
-                                };
-
-                                testPromiseResolution(xFactory, new Testable<String>() {
-                                    @Override
-                                    public void run() {
-                                        getPromise().then(null, new IThenCallable<Object, Void>() {
-                                            @Override
-                                            public Void apply(Object reason) throws Exception {
-                                                // FIXME So much unchecked typecasting
-                                                String stringReason = "?";
-
-                                                try {
-                                                    stringReason = (String) ((RejectReason) reason).getValue();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                done();
-
-                                                return null;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-
-                        describe("saving and abusing `resolvePromise` and `rejectPromise`", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                specify("Not implemented", new MiniMochaSpecificationRunnable() {
-                                    @Override
-                                    public void run() {
-                                        // FIXME Implement
-                                        throw new Error("Not implemented");
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-
-                describe("2.3.3.3.4: If calling `then` throws an exception `e`,", new MiniMochaRunnableNode() {
-                    @Override
-                    public void run() {
-                        describe("2.3.3.3.4.1: If `resolvePromise` or `rejectPromise` have been called, ignore it.", new MiniMochaRunnableNode() {
-                            @Override
-                            public void run() {
-                                describe("`resolvePromise` was called with a non-thenable", new MiniMochaRunnableNode() {
+                                describe("calling `resolvePromise` then `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
                                     @Override
                                     public void run() {
                                         ThenableFactory<String> xFactory = new ThenableFactory<String>() {
@@ -1374,208 +443,7 @@ public class Test233 extends MiniMochaDescription {
                                                     }
 
                                                     @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                        try {
-                                                            onFulfilled.apply(DUMMY);
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        throw new Error(OTHER);
-                                                    }
-                                                };
-                                            }
-                                        };
-
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
-                                                    @Override
-                                                    public Void apply(String value) throws Exception {
-                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                        done();
-
-                                                        return null;
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                                describe("`resolvePromise` was called with an asynchronously-fulfilled promise", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable create() {
-                                                return new IThenable() {
-                                                    @Override
-                                                    public IThenable then(IThenCallable onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                        final AbstractIOU<Object> d = deferred();
-                                                        delayedCall(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                d.resolve(DUMMY);
-                                                            }
-                                                        }, 50);
-
-                                                        try {
-                                                            onFulfilled.apply(d.getPromise());
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        throw new Error(OTHER);
-                                                    }
-                                                };
-                                            }
-                                        };
-
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
-                                                    @Override
-                                                    public Void apply(String value) throws Exception {
-                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                        done();
-
-                                                        return null;
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                                describe("`resolvePromise` was called with an asynchronously-rejected promise", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable create() {
-                                                return new IThenable() {
-                                                    @Override
-                                                    public IThenable then(IThenCallable onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                        final AbstractIOU<Object> d = deferred();
-                                                        delayedCall(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                d.reject(DUMMY);
-                                                            }
-                                                        }, 50);
-
-                                                        try {
-                                                            onFulfilled.apply(d.getPromise());
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        throw new Error(OTHER);
-                                                    }
-                                                };
-                                            }
-                                        };
-
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
-                                                    @Override
-                                                    public Void apply(Object reason) throws Exception {
-                                                        assertEquals("Value should equal DUMMY", DUMMY, reason);
-                                                        done();
-
-                                                        return null;
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                                describe("`rejectPromise` was called", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable create() {
-                                                return new IThenable() {
-                                                    @Override
-                                                    public IThenable then(IThenCallable onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
-                                                        try {
-                                                            onRejected.apply(DUMMY);
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        throw new Error(OTHER);
-                                                    }
-                                                };
-                                            }
-                                        };
-
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
-                                                    @Override
-                                                    public Void apply(Object reason) throws Exception {
-                                                        // FIXME So much unchecked typecasting
-                                                        String stringReason = "?";
-
-                                                        try {
-                                                            stringReason = (String) ((RejectReason) reason).getValue();
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                        done();
-
-                                                        return null;
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                                describe("`resolvePromise` then `rejectPromise` were called", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable create() {
-                                                return new IThenable() {
-                                                    @Override
-                                                    public IThenable then(IThenCallable onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled, IThenCallable<Object, TAnythingOutput> onRejected) {
                                                         try {
                                                             onFulfilled.apply(DUMMY);
                                                             onRejected.apply(OTHER);
@@ -1583,7 +451,7 @@ public class Test233 extends MiniMochaDescription {
                                                             e.printStackTrace();
                                                         }
 
-                                                        throw new Error(OTHER);
+                                                        return null;
                                                     }
                                                 };
                                             }
@@ -1591,28 +459,154 @@ public class Test233 extends MiniMochaDescription {
 
                                         testPromiseResolution(xFactory, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
                                                     @Override
                                                     public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         assertEquals("Value should equal DUMMY", DUMMY, value);
-                                                        done();
+                                                        parameters.done();
 
                                                         return null;
                                                     }
                                                 });
                                             }
                                         });
-
                                     }
                                 });
 
-                                describe("`rejectPromise` then `resolvePromise` were called", new MiniMochaRunnableNode() {
+                                describe("calling `resolvePromise` synchronously then `rejectPromise` asynchronously", new MiniMochaRunnableNode() {
                                     @Override
                                     public void run() {
                                         ThenableFactory<String> xFactory = new ThenableFactory<String>() {
                                             @Override
-                                            IThenable create() {
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onFulfilled.apply(DUMMY);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onRejected.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` then `rejectPromise`, both asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        delayedCall(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                try {
+                                                                    onFulfilled.apply(DUMMY);
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        }, 0);
+
+                                                        delayedCall(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                try {
+                                                                    allowMainThreadToFinish();
+                                                                    onRejected.apply(OTHER);
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        }, 0);
+
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` with an asynchronously-fulfilled promise, then calling `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                final AbstractIOU<Object> d = deferred();
+                                                delayedCall(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        d.resolve(DUMMY);
+                                                    }
+                                                }, 50);
+
                                                 return new IThenable() {
                                                     @Override
                                                     public IThenable then(IThenCallable onFulfilled) {
@@ -1622,13 +616,116 @@ public class Test233 extends MiniMochaDescription {
                                                     @Override
                                                     public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
                                                         try {
+                                                            onFulfilled.apply(d.getPromise());
+                                                            allowMainThreadToFinish();
+                                                            onRejected.apply(OTHER);
+
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+
+
+                                describe("calling `resolvePromise` with an asynchronously-rejected promise, then calling `rejectPromise`, both synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                final AbstractIOU<Object> d = deferred();
+                                                delayedCall(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        d.reject(DUMMY);
+                                                    }
+                                                }, 50);
+
+                                                return new IThenable() {
+                                                    @Override
+                                                    public IThenable then(IThenCallable onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                        try {
+                                                            onFulfilled.apply(d.getPromise());
+                                                            onRejected.apply(OTHER);
+
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `rejectPromise` then `resolvePromise`, both synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
                                                             onRejected.apply(DUMMY);
                                                             onFulfilled.apply(OTHER);
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
                                                         }
 
-                                                        throw new Error(OTHER);
+                                                        return null;
                                                     }
                                                 };
                                             }
@@ -1636,185 +733,1137 @@ public class Test233 extends MiniMochaDescription {
 
                                         testPromiseResolution(xFactory, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
                                                     @Override
                                                     public Void apply(Object reason) throws Exception {
-                                                        assertEquals("Value should equal DUMMY", DUMMY, reason);
-                                                        done();
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String) reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
 
                                                         return null;
                                                     }
                                                 });
                                             }
                                         });
+                                    }
+                                });
 
+                                describe("calling `rejectPromise` synchronously then `resolvePromise` asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onRejected.apply(DUMMY);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onFulfilled.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String)reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+
+                                describe("calling `rejectPromise` then `resolvePromise`, both asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onRejected.apply(DUMMY);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        allowMainThreadToFinish();
+                                                                        onFulfilled.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String)reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` twice synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onFulfilled.apply(DUMMY);
+                                                            onFulfilled.apply(OTHER);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` twice, first synchronously then asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onFulfilled.apply(DUMMY);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        allowMainThreadToFinish();
+                                                                        onFulfilled.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` twice, both times asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onFulfilled.apply(DUMMY);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        allowMainThreadToFinish();
+                                                                        onFulfilled.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` with an asynchronously-fulfilled promise, then calling it again, both times synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable() {
+                                                    @Override
+                                                    public IThenable then(IThenCallable onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                        try {
+                                                            final AbstractIOU<Object> d = deferred();
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    d.resolve(DUMMY);
+                                                                }
+                                                            }, 50);
+
+                                                            onFulfilled.apply(d.getPromise());
+                                                            onFulfilled.apply(OTHER);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                    @Override
+                                                    public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `resolvePromise` with an asynchronously-rejected promise, then calling it again, both times synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable() {
+                                                    @Override
+                                                    public IThenable then(IThenCallable onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                        try {
+                                                            final AbstractIOU<Object> d = deferred();
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    d.reject(DUMMY);
+                                                                }
+                                                            }, 50);
+
+                                                            onFulfilled.apply(d.getPromise());
+                                                            onFulfilled.apply(OTHER);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        assertEquals("Value should equal DUMMY", DUMMY, reason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `rejectPromise` twice synchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onRejected.apply(DUMMY);
+                                                            onRejected.apply(OTHER);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String)reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+
+                                describe("calling `rejectPromise` twice, first synchronously then asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            onRejected.apply(DUMMY);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onRejected.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String)reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("calling `rejectPromise` twice, both times asynchronously", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                            @Override
+                                            IThenable<String> create() {
+                                                return new IThenable<String>() {
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                        return then(onFulfilled, null);
+                                                    }
+
+                                                    @Override
+                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                        try {
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    try {
+                                                                        onRejected.apply(DUMMY);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+
+                                                            delayedCall(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    allowMainThreadToFinish();
+                                                                    try {
+                                                                        onRejected.apply(OTHER);
+                                                                    } catch (Exception e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+                                                            }, 0);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        return null;
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                            @Override
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                    @Override
+                                                    public Void apply(Object reason) throws Exception {
+                                                        allowMainThreadToFinish();
+                                                        // FIXME So much unchecked typecasting
+                                                        String stringReason = "?";
+
+                                                        try {
+                                                            stringReason = (String)reason;
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+
+                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                        parameters.done();
+
+                                                        return null;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("saving and abusing `resolvePromise` and `rejectPromise`", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        specify("Not implemented", new MiniMochaSpecificationRunnable() {
+                                            @Override
+                                            public void run() {
+                                                delayedDone(0);
+                                                // FIXME Implement
+                                                //throw new Error("Not implemented");
+                                            }
+                                        });
                                     }
                                 });
                             }
                         });
 
-                        describe("2.3.3.3.4.2: Otherwise, reject `promise` with `e` as the reason.", new MiniMochaRunnableNode() {
+                        describe("2.3.3.3.4: If calling `then` throws an exception `e`,", new MiniMochaRunnableNode() {
                             @Override
                             public void run() {
-                                describe("straightforward case", new MiniMochaRunnableNode() {
+                                describe("2.3.3.3.4.1: If `resolvePromise` or `rejectPromise` have been called, ignore it.", new MiniMochaRunnableNode() {
                                     @Override
                                     public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable<String> create() {
-                                                return new IThenable<String>() {
-                                                    @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                        throw new Error(DUMMY);
-                                                    }
-                                                };
-                                            }
-                                        };
-
-                                        testPromiseResolution(xFactory, new Testable<String>() {
+                                        describe("`resolvePromise` was called with a non-thenable", new MiniMochaRunnableNode() {
                                             @Override
                                             public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
                                                     @Override
-                                                    public Void apply(Object reason) throws Exception {
-                                                        // FIXME So much unchecked typecasting
-                                                        String stringReason = "?";
-
-                                                        try {
-                                                            stringReason = ((Error)((RejectReason) reason).getValue()).getMessage();
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                        done();
-
-                                                        return null;
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                                describe("`resolvePromise` is called asynchronously before the `throw`", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
-                                            @Override
-                                            IThenable<String> create() {
-                                                return new IThenable<String>() {
-                                                    @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                        delayedCall(new Runnable() {
+                                                    IThenable<String> create() {
+                                                        return new IThenable<String>() {
                                                             @Override
-                                                            public void run() {
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
                                                                 try {
-                                                                    onFulfilled.apply(OTHER);
+                                                                    onFulfilled.apply(DUMMY);
                                                                 } catch (Exception e) {
                                                                     e.printStackTrace();
                                                                 }
+
+                                                                allowMainThreadToFinish();
+                                                                throw new Error(OTHER);
                                                             }
-                                                        }, 0);
-                                                        throw new Error(DUMMY);
+                                                        };
                                                     }
                                                 };
-                                            }
-                                        };
 
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                testPromiseResolution(xFactory, new Testable<String>() {
                                                     @Override
-                                                    public Void apply(Object reason) throws Exception {
-                                                        // FIXME So much unchecked typecasting
-                                                        String stringReason = "?";
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                            @Override
+                                                            public Void apply(String value) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                                parameters.done();
 
-                                                        try {
-                                                            stringReason = ((Error)((RejectReason) reason).getValue()).getMessage();
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                        done();
-
-                                                        return null;
+                                                                return null;
+                                                            }
+                                                        });
                                                     }
                                                 });
+
                                             }
                                         });
 
-                                    }
-                                });
-
-                                describe("`rejectPromise` is called asynchronously before the `throw`", new MiniMochaRunnableNode() {
-                                    @Override
-                                    public void run() {
-                                        ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                        describe("`resolvePromise` was called with an asynchronously-fulfilled promise", new MiniMochaRunnableNode() {
                                             @Override
-                                            IThenable<String> create() {
-                                                return new IThenable<String>() {
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
                                                     @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
-                                                        return then(onFulfilled, null);
-                                                    }
-
-                                                    @Override
-                                                    public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
-                                                        delayedCall(new Runnable() {
+                                                    IThenable create() {
+                                                        return new IThenable() {
                                                             @Override
-                                                            public void run() {
+                                                            public IThenable then(IThenCallable onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                                final AbstractIOU<Object> d = deferred();
+                                                                delayedCall(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        d.resolve(DUMMY);
+                                                                    }
+                                                                }, 50);
+
                                                                 try {
+                                                                    onFulfilled.apply(d.getPromise());
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                throw new Error(OTHER);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                            @Override
+                                                            public Void apply(String value) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                        describe("`resolvePromise` was called with an asynchronously-rejected promise", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable create() {
+                                                        return new IThenable() {
+                                                            @Override
+                                                            public IThenable then(IThenCallable onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                                final AbstractIOU<Object> d = deferred();
+                                                                delayedCall(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        d.reject(DUMMY);
+                                                                    }
+                                                                }, 50);
+
+                                                                try {
+                                                                    onFulfilled.apply(d.getPromise());
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                throw new Error(OTHER);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                assertEquals("Value should equal DUMMY", DUMMY, reason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                        describe("`rejectPromise` was called", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable create() {
+                                                        return new IThenable() {
+                                                            @Override
+                                                            public IThenable then(IThenCallable onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                                try {
+                                                                    onRejected.apply(DUMMY);
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                throw new Error(OTHER);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                // FIXME So much unchecked typecasting
+                                                                String stringReason = "?";
+
+                                                                try {
+                                                                    stringReason = (String)reason;
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                        describe("`resolvePromise` then `rejectPromise` were called", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable create() {
+                                                        return new IThenable() {
+                                                            @Override
+                                                            public IThenable then(IThenCallable onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                                try {
+                                                                    onFulfilled.apply(DUMMY);
                                                                     onRejected.apply(OTHER);
                                                                 } catch (Exception e) {
                                                                     e.printStackTrace();
                                                                 }
+
+                                                                throw new Error(OTHER);
                                                             }
-                                                        }, 0);
-                                                        throw new Error(DUMMY);
+                                                        };
                                                     }
                                                 };
-                                            }
-                                        };
 
-                                        testPromiseResolution(xFactory, new Testable<String>() {
-                                            @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                testPromiseResolution(xFactory, new Testable<String>() {
                                                     @Override
-                                                    public Void apply(Object reason) throws Exception {
-                                                        // FIXME So much unchecked typecasting
-                                                        String stringReason = "?";
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(new IThenCallable<String, Void>() {
+                                                            @Override
+                                                            public Void apply(String value) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                assertEquals("Value should equal DUMMY", DUMMY, value);
+                                                                parameters.done();
 
-                                                        try {
-                                                            stringReason = ((Error)((RejectReason) reason).getValue()).getMessage();
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        assertEquals("Value should equal DUMMY", DUMMY, stringReason);
-                                                        done();
-
-                                                        return null;
+                                                                return null;
+                                                            }
+                                                        });
                                                     }
                                                 });
+
                                             }
                                         });
 
+                                        describe("`rejectPromise` then `resolvePromise` were called", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable create() {
+                                                        return new IThenable() {
+                                                            @Override
+                                                            public IThenable then(IThenCallable onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public IThenable then(final IThenCallable onFulfilled, final IThenCallable onRejected) {
+                                                                try {
+                                                                    onRejected.apply(DUMMY);
+                                                                    onFulfilled.apply(OTHER);
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                throw new Error(OTHER);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                // FIXME So much unchecked typecasting
+                                                                String stringReason = "?";
+
+                                                                try {
+                                                                    stringReason = (String)reason;
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                    }
+                                });
+
+                                describe("2.3.3.3.4.2: Otherwise, reject `promise` with `e` as the reason.", new MiniMochaRunnableNode() {
+                                    @Override
+                                    public void run() {
+                                        describe("straightforward case", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable<String> create() {
+                                                        return new IThenable<String>() {
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                                throw new Error(DUMMY);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                // FIXME So much unchecked typecasting
+                                                                String stringReason = "?";
+
+                                                                try {
+                                                                    stringReason = ((Error)reason).getMessage();
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                        describe("`resolvePromise` is called asynchronously before the `throw`", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable<String> create() {
+                                                        return new IThenable<String>() {
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                                delayedCall(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        try {
+                                                                            allowMainThreadToFinish();
+                                                                            onFulfilled.apply(OTHER);
+                                                                        } catch (Exception e) {
+                                                                            e.printStackTrace();
+                                                                        }
+                                                                    }
+                                                                }, 0);
+                                                                throw new Error(DUMMY);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                // FIXME So much unchecked typecasting
+                                                                String stringReason = "?";
+
+                                                                try {
+                                                                    stringReason = ((Error)reason).getMessage();
+                                                                } catch (Exception e) {
+
+                                                                }
+
+                                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
+
+                                        describe("`rejectPromise` is called asynchronously before the `throw`", new MiniMochaRunnableNode() {
+                                            @Override
+                                            public void run() {
+                                                ThenableFactory<String> xFactory = new ThenableFactory<String>() {
+                                                    @Override
+                                                    IThenable<String> create() {
+                                                        return new IThenable<String>() {
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(IThenCallable<String, TAnythingOutput> onFulfilled) {
+                                                                return then(onFulfilled, null);
+                                                            }
+
+                                                            @Override
+                                                            public <TAnythingOutput> IThenable<TAnythingOutput> then(final IThenCallable<String, TAnythingOutput> onFulfilled, final IThenCallable<Object, TAnythingOutput> onRejected) {
+                                                                delayedCall(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        try {
+                                                                            allowMainThreadToFinish();
+                                                                            onRejected.apply(OTHER);
+                                                                        } catch (Exception e) {
+                                                                            e.printStackTrace();
+                                                                        }
+                                                                    }
+                                                                }, 0);
+                                                                throw new Error(DUMMY);
+                                                            }
+                                                        };
+                                                    }
+                                                };
+
+                                                testPromiseResolution(xFactory, new Testable<String>() {
+                                                    @Override
+                                                    public void run(final TestableParameters parameters) {
+                                                        parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
+                                                            @Override
+                                                            public Void apply(Object reason) throws Exception {
+                                                                allowMainThreadToFinish();
+                                                                // FIXME So much unchecked typecasting
+                                                                String stringReason = "?";
+
+                                                                try {
+                                                                    stringReason = ((Error)reason).getMessage();
+                                                                } catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                                }
+
+                                                                assertEquals("Value should equal DUMMY", DUMMY, stringReason);
+                                                                parameters.done();
+
+                                                                return null;
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                            }
+                                        });
                                     }
                                 });
                             }
@@ -1822,8 +1871,14 @@ public class Test233 extends MiniMochaDescription {
                     }
                 });
 
-                handleNonSensicalTest("2.3.3.4: If `then` is not a function, fulfill promise with `x`");
+                describe("2.3.3.4: If `then` is not a function, fulfill promise with `x`", new MiniMochaRunnableNode() {
+                    @Override
+                    public void run() {
+                        handleNonSensicalTest("Not implemented");
+                    }
+                });
             }
+
         });
     }
 }

@@ -1,13 +1,12 @@
 package nl.brusque.iou.minimocha;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 class MiniMochaNode {
 
     private String _name;
 
-    public final String getName() {
+    final String getName() {
         return _name;
     }
 
@@ -15,24 +14,20 @@ class MiniMochaNode {
         _name = sanitizeDescriptionName(name);
     }
 
-    private final ExecutorService _delayedCallExecutor = Executors.newSingleThreadExecutor();
+    final ScheduledExecutorService _executor = Executors.newSingleThreadScheduledExecutor();
 
+    public final void allowMainThreadToFinish() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     public final void delayedCall(final Runnable runnable, final long milliseconds) {
-        _delayedCallExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(milliseconds);
-
-                    runnable.run();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        _executor.schedule(runnable, milliseconds, TimeUnit.MILLISECONDS);
     }
 
-    public static String sanitizeDescriptionName(String name) {
+    private static String sanitizeDescriptionName(String name) {
         return name
                 .replaceAll("[^a-zA-Z0-9_:,`\\-\\)\\( ]+", "_")
                 .replaceAll("\\(", "[")

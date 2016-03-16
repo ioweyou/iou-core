@@ -31,8 +31,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testFulfilled(sentinel, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -42,7 +43,7 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(handler1, spy);
                                             promise.then(handler2, spy);
                                             promise.then(handler3, spy);
@@ -58,7 +59,7 @@ public class Test226 extends MiniMochaDescription {
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
 
-                                                        done();
+                                                        parameters.done();
                                                     } catch (Exception e) {
                                                         throw new AssertionError(e);
                                                     }
@@ -79,8 +80,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testFulfilled(sentinel, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -90,7 +92,7 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenThrow(new Exception());
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(handler1, spy);
                                             promise.then(handler2, spy);
                                             promise.then(handler3, spy);
@@ -106,7 +108,7 @@ public class Test226 extends MiniMochaDescription {
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
 
-                                                        done();
+                                                        parameters.done();
                                                     } catch (Exception e) {
                                                         throw new AssertionError(e);
                                                     }
@@ -127,9 +129,10 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testFulfilled(dummy, new Testable<String>() {
                                     @Override
-                                    public void run() {
-                                        AbstractPromise<String> promise = getPromise();
-                                        final CallbackAggregator semiDone = new CallbackAggregator(3, this);
+                                    public void run(final TestableParameters parameters) {
+                                        allowMainThreadToFinish();
+                                        AbstractPromise<String> promise = parameters.getPromise();
+                                        final CallbackAggregator semiDone = new CallbackAggregator(3, parameters);
 
                                         promise
                                             .then(new TestThenCallable<String, String>() {
@@ -192,8 +195,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testFulfilled(dummy, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -203,12 +207,10 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(handler1);
                                             promise.then(handler2);
                                             promise.then(handler3);
-
-
 
                                             promise.then(new TestThenCallable<Object, String>() {
                                                 @Override
@@ -216,7 +218,7 @@ public class Test226 extends MiniMochaDescription {
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
-                                                    done();
+                                                    parameters.done();
                                                     return null;
                                                 }
                                             });
@@ -231,8 +233,9 @@ public class Test226 extends MiniMochaDescription {
                                 public void run() {
                                     testFulfilled(dummy, new Testable<Object>() {
                                         @Override
-                                        public void run() {
+                                        public void run(final TestableParameters parameters) {
                                             try {
+                                                allowMainThreadToFinish();
                                                 final IThenCallable<Object, String> handler1 = fulfillableStub();
                                                 final IThenCallable<Object, String> handler2 = fulfillableStub();
                                                 final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -242,10 +245,11 @@ public class Test226 extends MiniMochaDescription {
                                                 when(handler2.apply(any(Object.class))).thenReturn(null);
                                                 when(handler3.apply(any(Object.class))).thenReturn(null);
 
-                                                final AbstractPromise<Object> promise = getPromise();
+                                                final AbstractPromise<Object> promise = parameters.getPromise();
                                                 promise.then(new TestThenCallable<Object, String>() {
                                                     @Override
                                                     public String apply(Object o) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         handler1.apply(o);
 
                                                         promise.then(handler3);
@@ -267,7 +271,7 @@ public class Test226 extends MiniMochaDescription {
                                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                                     inOrder.verify(handler3).apply(any(Object.class));
 
-                                                                    done();
+                                                                    parameters.done();
                                                                 } catch (Exception e) {
                                                                     throw new AssertionError(e);
                                                                 }
@@ -297,8 +301,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testRejected(sentinel, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -308,7 +313,7 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(spy, handler1);
                                             promise.then(spy, handler2);
                                             promise.then(spy, handler3);
@@ -319,12 +324,13 @@ public class Test226 extends MiniMochaDescription {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
+                                                        allowMainThreadToFinish();
                                                         verify(handler1, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler2, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
 
-                                                        done();
+                                                        parameters.done();
                                                     } catch (Exception e) {
                                                         throw new AssertionError(e);
                                                     }
@@ -345,8 +351,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testRejected(sentinel, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -356,7 +363,7 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenThrow(new Exception());
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(spy, handler1);
                                             promise.then(spy, handler2);
                                             promise.then(spy, handler3);
@@ -367,12 +374,13 @@ public class Test226 extends MiniMochaDescription {
                                                     Assert.assertEquals("Value should equal sentinel", sentinel, o);
 
                                                     try {
+                                                        allowMainThreadToFinish();
                                                         verify(handler1, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler2, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(handler3, times(1)).apply(Matchers.eq(sentinel));
                                                         verify(spy, never()).apply(any(Object.class));
 
-                                                        done();
+                                                        parameters.done();
                                                     } catch (Exception e) {
                                                         throw new AssertionError(e);
                                                     }
@@ -393,10 +401,11 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testRejected(dummy, new Testable<String>() {
                                     @Override
-                                    public void run() {
-                                        AbstractPromise<String> promise = getPromise();
-                                        final CallbackAggregator semiDone = new CallbackAggregator(3, this);
+                                    public void run(final TestableParameters parameters) {
+                                        AbstractPromise<String> promise = parameters.getPromise();
+                                        final CallbackAggregator semiDone = new CallbackAggregator(3, parameters);
 
+                                        allowMainThreadToFinish();
                                         promise
                                                 .then(null, new TestThenCallable<Object, String>() {
                                                     @Override
@@ -458,8 +467,9 @@ public class Test226 extends MiniMochaDescription {
                             public void run() {
                                 testRejected(dummy, new Testable<Object>() {
                                     @Override
-                                    public void run() {
+                                    public void run(final TestableParameters parameters) {
                                         try {
+                                            allowMainThreadToFinish();
                                             final IThenCallable<Object, String> handler1 = fulfillableStub();
                                             final IThenCallable<Object, String> handler2 = fulfillableStub();
                                             final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -469,7 +479,7 @@ public class Test226 extends MiniMochaDescription {
                                             when(handler2.apply(any(Object.class))).thenReturn(other);
                                             when(handler3.apply(any(Object.class))).thenReturn(other);
 
-                                            AbstractPromise<Object> promise = getPromise();
+                                            AbstractPromise<Object> promise = parameters.getPromise();
                                             promise.then(null, handler1);
                                             promise.then(null, handler2);
                                             promise.then(null, handler3);
@@ -477,10 +487,11 @@ public class Test226 extends MiniMochaDescription {
                                             promise.then(null, new TestThenCallable<Object, String>() {
                                                 @Override
                                                 public String apply(Object o) throws Exception {
+                                                    allowMainThreadToFinish();
                                                     inOrder.verify(handler1).apply(any(Object.class));
                                                     inOrder.verify(handler2).apply(any(Object.class));
                                                     inOrder.verify(handler3).apply(any(Object.class));
-                                                    done();
+                                                    parameters.done();
                                                     return null;
                                                 }
                                             });
@@ -495,8 +506,9 @@ public class Test226 extends MiniMochaDescription {
                                     public void run() {
                                         testRejected(dummy, new Testable<Object>() {
                                             @Override
-                                            public void run() {
+                                            public void run(final TestableParameters parameters) {
                                                 try {
+                                                    allowMainThreadToFinish();
                                                     final IThenCallable<Object, String> handler1 = fulfillableStub();
                                                     final IThenCallable<Object, String> handler2 = fulfillableStub();
                                                     final IThenCallable<Object, String> handler3 = fulfillableStub();
@@ -506,10 +518,11 @@ public class Test226 extends MiniMochaDescription {
                                                     when(handler2.apply(any(Object.class))).thenReturn(null);
                                                     when(handler3.apply(any(Object.class))).thenReturn(null);
 
-                                                    final AbstractPromise<Object> promise = getPromise();
+                                                    final AbstractPromise<Object> promise = parameters.getPromise();
                                                     promise.then(null, new TestThenCallable<Object, String>() {
                                                         @Override
                                                         public String apply(Object o) throws Exception {
+                                                            allowMainThreadToFinish();
                                                             handler1.apply(o);
 
                                                             promise.then(null, handler3);
@@ -527,11 +540,12 @@ public class Test226 extends MiniMochaDescription {
                                                                 @Override
                                                                 public void run() {
                                                                     try {
+                                                                        allowMainThreadToFinish();
                                                                         inOrder.verify(handler1).apply(any(Object.class));
                                                                         inOrder.verify(handler2).apply(any(Object.class));
                                                                         inOrder.verify(handler3).apply(any(Object.class));
 
-                                                                        done();
+                                                                        parameters.done();
                                                                     } catch (Exception e) {
                                                                         throw new AssertionError(e);
                                                                     }

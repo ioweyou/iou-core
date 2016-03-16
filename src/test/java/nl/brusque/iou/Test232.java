@@ -26,16 +26,17 @@ public class Test232 extends MiniMochaDescription {
                             @Override
                             AbstractPromise<String> create() {
                                 AbstractIOU<String> d = deferred();
-
+                                allowMainThreadToFinish();
                                 return d.getPromise();
                             }
                         }, new Testable<String>() {
                             @Override
-                            public void run() {
+                            public void run(final TestableParameters parameters) {
                                 final boolean[] wasFulfilled = {false};
                                 final boolean[] wasRejected = {false};
 
-                                getPromise().then(new IThenCallable<String, Void>() {
+                                allowMainThreadToFinish();
+                                parameters.getPromise().then(new IThenCallable<String, Void>() {
                                     @Override
                                     public Void apply(String o) throws Exception {
                                         wasFulfilled[0] = true;
@@ -54,10 +55,11 @@ public class Test232 extends MiniMochaDescription {
                                 delayedCall(new Runnable() {
                                     @Override
                                     public void run() {
+                                        allowMainThreadToFinish();
                                         assertEquals("Expected wasFulfilled to be false", false, wasFulfilled[0]);
                                         assertEquals("Expected wasRejected to be false", false, wasRejected[0]);
 
-                                        done();
+                                        parameters.done();
                                     }
                                 }, 100);
                             }
@@ -79,14 +81,15 @@ public class Test232 extends MiniMochaDescription {
                                             }
                                         }, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                AbstractPromise<String> testPromise = getPromise();
+                                            public void run(final TestableParameters parameters) {
+                                                AbstractPromise<String> testPromise = parameters.getPromise();
 
                                                 testPromise.then(new IThenCallable<String, Void>() {
                                                     @Override
                                                     public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         assertEquals(sentinel, value);
-                                                        done();
+                                                        parameters.done();
 
                                                         return null;
                                                     }
@@ -115,12 +118,13 @@ public class Test232 extends MiniMochaDescription {
                                             }
                                         }, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                getPromise().then(new IThenCallable<String, Void>() {
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(new IThenCallable<String, Void>() {
                                                     @Override
                                                     public Void apply(String value) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         assertEquals(sentinel, value);
-                                                        done();
+                                                        parameters.done();
 
                                                         return null;
                                                     }
@@ -148,12 +152,13 @@ public class Test232 extends MiniMochaDescription {
                                             }
                                         }, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
                                                     @Override
                                                     public Void apply(Object value) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         assertEquals(sentinel, value);
-                                                        done();
+                                                        parameters.done();
 
                                                         return null;
                                                     }
@@ -182,12 +187,13 @@ public class Test232 extends MiniMochaDescription {
                                             }
                                         }, new Testable<String>() {
                                             @Override
-                                            public void run() {
-                                                getPromise().then(null, new IThenCallable<Object, Void>() {
+                                            public void run(final TestableParameters parameters) {
+                                                parameters.getPromise().then(null, new IThenCallable<Object, Void>() {
                                                     @Override
                                                     public Void apply(Object value) throws Exception {
+                                                        allowMainThreadToFinish();
                                                         assertEquals(sentinel, value);
-                                                        done();
+                                                        parameters.done();
 
                                                         return null;
                                                     }

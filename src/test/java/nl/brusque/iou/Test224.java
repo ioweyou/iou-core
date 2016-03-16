@@ -22,14 +22,15 @@ public class Test224 extends MiniMochaDescription {
                         final boolean[] thenHasReturned = {false};
                         testFulfilled(dummy, new Testable<String>() {
                             @Override
-                            public void run() {
-                                AbstractPromise<String> promise = getPromise();
+                            public void run(final TestableParameters parameters) {
+                                AbstractPromise<String> promise = parameters.getPromise();
 
                                 promise.then(new TestThenCallable<String, Void>() {
                                     @Override
                                     public Void apply(String o) throws Exception {
+                                        allowMainThreadToFinish();
                                         Assert.assertEquals(thenHasReturned[0], true);
-                                        done();
+                                        parameters.done();
 
                                         return null;
                                     }
@@ -41,16 +42,19 @@ public class Test224 extends MiniMochaDescription {
 
                         testRejected(dummy, new Testable<String>() {
                             @Override
-                            public void run() {
+                            public void run(final TestableParameters parameters) {
                                 thenHasReturned[0] = false;
 
-                                AbstractPromise<String> promise = getPromise();
+                                AbstractPromise<String> promise = parameters.getPromise();
+
+                                allowMainThreadToFinish();
 
                                 promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
                                     public Void apply(Object o) throws Exception {
+                                        allowMainThreadToFinish();
                                         Assert.assertEquals(thenHasReturned[0], true);
-                                        done();
+                                        parameters.done();
 
                                         return null;
                                     }
@@ -62,6 +66,11 @@ public class Test224 extends MiniMochaDescription {
                     }
                 });
 
+                // FIXME Consider ditching this test-case, because is not really fair or useful: its goal is to test
+                // FIXME that `then` is always executed asynchronously, to prevent us from introducing Zalgo, but the
+                // FIXME A+ tests make it seem like the execution stack needs to be empty, which in reality is only the
+                // FIXME tool the A+ tests use to ensure asynchronicity. Java does not work this way - it is
+                // FIXME multi-threaded and to check for a clean execution stack is nonsense.
                 describe("Clean-stack execution ordering tests (fulfillment case)", new Runnable() {
                     @Override
                     public void run() {
@@ -82,36 +91,33 @@ public class Test224 extends MiniMochaDescription {
 
                         d.resolve(dummy);
 
+                        // Non-deterministic
                         Assert.assertFalse("onFulfilled should not have been called.", onFullfilledCalled[0]);
 
-                        // FIXME Invoking on another thread here to fix synchronization
-                        // FIXME Not in original APlus-tests
-                        delayedDone(0);
+                        done();
                         }
                     });
 
                     specify("when `onFulfilled` is added immediately after the promise is fulfilled", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        AbstractIOU<String> d = deferred();
-                        final boolean[] onFullfilledCalled = {false};
+                            AbstractIOU<String> d = deferred();
+                            final boolean[] onFullfilledCalled = {false};
 
-                        d.resolve(dummy);
+                            d.resolve(dummy);
 
-                        d.getPromise().then(new TestThenCallable<String, Void>() {
-                            @Override
-                            public Void apply(String o) {
-                                onFullfilledCalled[0] = true;
+                            d.getPromise().then(new TestThenCallable<String, Void>() {
+                                @Override
+                                public Void apply(String o) {
+                                    onFullfilledCalled[0] = true;
 
-                                return null;
-                            }
-                        });
+                                    return null;
+                                }
+                            });
 
-                        Assert.assertFalse("onFulfilled should not have been called.", onFullfilledCalled[0]);
+                            Assert.assertFalse("onFulfilled should not have been called.", onFullfilledCalled[0]);
 
-                        // FIXME Invoking on another thread here to fix synchronization
-                        // FIXME Not in original APlus-tests
-                        delayedDone(0);
+                            done();
                         }
                     });
 
@@ -127,6 +133,7 @@ public class Test224 extends MiniMochaDescription {
                                 promise.then(new TestThenCallable<String, Void>() {
                                     @Override
                                     public Void apply(String o) {
+                                        allowMainThreadToFinish();
                                         Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
                                         done();
 
@@ -145,28 +152,29 @@ public class Test224 extends MiniMochaDescription {
                     specify("when `onFulfilled` is added inside an `onRejected`", new MiniMochaSpecificationRunnable() {
                         @Override
                         public void run() {
-                        final IThenable<String> promise = rejected();
-                        final AbstractPromise<String> promise2 = resolved();
-                        final boolean[] firstOnFulfilledFinished = {false};
+                            final IThenable<String> promise = rejected();
+                            final AbstractPromise<String> promise2 = resolved();
+                            final boolean[] firstOnFulfilledFinished = {false};
 
-                        promise.then(null, new TestThenCallable<Object, Void>() {
-                            @Override
-                            public Void apply(Object o) {
-                                promise2.then(new TestThenCallable<String, Void>() {
-                                    @Override
-                                    public Void apply(String o) {
-                                        Assert.assertTrue("first onRejected should have finished", firstOnFulfilledFinished[0]);
-                                        done();
+                            promise.then(null, new TestThenCallable<Object, Void>() {
+                                @Override
+                                public Void apply(Object o) {
+                                    promise2.then(new TestThenCallable<String, Void>() {
+                                        @Override
+                                        public Void apply(String s) {
+                                            allowMainThreadToFinish();
+                                            Assert.assertTrue("first onRejected should have finished", firstOnFulfilledFinished[0]);
+                                            done();
 
-                                        return null;
-                                    }
-                                });
+                                            return null;
+                                        }
+                                    });
 
-                                firstOnFulfilledFinished[0] = true;
+                                    firstOnFulfilledFinished[0] = true;
 
-                                return null;
-                            }
-                        });
+                                    return null;
+                                }
+                            });
                         }
                     });
 
@@ -179,6 +187,7 @@ public class Test224 extends MiniMochaDescription {
                         d.getPromise().then(new TestThenCallable<String, Void>() {
                             @Override
                             public Void apply(String o) {
+                                allowMainThreadToFinish();
                                 Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
                                 done();
 
@@ -211,6 +220,7 @@ public class Test224 extends MiniMochaDescription {
                         d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
+                                allowMainThreadToFinish(); // allow assert to happen before execution of onReject
                                 onRejectedCalled[0] = true;
 
                                 return null;
@@ -221,9 +231,7 @@ public class Test224 extends MiniMochaDescription {
 
                         Assert.assertFalse("onRejected should not have been called.", onRejectedCalled[0]);
 
-                        // FIXME Invoking on another thread here to fix synchronization
-                        // FIXME Not in original APlus-tests
-                        delayedDone(0);
+                        done();
                         }
                     });
 
@@ -238,6 +246,7 @@ public class Test224 extends MiniMochaDescription {
                         d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
+                                allowMainThreadToFinish(); // allow assert to happen before execution of onReject
                                 onRejectedCalled[0] = true;
 
                                 return null;
@@ -247,9 +256,7 @@ public class Test224 extends MiniMochaDescription {
 
                         Assert.assertFalse("onRejected should not have been called.", onRejectedCalled[0]);
 
-                        // FIXME Invoking on another thread here to fix synchronization
-                        // FIXME Not in original APlus-tests
-                        delayedDone(0);
+                        done();
                         }
                     });
 
@@ -266,6 +273,7 @@ public class Test224 extends MiniMochaDescription {
                                     promise2.then(null, new TestThenCallable<Object, Void>() {
                                         @Override
                                         public Void apply(Object o) {
+                                            allowMainThreadToFinish();
                                             Assert.assertTrue("first onFulfilled should have finished", firstOnFulfilledFinished[0]);
                                             done();
 
@@ -293,6 +301,7 @@ public class Test224 extends MiniMochaDescription {
                                 promise.then(null, new TestThenCallable<Object, Void>() {
                                     @Override
                                     public Void apply(Object o) {
+                                        allowMainThreadToFinish();
                                         Assert.assertTrue("first onRejected should have finished", firstOnRejectedFinished[0]);
                                         done();
 
@@ -317,6 +326,7 @@ public class Test224 extends MiniMochaDescription {
                         d.getPromise().then(null, new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
+                                allowMainThreadToFinish();
                                 Assert.assertTrue("first stack should have finished", firstStackFinished[0]);
                                 done();
 

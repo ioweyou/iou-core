@@ -21,8 +21,8 @@ public class Test234 extends MiniMochaDescription {
                     public void run() {
                         testFulfilled(dummy, new Testable<String>() {
                             @Override
-                            public void run() {
-                                IThenable<TAnything> promise2 = getPromise().then(new IThenCallable<String, TAnything>() {
+                            public void run(final TestableParameters parameters) {
+                                IThenable<TAnything> promise2 = parameters.getPromise().then(new IThenCallable<String, TAnything>() {
                                     @Override
                                     public TAnything apply(String o) throws Exception {
                                         return expectedValue;
@@ -34,7 +34,7 @@ public class Test234 extends MiniMochaDescription {
                                     @Override
                                     public Void apply(TAnything actualValue) throws Exception {
                                         assertEquals(expectedValue, actualValue);
-                                        done();
+                                        parameters.done();
 
                                         return null;
                                     }
@@ -44,8 +44,8 @@ public class Test234 extends MiniMochaDescription {
 
                         testRejected(dummy, new Testable<String>() {
                             @Override
-                            public void run() {
-                                IThenable <TAnything> promise2 = getPromise().then(null, new IThenCallable<Object, TAnything>() {
+                            public void run(final TestableParameters parameters) {
+                                IThenable <TAnything> promise2 = parameters.getPromise().then(null, new IThenCallable<Object, TAnything>() {
                                     @Override
                                     public TAnything apply(Object o) throws Exception {
                                         return expectedValue;
@@ -57,7 +57,7 @@ public class Test234 extends MiniMochaDescription {
                                     @Override
                                     public Void apply(TAnything actualValue) throws Exception {
                                         assertEquals(expectedValue, actualValue);
-                                        done();
+                                        parameters.done();
 
                                         return null;
                                     }

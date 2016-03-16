@@ -60,6 +60,10 @@ final class PromiseResolver<TFulfill> {
             x.then(new IThenCallable<TThenable, Void>() {
                 @Override
                 public Void apply(TThenable y) throws Exception {
+                    if (isRejectPromiseCalled[0] || isResolvePromiseCalled[0]) {
+                        return null;
+                    }
+
                     isResolvePromiseCalled[0] = true;
                     resolve(promise, y);
 
@@ -68,6 +72,10 @@ final class PromiseResolver<TFulfill> {
             }, new IThenCallable<Object, Void>() {
                 @Override
                 public Void apply(Object r) throws Exception {
+                    if (isRejectPromiseCalled[0] || isResolvePromiseCalled[0]) {
+                        return null;
+                    }
+
                     isRejectPromiseCalled[0] = true;
                     promise.reject(new RejectReason<>(r));
 

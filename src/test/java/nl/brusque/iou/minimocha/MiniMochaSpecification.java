@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.concurrent.*;
 
 class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneListener {
-    private final Object _synchronizer = new Object();
-
     private MiniMochaSpecificationRunnable _test;
     private Date _start;
     private Date _stop;
@@ -36,7 +34,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
     }
 
     boolean _isDoneCalled = false;
-    public final void done() {
+    public synchronized final void done() {
         _stop = new Date();
         _isDoneCalled = true;
         if (!_executor.isTerminated()) {
@@ -52,7 +50,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
         }
     }
 
-    public final synchronized void run() throws InterruptedException, ExecutionException, TimeoutException {
+    public synchronized final void run() throws InterruptedException, ExecutionException, TimeoutException {
         Thread.UncaughtExceptionHandler oldUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(createUncaughtExceptionHandler());
 
@@ -65,9 +63,7 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
             }
         }).get(1000, TimeUnit.MILLISECONDS);
 
-        synchronized (_synchronizer) {
-            _synchronizer.wait(5000);
-        }
+        wait(1000);
 
         testDone();
 

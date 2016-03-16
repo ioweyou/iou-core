@@ -15,21 +15,24 @@ public class Test213 extends MiniMochaDescription {
             @Override
             public void run() {
                 final String dummy = "DUMMY";
+
                 testRejected(dummy, new Testable<Object>() {
                     final boolean[] onRejectedCalled = {false};
 
 
                     @Override
-                    public void run() {
+                    public void run(final TestableParameters parameters) {
 
-                        AbstractPromise<Object> promise = getPromise();
+                        AbstractPromise<Object> promise = parameters.getPromise();
+
+                        allowMainThreadToFinish();
 
                         promise.then(new TestThenCallable<Object, Void>() {
                             @Override
                             public Void apply(Object o) {
                                 assertEquals("onRejected should not have been called", onRejectedCalled[0], false);
 
-                                done();
+                                parameters.done();
 
                                 return null;
                             }
@@ -42,7 +45,7 @@ public class Test213 extends MiniMochaDescription {
                             }
                         });
 
-                        delayedDone(100);
+                        parameters.delayedDone(100);
                     }
                 });
 

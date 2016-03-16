@@ -21,9 +21,9 @@ public class Test212 extends MiniMochaDescription {
 
 
                     @Override
-                    public void run() {
+                    public void run(final TestableParameters parameters) {
 
-                        AbstractPromise<Object> promise = getPromise();
+                        AbstractPromise<Object> promise = parameters.getPromise();
 
                         promise.then(new TestThenCallable<Object, Void>() {
                             @Override
@@ -37,13 +37,13 @@ public class Test212 extends MiniMochaDescription {
                             public Void apply(Object o) throws Exception {
                                 assertEquals("OnFulfilled should not have been called", onFulfilledCalled[0], false);
 
-                                done();
+                                parameters.done();
 
                                 return null;
                             }
                         });
 
-                        delayedDone(100);
+                        parameters.delayedDone(100);
                     }
                 });
 
@@ -137,6 +137,7 @@ public class Test212 extends MiniMochaDescription {
                             @Override
                             public void run() {
                                 d.resolve(dummy);
+                                allowMainThreadToFinish();
                                 d.reject(dummy);
                             }
                         }, 50);
