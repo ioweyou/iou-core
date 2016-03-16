@@ -61,9 +61,9 @@ class MiniMochaSpecification extends MiniMochaNode implements IMiniMochaDoneList
                 _test.addDoneListener(MiniMochaSpecification.this);
                 _test.run();
             }
-        }).get(1000, TimeUnit.MILLISECONDS);
+        }).get(2000, TimeUnit.MILLISECONDS);
 
-        wait(1000);
+        wait(2500);
 
         testDone();
 
