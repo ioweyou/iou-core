@@ -3,11 +3,11 @@ package nl.brusque.iou;
 final class Rejector<TFulfill> {
     private final ResolvableManager<TFulfill> _resolvableManager;
 
-    public Rejector(ResolvableManager<TFulfill> resolvableManager) {
+    Rejector(ResolvableManager<TFulfill> resolvableManager) {
         _resolvableManager = resolvableManager;
     }
 
-    public void reject(final Object reason) {
+    <TAnything> void reject(final TAnything reason) {
         _resolvableManager.process(new Function<Resolvable<TFulfill, ?>, Void>() {
             @Override
             Void apply(Resolvable<TFulfill, ?> resolvable) {

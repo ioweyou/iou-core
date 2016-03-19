@@ -1,17 +1,16 @@
 package nl.brusque.iou;
 
-final class ResolveEventListener<TFulfill> implements IEventListener<ResolveEvent<TFulfill>> {
-    private final PromiseResolver<TFulfill> _promiseResolver;
-    private final AbstractPromise<TFulfill> _promise;
+final class ResolveEventListener<TFulfill, TAnything> implements IEventListener<ResolveEvent<TFulfill, TAnything>> {
+    private final PromiseState<TFulfill> _stateManager;
 
-    public ResolveEventListener(AbstractPromise<TFulfill> promise, PromiseState<TFulfill> promiseState) {
-        _promiseResolver = new PromiseResolver<>(promiseState);
-
-        _promise = promise;
+    ResolveEventListener(PromiseState<TFulfill> stateManager) {
+        _stateManager = stateManager;
     }
 
     @Override
-    public void process(ResolveEvent<TFulfill> event) {
-        _promiseResolver.resolve(_promise, event.getValue().getValue());
+    public void process(ResolveEvent<TFulfill, TAnything> event) throws Exception {
+        PromiseResolver.resolve(
+                _stateManager,
+                event.getValue());
     }
 }

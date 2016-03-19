@@ -1,13 +1,19 @@
 package nl.brusque.iou;
 
-class DefaultEvent<TValue> {
+class DefaultEvent<TFulfill, TValue> {
     private final TValue _value;
+    private final AbstractPromise<TFulfill> _promise;
 
-    public DefaultEvent(TValue value) {
-        _value = value;
+    DefaultEvent(AbstractPromise<TFulfill> promise, TValue value) {
+        _promise = promise;
+
+        _value   = value;
     }
 
-    public final TValue getValue() {
+    final TValue getValue() {
         return _value;
+    }
+    final AbstractPromise<TFulfill> getPromise() {
+        return _promise;
     }
 }

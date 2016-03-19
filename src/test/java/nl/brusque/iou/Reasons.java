@@ -6,12 +6,12 @@ import java.util.HashMap;
 import static nl.brusque.iou.Util.rejected;
 import static nl.brusque.iou.Util.resolved;
 
-public class Reasons {
+class Reasons {
     abstract class ReasonsFactory<TReason> {
         protected abstract TReason getReason();
 
-        public RejectReason<TReason> create() {
-            return new RejectReason<>(getReason());
+        TReason create() {
+            return getReason();
         }
     }
 
@@ -84,7 +84,7 @@ public class Reasons {
         }
     };
 
-    public HashMap<String, ReasonsFactory> getReasons() {
+    HashMap<String, ReasonsFactory> getReasons() {
         return _reasons;
     }
 }

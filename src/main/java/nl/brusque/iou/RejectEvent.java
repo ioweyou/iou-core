@@ -1,8 +1,8 @@
 package nl.brusque.iou;
 
-final class RejectEvent<TInput, TAnything> extends DefaultEvent<RejectEventValue<TInput, TAnything>> {
-    public RejectEvent(RejectEventValue<TInput, TAnything> value)
+final class RejectEvent<TInput, TAnything> extends DefaultEvent<TInput, TAnything> {
+    RejectEvent(AbstractPromise<TInput> promise, TAnything value)
     {
-        super(value);
+        super(promise, value);
     }
 }

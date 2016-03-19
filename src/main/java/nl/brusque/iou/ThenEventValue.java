@@ -1,25 +1,25 @@
 package nl.brusque.iou;
 
 final class ThenEventValue<TFulfill, TOutput> {
-    private final IThenCallable<TFulfill, TOutput> onFulfilled;
-    private final IThenCallable<Object, TOutput> onRejected;
-    private final AbstractPromise nextPromise;
+    private final IThenCallable<TFulfill, TOutput> _onFulfilled;
+    private final IThenCallable<Object, TOutput> _onRejected;
+    private final AbstractPromise _nextPromise;
 
-    public ThenEventValue(IThenCallable<TFulfill, TOutput> onFulfilled, IThenCallable<Object, TOutput> onRejected, AbstractPromise nextPromise) {
-        this.onFulfilled = onFulfilled;
-        this.onRejected  = onRejected;
-        this.nextPromise = nextPromise;
+    ThenEventValue(IThenCallable<TFulfill, TOutput> onFulfilled, IThenCallable<Object, TOutput> onRejected, AbstractPromise nextPromise) {
+        _onFulfilled = onFulfilled;
+        _onRejected  = onRejected;
+        _nextPromise = nextPromise;
     }
 
-    public IThenCallable<TFulfill, TOutput> getFulfillable() {
-        return onFulfilled;
+    IThenCallable<TFulfill, TOutput> getFulfillable() {
+        return _onFulfilled;
     }
 
-    public IThenCallable<Object, TOutput> getRejectable() {
-        return onRejected;
+    IThenCallable<Object, TOutput> getRejectable() {
+        return _onRejected;
     }
 
-    public AbstractPromise getPromise() {
-        return nextPromise;
+    AbstractPromise getPromise() {
+        return _nextPromise;
     }
 }

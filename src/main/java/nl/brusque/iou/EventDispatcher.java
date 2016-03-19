@@ -13,16 +13,20 @@ final class EventDispatcher {
         @Override
         public void run() {
             while(true) {
-                processNextEvent();
+                try {
+                    processNextEvent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     });
 
-    public EventDispatcher() {
+    EventDispatcher() {
         _looper.start();
     }
 
-    public void addListener(Class<? extends DefaultEvent> eventType, IEventListener<? extends DefaultEvent> listener) {
+    void addListener(Class<? extends DefaultEvent> eventType, IEventListener<? extends DefaultEvent> listener) {
         if (!_eventListeners.containsKey(eventType)) {
             _eventListeners.put(eventType, new ArrayList<IEventListener<? extends DefaultEvent>>());
         }
@@ -30,11 +34,11 @@ final class EventDispatcher {
        _eventListeners.get(eventType).add(listener);
     }
 
-    public synchronized void queue(DefaultEvent event) {
+    synchronized void queue(DefaultEvent event) {
         _eventQueue.add(event);
 
         synchronized (_looper) {
-            _looper.notify();
+            _looper.notifyAll();
         }
     }
 
@@ -46,7 +50,7 @@ final class EventDispatcher {
         return _eventQueue.remove();
     }
 
-    private void process(DefaultEvent event) {
+    private void process(DefaultEvent event) throws Exception {
         Class<? extends DefaultEvent> clazz = event.getClass();
         if (!_eventListeners.containsKey(clazz)) {
             return;
@@ -57,7 +61,7 @@ final class EventDispatcher {
         }
     }
 
-    private void processNextEvent() {
+    private void processNextEvent() throws Exception {
         DefaultEvent event = dequeue();
         if (event != null) {
             process(event);

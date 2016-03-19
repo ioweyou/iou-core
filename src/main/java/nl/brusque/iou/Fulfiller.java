@@ -3,11 +3,11 @@ package nl.brusque.iou;
 final class Fulfiller<TFulfill> {
     private final ResolvableManager<TFulfill> _resolvableManager;
 
-    public Fulfiller(ResolvableManager<TFulfill> resolvableManager) {
+    Fulfiller(ResolvableManager<TFulfill> resolvableManager) {
         _resolvableManager = resolvableManager;
     }
 
-    public void fulfill(final TFulfill value) {
+    void fulfill(final TFulfill value) {
         _resolvableManager.process(new Function<Resolvable<TFulfill, ?>, Void>() {
             @Override
             Void apply(Resolvable<TFulfill, ?> resolvable) {

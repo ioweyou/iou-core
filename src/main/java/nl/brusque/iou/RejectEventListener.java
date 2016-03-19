@@ -1,14 +1,14 @@
 package nl.brusque.iou;
 
-final class RejectEventListener<TInput, TAnything> implements IEventListener<RejectEvent<TInput, TAnything>> {
-    private final PromiseState _promiseState;
+final class RejectEventListener<TFulfill, TAnything> implements IEventListener<RejectEvent<TFulfill, TAnything>> {
+    private final PromiseState<TFulfill> _stateManager;
 
-    public RejectEventListener(PromiseState promiseState) {
-        _promiseState = promiseState;
+    RejectEventListener(PromiseState<TFulfill> stateManager) {
+        _stateManager = stateManager;
     }
 
     @Override
-    public void process(RejectEvent<TInput, TAnything> event) {
-        _promiseState.reject(event.getValue().getValue());
+    public void process(RejectEvent<TFulfill, TAnything> event) throws Exception {
+        _stateManager.reject(event.getValue());
     }
 }

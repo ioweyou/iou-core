@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class MiniMochaSpecificationRunnable extends MiniMochaNode implements Runnable {
 
-    private List<IMiniMochaDoneListener> _doneListeners = new ArrayList<>();
+    private final List<IMiniMochaDoneListener> _doneListeners = new ArrayList<>();
 
     public final void done() {
         for (IMiniMochaDoneListener listener : _doneListeners) {

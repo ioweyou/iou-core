@@ -2,17 +2,17 @@ package nl.brusque.iou;
 
 import java.util.HashMap;
 
-public class Thenables {
+class Thenables {
     abstract class ThenablesFactory<TFulfill> {
         private TFulfill _value;
 
-        protected TFulfill getValue() {
+        TFulfill getValue() {
             return _value;
         }
 
         protected abstract IThenable<TFulfill> getThenable();
 
-        public IThenable<TFulfill> create(TFulfill value) {
+        IThenable<TFulfill> create(TFulfill value) {
             _value = value;
 
             return getThenable();

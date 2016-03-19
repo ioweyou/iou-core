@@ -7,14 +7,15 @@ public class Util {
         return new TestTypedIOU<>();
     }
 
-    public static <TInput> AbstractPromise<TInput> resolved() {
+    static <TInput> AbstractPromise<TInput> resolved() {
         return resolved(null);
     }
 
-    public static <TInput> AbstractPromise<TInput> resolved(TInput o) {
+    static <TInput> AbstractPromise<TInput> resolved(TInput o) {
         AbstractIOU<TInput> d = deferred();
 
         d.resolve(o);
+        allowMainThreadToFinish();
 
         return d.getPromise();
     }
@@ -23,22 +24,23 @@ public class Util {
         return rejected("");
     }
 
-    public static <TInput> AbstractPromise<TInput> rejected(TInput o) {
-        AbstractIOU<TInput> d = deferred();
-
-        d.reject(o);
-
-        return d.getPromise();
-    }
-
-    public static void delay(long milliseconds) {
+    private static void allowMainThreadToFinish() {
         try {
-            Thread.sleep(milliseconds);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-    public static class TestMockableCallable<TInput, TOutput> extends TestThenCallable<TInput, TOutput> {
+    public static <TInput> AbstractPromise<TInput> rejected(TInput o) {
+        AbstractIOU<TInput> d = deferred();
+
+        d.reject(o);
+        allowMainThreadToFinish();
+
+        return d.getPromise();
+    }
+
+    static class TestMockableCallable<TInput, TOutput> extends TestThenCallable<TInput, TOutput> {
 
         @Override
         public TOutput apply(TInput o) throws Exception {
@@ -46,13 +48,13 @@ public class Util {
         }
     }
 
-    public static <TInput, TOutput> IThenCallable<TInput, TOutput> fulfillableStub() {
+    static <TInput, TOutput> IThenCallable<TInput, TOutput> fulfillableStub() {
         TestMockableCallable<TInput, TOutput> callable = new TestMockableCallable<>();
 
         return spy(callable);
     }
 
-    public static <TInput, TOutput> IThenCallable<TInput, TOutput> rejectableStub() {
+    static <TInput, TOutput> IThenCallable<TInput, TOutput> rejectableStub() {
         TestMockableCallable<TInput, TOutput> callable = new TestMockableCallable<>();
 
         return spy(callable);

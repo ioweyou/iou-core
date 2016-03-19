@@ -8,42 +8,61 @@ final class PromiseState<TFulfill> {
     private final Rejector<TFulfill> _rejector;
 
     private IStateStrategy<TFulfill> _stateStrategy = new DefaultStateStrategy();
+    private StateManager _stateManager = new StateManager();
 
-    public PromiseState(Fulfiller<TFulfill> fulfiller, Rejector<TFulfill> rejector) {
+    PromiseState(Fulfiller<TFulfill> fulfiller, Rejector<TFulfill> rejector) {
         _fulfiller = fulfiller;
         _rejector  = rejector;
     }
 
-    public Object getRejectionReason() {
+    Object getRejectionReason() throws Exception {
         return _stateStrategy.getRejectionReason();
     }
 
-    public boolean isRejected() {
-        return _stateStrategy.getState() == State.REJECTED;
+    boolean isRejected() {
+        try {
+            return _stateStrategy.getState() == State.REJECTED;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    public State getState() {
-        return _stateStrategy.getState();
+    boolean isResolved() {
+        try {
+            return _stateStrategy.getState() == State.RESOLVED;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    public boolean isResolved() {
-        return _stateStrategy.getState() == State.RESOLVED;
-    }
-
-    public TFulfill getResolvedWith() {
+    TFulfill getResolvedWith() throws Exception {
         return _stateStrategy.getResolvedWith();
     }
 
-    public boolean isPending() {
-        return _stateStrategy.getState() == State.PENDING;
+    boolean isPending() {
+        try {
+            return _stateStrategy.getState() == State.PENDING;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    <TAnything> void registerPromiseState(AbstractPromise<TAnything> promise, PromiseState state) {
+        _stateManager.register(promise, state);
     }
 
     private interface IStateStrategy<TStrategyFulfill> {
-        void fulfill(TStrategyFulfill o);
-        void reject(Object reason);
-        Object getRejectionReason();
-        State getState();
-        TStrategyFulfill getResolvedWith();
+        void fulfill(TStrategyFulfill o) throws Exception;
+        <TAnything> void reject(TAnything reason) throws Exception;
+        Object getRejectionReason() throws Exception;
+        State getState() throws Exception;
+        TStrategyFulfill getResolvedWith() throws Exception;
     }
 
     private List<IFulfillerListener<TFulfill>> _fulfillerListeners = new ArrayList<>();
@@ -56,7 +75,7 @@ final class PromiseState<TFulfill> {
 
 
         @Override
-        public void fulfill(TFulfill o) {
+        public void fulfill(TFulfill o) throws Exception {
             if (_state == State.PENDING) {
                 _state = State.RESOLVED;
 
@@ -71,7 +90,7 @@ final class PromiseState<TFulfill> {
         }
 
         @Override
-        public void reject(Object reason) {
+        public <TAnything> void reject(TAnything reason) throws Exception {
             if (_state == State.PENDING) {
                 _state = State.REJECTED;
 
@@ -102,87 +121,93 @@ final class PromiseState<TFulfill> {
 
     private class AdoptedStateStrategy implements IStateStrategy<TFulfill>,  IRejectorListener, IFulfillerListener<TFulfill> {
         private final AbstractPromise<TFulfill> _adoptedPromise;
-        private final PromiseState<TFulfill> _adoptedPromiseState;
 
-        public AdoptedStateStrategy(AbstractPromise<TFulfill> adoptedStatePromise) {
+        // FIXME Trainwrecks: _adoptedPromise.get().<something>
+
+        AdoptedStateStrategy(AbstractPromise<TFulfill> adoptedStatePromise) throws Exception {
             _adoptedPromise      = adoptedStatePromise;
-            _adoptedPromiseState = _adoptedPromise.leakState();
 
-            _adoptedPromiseState.addFulfillerListener(this);
-            _adoptedPromiseState.addRejectorListener(this);
-            if (_adoptedPromiseState.isRejected()) {
-                _rejector.reject(_adoptedPromiseState.getRejectionReason());
-            } else if (_adoptedPromiseState.isResolved()) {
-                _fulfiller.fulfill(_adoptedPromiseState.getResolvedWith());
+            _stateManager.addFulfillerListener(_adoptedPromise, this);
+            _stateManager.addRejectorListener(_adoptedPromise, this);
+
+            if (_stateManager.isRejected(_adoptedPromise)) {
+                _rejector.reject(_stateManager.getRejectionReason(_adoptedPromise));
+            } else if (_stateManager.isResolved(_adoptedPromise)) {
+                _fulfiller.fulfill(_stateManager.getResolvedWith(_adoptedPromise));
             }
         }
 
         @Override
-        public void fulfill(TFulfill o) { // FIXME Narrow interface
+        public void fulfill(TFulfill o) throws Exception { // FIXME Narrow interface
             // If x is pending, promise must remain pending until x is fulfilled or rejected.
-            if (_adoptedPromiseState.isPending()) {
+            if (_stateManager.isPending(_adoptedPromise)) {
                 return;
             }
 
             // If/when x is fulfilled, fulfill promise with the same value.
-            _fulfiller.fulfill(_adoptedPromiseState.getResolvedWith());
+            _fulfiller.fulfill(_stateManager.getResolvedWith(_adoptedPromise));
         }
 
         @Override
-        public void reject(Object reason) { // FIXME Narrow interface
+        public <TAnything> void reject(TAnything reason) throws Exception { // FIXME Narrow interface
             // If x is pending, promise must remain pending until x is fulfilled or rejected.
-            if (_adoptedPromiseState.isPending()) {
+            if (_stateManager.isPending(_adoptedPromise)) {
                 return;
             }
 
             // If/when x is rejected, reject promise with the same reason.
-            _rejector.reject(_adoptedPromiseState.getRejectionReason());
+            _rejector.reject(_stateManager.getRejectionReason(_adoptedPromise));
         }
 
         @Override
-        public Object getRejectionReason() {
-            return _adoptedPromiseState.getRejectionReason();
+        public Object getRejectionReason() throws Exception {
+            return _stateManager.getRejectionReason(_adoptedPromise);
         }
 
         @Override
-        public State getState() {
-            return _adoptedPromiseState.getState();
+        public State getState() throws Exception {
+            return _stateManager.getState(_adoptedPromise);
         }
 
         @Override
-        public TFulfill getResolvedWith() {
-            return _adoptedPromiseState.getResolvedWith();
+        public TFulfill getResolvedWith() throws Exception {
+            return _stateManager.getResolvedWith(_adoptedPromise);
         }
 
         @Override
-        public void onFulfill(TFulfill o) {
-            _fulfiller.fulfill(_adoptedPromiseState.getResolvedWith());
+        public void onFulfill(TFulfill o) throws Exception {
+            _fulfiller.fulfill(_stateManager.getResolvedWith(_adoptedPromise));
         }
 
         @Override
-        public void onReject(Object value) {
-            _rejector.reject(_adoptedPromiseState.getRejectionReason());
+        public void onReject(Object value) throws Exception {
+            _rejector.reject(_stateManager.getRejectionReason(_adoptedPromise));
         }
     }
 
+    State getState() throws Exception {
+        return _stateStrategy.getState();
+    }
 
-    public void addFulfillerListener(IFulfillerListener listener) {
+    void addFulfillerListener(IFulfillerListener listener) {
         _fulfillerListeners.add(listener);
     }
 
-    public void addRejectorListener(IRejectorListener listener) {
+    void addRejectorListener(IRejectorListener listener) {
         _rejectorListeners.add(listener);
     }
 
-    public void adopt(AbstractPromise x) {
+    void adopt(AbstractPromise x) throws Exception {
+        x.shareStateWith(this);
+
         _stateStrategy = new AdoptedStateStrategy(x);
     }
 
-    public void fulfill(TFulfill o) {
+    void fulfill(TFulfill o) throws Exception {
         _stateStrategy.fulfill(o);
     }
 
-    public void reject(Object reason) {
+    <TAnything> void reject(TAnything reason) throws Exception {
         _stateStrategy.reject(reason);
     }
 }
