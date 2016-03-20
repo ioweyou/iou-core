@@ -8,6 +8,7 @@ public abstract class AbstractPromise<TFulfill> implements IThenable<TFulfill> {
         ResolvableManager<TFulfill> resolvableManager = new ResolvableManager<>();
 
         _promiseState = new PromiseState<>(
+                this,
                 new Fulfiller<>(resolvableManager),
                 new Rejector<>(resolvableManager));
 

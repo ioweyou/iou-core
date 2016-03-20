@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 
 final class PromiseResolver {
     static <TFulfill, TAnything> void resolve(PromiseState<TFulfill> promise, TAnything x) throws Exception {
-        Boolean promiseAndXReferToTheSameObject = promise == x;
+        Boolean promiseAndXReferToTheSameObject = promise.getPromise() == x;
         Boolean xIsAPromise = x instanceof AbstractPromise;
 
         if (promiseAndXReferToTheSameObject) {

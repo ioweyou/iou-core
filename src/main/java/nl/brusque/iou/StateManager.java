@@ -3,17 +3,10 @@ package nl.brusque.iou;
 import java.util.*;
 
 class StateManager {
-    //private final static WeakHashMap<AbstractPromise, PromiseState> _promiseStates = new WeakHashMap<>();
-    //private final static Map<AbstractPromise, PromiseState> _promiseStates = Collections.synchronizedMap(new WeakHashMap<AbstractPromise, PromiseState>());
     private final HashMap<AbstractPromise, PromiseState> _promiseStates = new HashMap<>();
-
 
     void register(AbstractPromise promise, PromiseState promiseState) {
         _promiseStates.put(promise, promiseState);
-    }
-
-    int getRegisteredPromiseCount() {
-        return _promiseStates.size();
     }
 
     <TFulfill> void addFulfillerListener(AbstractPromise<TFulfill> promise, IFulfillerListener<TFulfill> listener) throws Exception {
@@ -62,11 +55,6 @@ class StateManager {
     <TFulfill> State getState(AbstractPromise<TFulfill> promise) throws Exception {
         return getStateForPromise(promise)
                 .getState();
-    }
-
-    <TFulfill> void adopt(AbstractPromise<TFulfill> promise, AbstractPromise x) throws Exception {
-        getStateForPromise(promise)
-                .adopt(x);
     }
 
     <TFulfill> void fulfill(AbstractPromise<TFulfill> promise, TFulfill x) throws Exception {

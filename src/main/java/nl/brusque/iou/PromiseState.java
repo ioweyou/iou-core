@@ -6,11 +6,13 @@ import java.util.List;
 final class PromiseState<TFulfill> {
     private final Fulfiller<TFulfill>_fulfiller;
     private final Rejector<TFulfill> _rejector;
+    private final AbstractPromise<TFulfill> _promise;
 
     private IStateStrategy<TFulfill> _stateStrategy = new DefaultStateStrategy();
     private StateManager _stateManager = new StateManager();
 
-    PromiseState(Fulfiller<TFulfill> fulfiller, Rejector<TFulfill> rejector) {
+    PromiseState(AbstractPromise<TFulfill> promise, Fulfiller<TFulfill> fulfiller, Rejector<TFulfill> rejector) {
+        _promise   = promise;
         _fulfiller = fulfiller;
         _rejector  = rejector;
     }
@@ -51,6 +53,10 @@ final class PromiseState<TFulfill> {
         }
 
         return false;
+    }
+
+    AbstractPromise<TFulfill> getPromise() {
+        return _promise;
     }
 
     <TAnything> void registerPromiseState(AbstractPromise<TAnything> promise, PromiseState state) {
