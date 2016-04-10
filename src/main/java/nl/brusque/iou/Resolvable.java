@@ -5,13 +5,15 @@ final class Resolvable<TFulfill, TOutput> {
     private final AbstractPromise<TOutput> _nextPromise;
     private final IThenCallable<TFulfill, TOutput> _fulfillable;
     private final IThenCallable<Object, TOutput> _rejectable;
+    private final AbstractThenCallableStrategy<TFulfill, TOutput> _thenCaller;
 
     // FIXME Trainwrecks: _nextPromise.get().<something>
 
-    Resolvable(IThenCallable<TFulfill, TOutput> fulfillable, IThenCallable<Object, TOutput> rejectable, AbstractPromise<TOutput> nextPromise) {
+    Resolvable(IThenCallable<TFulfill, TOutput> fulfillable, IThenCallable<Object, TOutput> rejectable, AbstractPromise<TOutput> nextPromise, AbstractThenCallableStrategy<TFulfill, TOutput> thenCaller) {
         _nextPromise = nextPromise;
         _fulfillable = fulfillable;
         _rejectable  = rejectable;
+        _thenCaller  = thenCaller;
     }
 
     AbstractPromise<TOutput> getPromise() {
@@ -28,7 +30,7 @@ final class Resolvable<TFulfill, TOutput> {
         }
 
         // 2.2.7.1 If either onFulfilled or onRejected returns a value x, run the Promise Resolution Procedure [[Resolve]](promise2, x).
-        TOutput x = _fulfillable.apply(value);
+        TOutput x = _thenCaller.resolve(_fulfillable, value);
 
         _nextPromise.resolve(x);
     }
@@ -45,7 +47,7 @@ final class Resolvable<TFulfill, TOutput> {
             return;
         }
 
-        TOutput result = _rejectable.apply(reason);
+        TOutput result = _thenCaller.reject(_rejectable, reason);
 
         // FIXME Trainwrecks
         if (_nextPromise == null) {

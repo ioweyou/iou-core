@@ -3,8 +3,8 @@ package nl.brusque.iou;
 final class PromiseEventHandler<TFulfill> {
     private final EventDispatcher _eventDispatcher  = new EventDispatcher();
 
-    PromiseEventHandler(PromiseState<TFulfill> promiseState, ResolvableManager<TFulfill> resolvableManager) {
-        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(promiseState, resolvableManager));
+    PromiseEventHandler(PromiseState<TFulfill> promiseState, ResolvableManager<TFulfill> resolvableManager, AbstractThenCallableStrategy thenCaller) {
+        _eventDispatcher.addListener(ThenEvent.class, new ThenEventListener<>(promiseState, resolvableManager, thenCaller));
         _eventDispatcher.addListener(ResolveEvent.class, new ResolveEventListener<>(promiseState));
         _eventDispatcher.addListener(RejectEvent.class, new RejectEventListener<>(promiseState));
     }

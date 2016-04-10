@@ -4,7 +4,18 @@ public abstract class AbstractPromise<TFulfill> implements IThenable<TFulfill> {
     private final PromiseEventHandler<TFulfill> _promiseEventHandler;
     private final PromiseState<TFulfill> _promiseState;
 
+    private static class DefaultThenCallableStrategy extends AbstractThenCallableStrategy {
+        @Override
+        IThenCallable convert(IThenCallable thenCallable) throws Exception {
+            return thenCallable;
+        }
+    }
+
     protected AbstractPromise() {
+        this(new DefaultThenCallableStrategy());
+    }
+
+    protected AbstractPromise(AbstractThenCallableStrategy thenCaller) {
         ResolvableManager<TFulfill> resolvableManager = new ResolvableManager<>();
 
         _promiseState = new PromiseState<>(
@@ -12,7 +23,7 @@ public abstract class AbstractPromise<TFulfill> implements IThenable<TFulfill> {
                 new Fulfiller<>(resolvableManager),
                 new Rejector<>(resolvableManager));
 
-        _promiseEventHandler = new PromiseEventHandler<>(_promiseState, resolvableManager);
+        _promiseEventHandler = new PromiseEventHandler<>(_promiseState, resolvableManager, thenCaller);
     }
 
     protected abstract <TAnythingFulfill> AbstractPromise<TAnythingFulfill> create();
