@@ -1,2 +1,8 @@
 language: java
 
+cache:
+  directories:
+  - $HOME/.m2
+
+script:
+  - mvn clean cobertura:cobertura -Dcobertura.report.format=xml org.eluder.coveralls:coveralls-maven-plugin:report
