@@ -1,6 +1,9 @@
 # IOU Core
 
-IOU Core is a Java promise-library that adheres to the [A+ spec](https://github.com/promises-aplus/promises-spec) as closely as possible and is designed not to be used directly, but for extension by actual implementations.
+[![Travis CI](https://travis-ci.org/ioweyou/iou-core.svg)](https://travis-ci.org/ioweyou/iou-core)
+[![License MIT](https://img.shields.io/:license-mit-blue.svg)](http://badges.mit-license.org)
+
+Java promise-library that adheres to the [A+ spec](https://github.com/promises-aplus/promises-spec) as closely as possible. It designed to be extended by other libraries, like [IOU Java](https://github.com/ioweyou/iou-java) and [IOU Android](https://github.com/ioweyou/iou-android).
 
 #### Table Of Contents
 
@@ -167,10 +170,12 @@ iou.getPromise()
 
             return null;
         }
-    } ,new IThenCallable<Object, Void>() {
+    }, new IThenCallable<Object, Void>() {
         @Override
         public Void apply(Object reason) throws Exception {
-            System.out.println(String.format("It's not that I'm lazy, it's that %s", ((Exception)reason).getMessage()));
+            System.out.println(
+              String.format("It's not that I'm lazy, it's that %s",
+                ((Exception)reason).getMessage()));
 
             return null;
         }
