@@ -1,6 +1,7 @@
 # IOU Core
 
 [![Travis CI](https://travis-ci.org/ioweyou/iou-core.svg)](https://travis-ci.org/ioweyou/iou-core)
+[![Coverage Status](https://coveralls.io/repos/github/ioweyou/iou-core/badge.svg?branch=master)](https://coveralls.io/github/ioweyou/iou-core?branch=master)
 [![License MIT](https://img.shields.io/:license-mit-blue.svg)](http://badges.mit-license.org)
 
 Java promise-library that adheres to the [A+ spec](https://github.com/promises-aplus/promises-spec) as closely as possible. It designed to be extended by other libraries, like [IOU Java](https://github.com/ioweyou/iou-java) and [IOU Android](https://github.com/ioweyou/iou-android).
