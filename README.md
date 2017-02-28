@@ -8,7 +8,7 @@
     <img src="https://promisesaplus.com/assets/logo-small.png" alt="Promises/A+ logo"
          title="Promises/A+ 1.0 compliant" align="right" />
 </a>
-Java [Promises/A+](https://github.com/promises-aplus/promises-spec) compliant promise library. It designed to be extended by other libraries, like [IOU Java](https://github.com/ioweyou/iou-java) and [IOU Android](https://github.com/ioweyou/iou-android).
+[Promises/A+](https://github.com/promises-aplus/promises-spec) compliant library for Java. It designed to be extended by other libraries, like [IOU Java](https://github.com/ioweyou/iou-java) and [IOU Android](https://github.com/ioweyou/iou-android).
 
 #### Table Of Contents
 
